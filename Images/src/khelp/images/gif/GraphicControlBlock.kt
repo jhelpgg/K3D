@@ -24,9 +24,12 @@ internal class GraphicControlBlock : BlockExtension()
         private set
 
     /**
-     * Read stream to extract block information <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Read stream to extract block information
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param inputStream Stream to read

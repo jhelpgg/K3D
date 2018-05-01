@@ -1,7 +1,6 @@
 package khelp.k3d.render
 
 import khelp.alphabet.AlphabetBlue16x16
-import khelp.debug.debug
 import khelp.debug.information
 import khelp.debug.todo
 import khelp.images.JHelpImage
@@ -14,6 +13,7 @@ import khelp.k3d.k2d.GUI2D
 import khelp.k3d.k2d.Object2D
 import khelp.k3d.render.event.ClickInSpaceListener
 import khelp.k3d.sound.SoundManager
+import khelp.k3d.ui.TextureFrame
 import khelp.k3d.util.TEMPORARY_DOUBLE_BUFFER
 import khelp.k3d.util.TEMPORARY_FLOAT_BUFFER
 import khelp.k3d.util.TEMPORARY_INT_BUFFER
@@ -46,6 +46,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.DecimalFormat
 import java.util.Optional
+import java.util.Stack
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -103,7 +104,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
         }
 
         /**
-         * Create a window with initial specified size.<br></br>
+         * Create a window with initial specified size.
+         *
          * Window size must be at least 16x16.
          *
          * @param width     Initial width
@@ -480,6 +482,20 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
         MainPool.run(({ this.render3D() }), 128)
     }
 
+    private fun stopTextureFrame(texture: Texture?)
+    {
+        if (texture != null && (texture is TextureFrame<*>))
+        {
+            texture.stopRender()
+        }
+    }
+
+    private fun stopTextureFrame(material: Material)
+    {
+        this.stopTextureFrame(material.textureDiffuse)
+        this.stopTextureFrame(material.textureSpheric)
+    }
+
     /**
      * Will be called when the user attempts to close the specified window, for example by clicking the close widget in the title bar.
      *
@@ -494,6 +510,35 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
 
         //Closing
         GLFW.glfwSetWindowShouldClose(this.window, true)
+
+        //Stop all TextureFrames
+        val nodes = Stack<Node>()
+        nodes.push(this.currentScene.root)
+        var node: Node
+
+        while (!nodes.empty())
+        {
+            node = nodes.pop()
+            node.forEach {
+                if (it is NodeWithMaterial)
+                {
+                    val material = it.materialForSelection()
+
+                    if (material != null)
+                    {
+                        this.stopTextureFrame(material)
+                    }
+
+                    this.stopTextureFrame(it.material())
+                }
+
+                nodes.push(it)
+            }
+        }
+
+        this.gui2d.iteratorUnder3D().forEach { it.stopTextureFrame() }
+        this.gui2d.iteratorOver3D().forEach { it.stopTextureFrame() }
+
         this.animationsManager.destroy()
         this.soundManager.destroy()
         this.showing.set(false)
@@ -605,7 +650,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     }
 
     /**
-     * Convert a screen point to 3D point.<br></br>
+     * Convert a screen point to 3D point.
+     *
      * You have to specify the Z of the 3D point you want
      *
      * @param x X
@@ -720,7 +766,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
      * @param window    the window that received the event
      * @param key       the keyboard key that was pressed or released
      * @param scanCode  the system-specific scanCode of the key
-     * @param action    the key action. One of:<br></br><table><tr><td>[PRESS][GLFW.GLFW_PRESS]</td><td>[RELEASE][GLFW.GLFW_RELEASE]</td><td>[REPEAT][GLFW.GLFW_REPEAT]</td></tr></table>
+     * @param action    the key action. One of:
+     *<table><tr><td>[PRESS][GLFW.GLFW_PRESS]</td><td>[RELEASE][GLFW.GLFW_RELEASE]</td><td>[REPEAT][GLFW.GLFW_REPEAT]</td></tr></table>
      * @param modifiers bit field describing which modifiers keys were held down
      */
     @ThreadOpenGL
@@ -817,7 +864,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
      *
      * @param window    the window that received the event
      * @param button    the mouse button that was pressed or released
-     * @param action    the button action. One of:<br></br><table><tr><td>[PRESS][GLFW.GLFW_PRESS]</td><td>[RELEASE][GLFW.GLFW_RELEASE]</td><td>[REPEAT][GLFW.GLFW_REPEAT]</td></tr></table>
+     * @param action    the button action. One of:
+     *<table><tr><td>[PRESS][GLFW.GLFW_PRESS]</td><td>[RELEASE][GLFW.GLFW_RELEASE]</td><td>[REPEAT][GLFW.GLFW_REPEAT]</td></tr></table>
      * @param modifiers bit field describing which modifiers keys were held down
      */
     @ThreadOpenGL
@@ -1426,7 +1474,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     fun animationsManager() = this.animationsManager
 
     /**
-     * Close the window.<br></br>
+     * Close the window.
+     *
      * Can't be used later
      */
     fun close()
@@ -1458,7 +1507,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     fun fpsShown() = this.objectFPS.visible()
 
     /**
-     * Convert a number of frame to a time in millisecond .<br></br>
+     * Convert a number of frame to a time in millisecond .
+     *
      * Warning: The result depends on current [animationsFps][.animationsFps].
      * If [animationsFps][.animationsFps] change after the call of this method the obtained result becomes obsolete.
      *
@@ -1486,29 +1536,33 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     }
 
     /**
-     * Last detect node.<br></br>
-     * Beware it becomes often `null`.<br></br>
+     * Last detect node.
+     *
+     * Beware it becomes often `null`.
+     *
      * Prefer use listener to detected mouse on node
      *
      * @return Last detect node
      */
-    fun nodeDetect()= this.nodeDetect
+    fun nodeDetect() = this.nodeDetect
 
     /**
-     * Last detect 2D object<br></br>
-     * Beware it becomes often `null`.<br></br>
+     * Last detect 2D object
+     *
+     * Beware it becomes often `null`.
+     *
      * Prefer use listener to detected mouse on 2D objects
      *
      * @return Last detect 2D object
      */
-    fun object2DDetect()=this.object2DDetect
+    fun object2DDetect() = this.object2DDetect
 
     /**
      * Return pickUVnode
      *
      * @return pickUVnode
      */
-    fun pickUVnode()= this.pickUVnode
+    fun pickUVnode() = this.pickUVnode
 
     /**
      * Modify pickUVnode
@@ -1521,7 +1575,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     }
 
     /**
-     * Play animation .<br></br>
+     * Play animation .
+     *
      * The animation is played as soon as possible
      *
      * @param animation Animation to play
@@ -1645,7 +1700,7 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     /**
      * Take several screen shots and put each on the given directory
      *
-     * @param number    Number o screenshot to take
+     * @param number    Number of screenshot to take
      * @param directory Directory where write screen shots
      * @return Future to know when all screen shots are done
      */
@@ -1712,7 +1767,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     }
 
     /**
-     * Convert a time in millisecond to a number of frame.<br></br>
+     * Convert a time in millisecond to a number of frame.
+     *
      * Warning: The result depends on current [animationsFps][.animationsFps].
      * If [animationsFps][.animationsFps] change after the call of this method the obtained result becomes obsolete.
      *

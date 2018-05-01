@@ -3,7 +3,8 @@ package khelp.k3d.render.event
 interface ActionListener
 {
     /**
-     * Called each time current actions updates.<br></br>
+     * Called each time current actions updates.
+     *
      * Note if their no current active action, the method is not called
      *
      * @param actionCodes Current active action code list.

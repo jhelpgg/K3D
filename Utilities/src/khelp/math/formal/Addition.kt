@@ -333,7 +333,8 @@ class Addition(parameter1: Function, parameter2: Function) : BinaryOperator("+",
             object : FunctionSimplifier
             {
                 /**
-                 * Try to "compress" the addition.<br>
+                 * Try to "compress" the addition.
+                 *
                  * f1+C1+C2+f2+C3 => C4+f1+f2 (by example)
                  *
                  * @return Compressed function

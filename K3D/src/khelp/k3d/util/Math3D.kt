@@ -59,8 +59,10 @@ fun computeNearestPowerOf2(integer: Int): Int
 
 /**
  * Compute the bigger power of 2 lesser or equal to integer in parameter, and return couple made of the LOG2 of the power of
- * 2 number and the power of 2 it self.<br></br>
- * For example, for 5, the power of 2 is 4=2^2, return (2, 4).<br></br>
+ * 2 number and the power of 2 it self.
+ *
+ * For example, for 5, the power of 2 is 4=2^2, return (2, 4).
+ *
  * Other example 9 => (3, 8) ...
  *
  * @param integer Integer look for near power of 2
@@ -279,3 +281,6 @@ fun squareRoot(f: Float) = Math.sqrt(f.toDouble()).toFloat()
  */
 fun symetric(point: Point3D, center: Point3D) =
         Point3D(2f * center.x - point.x, 2f * center.y - point.y, 2f * center.z - point.z)
+
+fun Float.toRadians() = Math.toRadians(this.toDouble()).toFloat()
+fun Float.toDegrees() = Math.toDegrees(this.toDouble()).toFloat()

@@ -14,12 +14,18 @@ internal class AnimationTextureFrame(val frame: Int,
                                      var textureTransformation: TextureTransformation) : Comparable<AnimationTextureFrame>
 {
     /**
-     * Compare this frame with an other one<br></br>
-     * Negative result means this frame is before given one<br></br>
-     * Null results, they are in same place<br></br>
-     * Positive means this frame is after given one <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Compare this frame with an other one
+     *
+     * Negative result means this frame is before given one
+     *
+     * Null results, they are in same place
+     *
+     * Positive means this frame is after given one
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param animationTextureFrame Frame to compare with
@@ -39,7 +45,8 @@ class AnimationTextureTransformation(private val texture: Texture) : Animation
     private var startAbsoluteFrame = 0f
 
     /**
-     * Add a frame to the animation.<br></br>
+     * Add a frame to the animation.
+     *
      * If the frame already exist, the transformation is replaced
      *
      * @param frame                 Frame index
@@ -67,9 +74,12 @@ class AnimationTextureTransformation(private val texture: Texture) : Animation
     }
 
     /**
-     * Play the animation <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Play the animation
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param absoluteFrame Absolute frame
@@ -104,9 +114,12 @@ class AnimationTextureTransformation(private val texture: Texture) : Animation
     }
 
     /**
-     * Called when animation start <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Called when animation start
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param startAbsoluteFrame Started frame

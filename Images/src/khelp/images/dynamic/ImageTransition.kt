@@ -1,6 +1,10 @@
 package khelp.images.dynamic
 
 import khelp.images.JHelpImage
+import khelp.images.alpha
+import khelp.images.blue
+import khelp.images.green
+import khelp.images.red
 import khelp.math.limit0_255
 
 /**
@@ -101,20 +105,16 @@ class ImageTransition(numberTransitionFrame: Int,
 
             pixels[pix] =
                     // alpha
-                    (ImageTransition.interpolate((colorFrom shr 24) and 0xFF,
-                                                 (colorTo shr 24) and 0xFF,
+                    (ImageTransition.interpolate(colorFrom.alpha(), colorTo.alpha(),
                                                  percent, anti) shl 24) or
                     // red
-                    (ImageTransition.interpolate((colorFrom shr 16) and 0xFF,
-                                                 (colorTo shr 16) and 0xFF,
+                    (ImageTransition.interpolate(colorFrom.red(), colorTo.red(),
                                                  percent, anti) shl 16) or
                     // green
-                    (ImageTransition.interpolate((colorFrom shr 8) and 0xFF,
-                                                 (colorTo shr 8) and 0xFF,
+                    (ImageTransition.interpolate(colorFrom.green(), colorTo.green(),
                                                  percent, anti) shl 8) or
                     // blue
-                    ImageTransition.interpolate(colorFrom and 0xFF,
-                                                colorTo and 0xFF,
+                    ImageTransition.interpolate(colorFrom.blue(), colorTo.blue(),
                                                 percent, anti)
         }
 

@@ -2,6 +2,7 @@ package khelp.images
 
 import khelp.images.dynamic.Interpolation
 import khelp.text.JHelpTextAlign
+import khelp.util.ColorInt
 import java.awt.Color
 
 /**
@@ -612,3 +613,15 @@ fun fillUpTriangle(x: Int, y: Int, size: Int, image: JHelpImage, color: Int)
  * @return Inverted color
  */
 fun invertColor(color: Color) = Color(255 - color.red, 255 - color.green, 255 - color.blue, color.alpha)
+
+/**Color alpha part*/
+fun ColorInt.alpha() = (this shr 24) and 0xFF
+
+/**Color red part*/
+fun ColorInt.red() = (this shr 16) and 0xFF
+
+/**Color green part*/
+fun ColorInt.green() = (this shr 8) and 0xFF
+
+/**Color blue part*/
+fun ColorInt.blue() = this and 0xFF

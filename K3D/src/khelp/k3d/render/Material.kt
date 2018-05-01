@@ -73,7 +73,8 @@ class Material(private var name: String)
         }
 
         /**
-         * Create a new material with a specific base name.<br></br>
+         * Create a new material with a specific base name.
+         *
          * Note if the name is alred given to an other material, the name is little changed to be unique
          *
          * @param name Base name. If `null` or empty, a name is automatic given
@@ -414,7 +415,8 @@ class Material(private var name: String)
     }
 
     /**
-     * Prepare material for OpenGL render.<br></br>
+     * Prepare material for OpenGL render.
+     *
      * Use by the renderer, don't call it directly
      */
     @ThreadOpenGL

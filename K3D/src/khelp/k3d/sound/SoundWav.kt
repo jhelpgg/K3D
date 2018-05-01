@@ -242,7 +242,8 @@ class SoundWav private constructor(private val data: ByteBuffer,
     override fun duration() = this.duration
 
     /**
-     * Disposes the data sound.<br></br>
+     * Disposes the data sound.
+     *
      * Sound can't be used after that
      */
     fun dispose()

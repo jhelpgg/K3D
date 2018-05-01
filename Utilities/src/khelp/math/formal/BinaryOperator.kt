@@ -31,7 +31,8 @@ abstract class BinaryOperator(val operator: String, val parameter1: Function, va
          */
         private val INDEX_SUBTRACTION = 2
         /**
-         * Symbols list of operator concern.<br></br>
+         * Symbols list of operator concern.
+         *
          * Operators are sort by priority, the less priority to the most
          */
         private val OPERATORS = arrayOf('^', '+', '-', '*', '/')
@@ -146,9 +147,12 @@ abstract class BinaryOperator(val operator: String, val parameter1: Function, va
     }
 
     /**
-     * Internal comparison <br>
-     * <br>
-     * <b>Parent documentation:</b><br>
+     * Internal comparison
+     *
+     *
+     *
+     * <b>Parent documentation:</b>
+     *
      * {@inheritDoc}
      *
      * @param function Function sure be the instance of the function

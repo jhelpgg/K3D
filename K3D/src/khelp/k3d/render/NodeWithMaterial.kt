@@ -1,7 +1,8 @@
 package khelp.k3d.render
 
 /**
- * Tow side "philosophy" <br></br>
+ * Tow side "philosophy"
+ *
  *
  * @author JHelp
  */

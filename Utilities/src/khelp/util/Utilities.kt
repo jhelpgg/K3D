@@ -21,24 +21,59 @@ import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 
+typealias ColorInt = Int
+typealias Pixels = IntArray
+
 /**Black color OR alpha mask*/
-const val BLACK_ALPHA_MASK = 0xFF000000.toInt()
+const val BLACK_ALPHA_MASK: ColorInt = 0xFF000000.toInt()
 /**Color part mask*/
-const val COLOR_MASK = 0x00FFFFFF.toInt()
+const val COLOR_MASK: ColorInt = 0x00FFFFFF.toInt()
 /**White*/
-const val WHITE = 0xFFFFFFFF.toInt()
+const val WHITE: ColorInt = 0xFFFFFFFF.toInt()
 /**Red*/
-const val RED = 0xFFFF0000.toInt()
+const val RED: ColorInt = 0xFFFF0000.toInt()
+/**Dark red*/
+const val DARK_RED: ColorInt = 0xFF800000.toInt()
+/**Light red*/
+const val LIGHT_RED: ColorInt = 0xFFFF8080.toInt()
 /**Red part mask*/
-const val RED_MASK = 0x00FF0000.toInt()
+const val RED_MASK: ColorInt = 0x00FF0000.toInt()
 /**Green*/
-const val GREEN = 0xFF00FF00.toInt()
+const val GREEN: ColorInt = 0xFF00FF00.toInt()
+/**Dark green*/
+const val DARK_GREEN: ColorInt = 0xFF008000.toInt()
+/**Light green*/
+const val LIGHT_GREEN: ColorInt = 0xFF80FF80.toInt()
 /**Green part mask*/
-const val GREEN_MASK = 0x0000FF00.toInt()
+const val GREEN_MASK: ColorInt = 0x0000FF00.toInt()
 /**Blue*/
-const val BLUE = 0xFF0000FF.toInt()
+const val BLUE: ColorInt = 0xFF0000FF.toInt()
+/**Dark blue*/
+const val DARK_BLUE: ColorInt = 0xFF000080.toInt()
+/**Light blue*/
+const val LIGHT_BLUE: ColorInt = 0xFF8080FF.toInt()
 /**Blue part mask*/
-const val BLUE_MASK = 0x000000FF.toInt()
+const val BLUE_MASK: ColorInt = 0x000000FF.toInt()
+/**Light gray*/
+const val LIGHT_GRAY: ColorInt = 0xFFC0C0C0.toInt()
+/**Gray*/
+const val GRAY: ColorInt = 0xFF808080.toInt()
+/**Dark gray*/
+const val DARK_GRAY: ColorInt = 0xFF404040.toInt()
+/**Pink*/
+const val PINK: ColorInt = 0xFFFFAFAF.toInt()
+/**Orange*/
+const val ORANGE: ColorInt = 0xFFFF7A00.toInt()
+/**Yellow*/
+const val YELLOW: ColorInt = 0xFFFFFF00.toInt()
+/**Magenta*/
+const val MAGENTA: ColorInt = 0xFFFF00FF.toInt()
+/**Cyan*/
+const val CYAN: ColorInt = 0xFF00FFFF.toInt()
+/**Post-it color*/
+const val POST_IT: ColorInt = 0xCAFEFACE.toInt()
+/**Brown*/
+const val BROWN: ColorInt = 0xFFA0661C.toInt()
 
 /**
  * Apply a function if the option is present or an other action if absent

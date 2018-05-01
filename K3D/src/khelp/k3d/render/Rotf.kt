@@ -1,5 +1,6 @@
 package khelp.k3d.render
 
+import khelp.math.EPSILON_FLOAT
 import khelp.math.isNul
 
 /**
@@ -9,12 +10,12 @@ import khelp.math.isNul
  * @param y Quaternion y
  * @param z Quaternion z
  */
-class Rotf(private var w: Float = 1f, private var x: Float = 0f, private var y: Float = 0f, private var z: Float = 0f)
+class Rotf(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
 {
     companion object
     {
         /**Computing precision*/
-        private val EPSILON = 1.0E-7f
+        private val EPSILON = EPSILON_FLOAT
     }
 
     /**
@@ -221,11 +222,10 @@ class Rotf(private var w: Float = 1f, private var x: Float = 0f, private var y: 
         val semiAngle = angle / 2.0F;
         this.w = Math.cos(semiAngle.toDouble()).toFloat();
         val sinus = Math.sin(semiAngle.toDouble()).toFloat();
-        val axisCopy = Vec3f(axis);
-        axisCopy.normalize();
-        this.x = axisCopy.x * sinus;
-        this.y = axisCopy.y * sinus;
-        this.z = axisCopy.z * sinus;
+        val size = axis.length()
+        this.x = (axis.x * sinus) / size;
+        this.y = (axis.y * sinus) / size;
+        this.z = (axis.z * sinus) / size;
     }
 
     /**
@@ -238,5 +238,59 @@ class Rotf(private var w: Float = 1f, private var x: Float = 0f, private var y: 
         val rotationResult = Rotf();
         rotationResult.multiply(this, rotation);
         return rotationResult;
+    }
+
+    fun angle() = 2f * Math.acos(this.w.toDouble()).toFloat()
+
+    fun vector(): Vec3f
+    {
+        val vector = Vec3f(this.x, this.y, this.z)
+        vector.normalize()
+        return vector
+    }
+
+    fun rotateX(angle: Float)
+    {
+        val w = this.w
+        val x = this.x
+        val y = this.y
+        val z = this.z
+        val an = angle / 2.0
+        val rx = Math.sin(an).toFloat()
+        val rw = Math.cos(an).toFloat()
+        this.w = w * rw - x * rx
+        this.x = w * rx + x * rw
+        this.y = y * rw - z * rx
+        this.z = z * rw - y * rx
+    }
+
+    fun rotateY(angle: Float)
+    {
+        val w = this.w
+        val x = this.x
+        val y = this.y
+        val z = this.z
+        val an = angle / 2.0
+        val ry = Math.sin(an).toFloat()
+        val rw = Math.cos(an).toFloat()
+        this.w = w * rw - y * ry
+        this.x = x * rw - z * ry
+        this.y = w * ry + y * rw
+        this.z = z * rw + x * ry
+    }
+
+    fun rotateZ(angle: Float)
+    {
+        val w = this.w
+        val x = this.x
+        val y = this.y
+        val z = this.z
+        val an = angle / 2.0
+        val rz = Math.sin(an).toFloat()
+        val rw = Math.cos(an).toFloat()
+        this.w = w * rw - z * rz
+        this.x = x * rw + y * rz
+        this.y = y * rw + x * rz
+        this.z = w * rz + z * rw
     }
 }

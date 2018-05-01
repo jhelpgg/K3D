@@ -1,6 +1,7 @@
 package khelp.k3d.ui
 
 import khelp.images.DEFAULT_FONT
+import khelp.images.JHelpFont
 import khelp.images.JHelpImage
 import khelp.images.JHelpTextLineAlpha
 import khelp.text.JHelpTextAlign
@@ -11,34 +12,40 @@ import java.util.concurrent.atomic.AtomicBoolean
 abstract class ComponentWithText : Component()
 {
     var font = DEFAULT_FONT
-        set(value)
+        private set
+
+    fun font(font: JHelpFont)
+    {
+        if (this.font != font)
         {
-            if (this.font != value)
-            {
-                this.font = value
-                this.refreshText.set(true)
-            }
+            this.font = font
+            this.refreshText.set(true)
         }
+    }
 
     var text = ""
-        set(value)
+        private set
+
+    fun text(text: String)
+    {
+        if (this.text != text)
         {
-            if (this.text != value)
-            {
-                this.text = value
-                this.refreshText.set(true)
-            }
+            this.text = text
+            this.refreshText.set(true)
         }
+    }
 
     var textAlign = JHelpTextAlign.LEFT
-        set(value)
+        private set
+
+    fun textAlign(textAlign: JHelpTextAlign)
+    {
+        if (this.textAlign != textAlign)
         {
-            if (this.textAlign != value)
-            {
-                this.textAlign = value
-                this.refreshText.set(true)
-            }
+            this.textAlign = textAlign
+            this.refreshText.set(true)
         }
+    }
 
     var foreground = BLACK_ALPHA_MASK
     var textLines = Pair<List<JHelpTextLineAlpha>, Dimension>(ArrayList<JHelpTextLineAlpha>(), Dimension())
@@ -58,7 +65,7 @@ abstract class ComponentWithText : Component()
         return this.computePreferredSize(this.textLines.second)
     }
 
-    abstract fun computePreferredSize(textSize:Dimension) : Dimension
+    abstract fun computePreferredSize(textSize: Dimension): Dimension
 
     protected fun drawText(parent: JHelpImage, x: Int, y: Int)
     {
@@ -67,4 +74,9 @@ abstract class ComponentWithText : Component()
             parent.paintAlphaMask(x + it.x, y + it.y, it.mask, this.foreground, 0, true)
         }
     }
+
+    override final fun drawComponent(parent: JHelpImage, x: Int, y: Int) =
+            this.drawComponent(parent, x, y, this.textLines.second)
+
+    abstract fun drawComponent(parent: JHelpImage, x: Int, y: Int, textSize: Dimension);
 }

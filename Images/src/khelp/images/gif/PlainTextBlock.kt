@@ -55,9 +55,12 @@ internal class PlainTextBlock : BlockExtension()
         private set
 
     /**
-     * Read the plain text extension block <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Read the plain text extension block
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param inputStream Stream to read

@@ -1,5 +1,8 @@
 package khelp.k3d.render
 
+import khelp.images.blue
+import khelp.images.green
+import khelp.images.red
 import khelp.k3d.render.event.NodeListener
 import khelp.k3d.render.event.NodePositionListener
 import khelp.k3d.render.event.PickUVlistener
@@ -36,13 +39,16 @@ internal fun taskFireNodePositionChange(node: Node, nodePositionListener: NodePo
         }
 
 /**
- * General node of the graph scene.<br>
- * It could be use also as a virtual object<br>
- * <br>
+ * General node of the graph scene.
+ *
+ * It could be use also as a virtual object
+ *
+ *
+ *
  *
  * @author JHelp
  */
-open class Node
+open class Node : Iterable<Node>
 {
     companion object
     {
@@ -116,13 +122,14 @@ open class Node
     init
     {
         this.colorPickingId = Node.ID_PICKING.getAndAccumulate(PICKING_PRECISION, { i1, i2 -> i1 + i2 })
-        this.redPicking = (this.colorPickingId shr 16 and 0xFF) / 255f
-        this.greenPicking = (this.colorPickingId shr 8 and 0xFF) / 255f
-        this.bluePicking = (this.colorPickingId and 0xFF) / 255f
+        this.redPicking = this.colorPickingId.red() / 255f
+        this.greenPicking = this.colorPickingId.green() / 255f
+        this.bluePicking = this.colorPickingId.blue() / 255f
     }
 
     /**
-     * Check if locations and rotations value are valid.<br></br>
+     * Check if locations and rotations value are valid.
+     *
      * Make corrections if need
      */
     private fun checkValues()
@@ -375,7 +382,8 @@ open class Node
     }
 
     /**
-     * Render specific for UV picking.<br></br>
+     * Render specific for UV picking.
+     *
      * Override it to do the specific part
      */
     @ThreadOpenGL
@@ -470,7 +478,7 @@ open class Node
 
     fun z(z: Float)
     {
-        this.z=z
+        this.z = z
         this.checkValues()
     }
 
@@ -482,31 +490,31 @@ open class Node
 
     fun angleY(angleY: Float)
     {
-        this.angleY=angleY
+        this.angleY = angleY
         this.checkValues()
     }
 
     fun angleZ(angleZ: Float)
     {
-        this.angleZ=angleZ
+        this.angleZ = angleZ
         this.checkValues()
     }
 
     fun scaleX(scaleX: Float)
     {
-        this.scaleX=scaleX
+        this.scaleX = scaleX
         this.checkValues()
     }
 
     fun scaleY(scaleY: Float)
     {
-        this.scaleY=scaleY
+        this.scaleY = scaleY
         this.checkValues()
     }
 
     fun scaleZ(scaleZ: Float)
     {
-        this.scaleZ=scaleZ
+        this.scaleZ = scaleZ
         this.checkValues()
     }
 
@@ -605,16 +613,16 @@ open class Node
      *
      * @param material Material to apply
      */
-    fun applyMaterialHierarchicaly(material: Material)
+    fun applyMaterialHierarchically(material: Material)
     {
         if (this is NodeWithMaterial)
         {
-            (this as NodeWithMaterial).material(material)
+            this.material(material)
         }
 
         for (node in this.children)
         {
-            node.applyMaterialHierarchicaly(material)
+            node.applyMaterialHierarchically(material)
         }
     }
 
@@ -1088,7 +1096,8 @@ open class Node
     }
 
     /**
-     * Scale the node.<br></br>
+     * Scale the node.
+     *
      * Use the same value for X, Y and Z
      *
      * @param scale Scale quantity
@@ -1113,7 +1122,8 @@ open class Node
     }
 
     /**
-     * Change scale value.<br></br>
+     * Change scale value.
+     *
      * Use the same value for X, Y and Z
      *
      * @param scale New scale value
@@ -1185,4 +1195,9 @@ open class Node
             child.visibleHierarchy(visible)
         }
     }
+
+    /**
+     * Returns an iterator over the elements of this object.
+     */
+    override fun iterator() = this.children().iterator()
 }

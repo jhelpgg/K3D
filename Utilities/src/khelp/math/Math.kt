@@ -129,7 +129,8 @@ fun centimeterToPica(centimeter: Double) = centimeter * CENTIMETER_IN_PICA
 fun centimeterToPoint(centimeter: Double) = centimeter * CENTIMETER_IN_POINT
 
 /**
- * Compare two real<br>
+ * Compare two real
+ *
  * It returns:
  * <ul>
  * <li>-1 : if first is lower than the second </li>
@@ -144,7 +145,8 @@ fun centimeterToPoint(centimeter: Double) = centimeter * CENTIMETER_IN_POINT
 fun compare(value1: Double, value2: Double) = sign(value1 - value2)
 
 /**
- * Compare two real<br>
+ * Compare two real
+ *
  * It returns:
  * <ul>
  * <li>-1 : if first is lower than the second </li>
@@ -409,10 +411,14 @@ fun inchToPica(inch: Double) = inch * INCH_IN_PICA
 fun inchToPoint(inch: Double) = inch * INCH_IN_POINT
 
 /**
- * Compute cosinus interpolation.<br></br>
- * f : [0, 1] -> [0, 1]<br></br>
- * f(0)=0<br></br>
- * f(1)=1<br></br>
+ * Compute cosinus interpolation.
+ *
+ * f : [0, 1] -> [0, 1]
+ *
+ * f(0)=0
+ *
+ * f(1)=1
+ *
  * f is strictly increase
  *
  * @param t Value to interpolate in [0, 1]
@@ -421,10 +427,14 @@ fun inchToPoint(inch: Double) = inch * INCH_IN_POINT
 fun interpolationCosinus(t: Double) = 0.5 + Math.cos((t + 1) * Math.PI) / 2.0
 
 /**
- * Compute exponential interpolation.<br></br>
- * f : [0, 1] -> [0, 1]<br></br>
- * f(0)=0<br></br>
- * f(1)=1<br></br>
+ * Compute exponential interpolation.
+ *
+ * f : [0, 1] -> [0, 1]
+ *
+ * f(0)=0
+ *
+ * f(1)=1
+ *
  * f is strictly increase
  *
  * @param t Value to interpolate in [0, 1]
@@ -435,10 +445,14 @@ fun interpolationExponential(t: Double) = Math.expm1(t) / (Math.E - 1.0)
 fun sigmoid(t: Double) = 1.0 / (2.0 + Math.expm1(-t))
 
 /**
- * Compute logarithm interpolation.<br></br>
- * f : [0, 1] -> [0, 1]<br></br>
- * f(0)=0<br></br>
- * f(1)=1<br></br>
+ * Compute logarithm interpolation.
+ *
+ * f : [0, 1] -> [0, 1]
+ *
+ * f(0)=0
+ *
+ * f(1)=1
+ *
  * f is strictly increase
  *
  * @param t Value to interpolate in [0, 1]
@@ -447,10 +461,14 @@ fun sigmoid(t: Double) = 1.0 / (2.0 + Math.expm1(-t))
 fun interpolationLogarithm(t: Double) = Math.log1p(t) / Math.log(2.0)
 
 /**
- * Compute sinus interpolation.<br></br>
- * f : [0, 1] -> [0, 1]<br></br>
- * f(0)=0<br></br>
- * f(1)=1<br></br>
+ * Compute sinus interpolation.
+ *
+ * f : [0, 1] -> [0, 1]
+ *
+ * f(0)=0
+ *
+ * f(1)=1
+ *
  * f is strictly increase
  *
  * @param t Value to interpolate in [0, 1]
@@ -475,9 +493,12 @@ fun isNul(value: Double) = Math.abs(value) <= EPSILON
 fun isNul(value: Float) = Math.abs(value) <= EPSILON_FLOAT
 
 /**
- * Limit an integer between 2 values.<br>
- * If the integer is between given bounds, the integer is returned.<br>
- * If the integer is lower the minimum of the given bounds, the minimum is returned.<br>
+ * Limit an integer between 2 values.
+ *
+ * If the integer is between given bounds, the integer is returned.
+ *
+ * If the integer is lower the minimum of the given bounds, the minimum is returned.
+ *
  * If the integer is upper the maximum of the given bounds, the maximum is returned.
  *
  * @param integer Integer to limit
@@ -491,9 +512,12 @@ fun limit(number: Int, bound1: Int, bound2: Int): Int =
                           number))
 
 /**
- * Limit a double between 2 values.<br>
- * If the double is between given bounds, the double is returned.<br>
- * If the double is lower the minimum of the given bounds, the minimum is returned.<br>
+ * Limit a double between 2 values.
+ *
+ * If the double is between given bounds, the double is returned.
+ *
+ * If the double is lower the minimum of the given bounds, the minimum is returned.
+ *
  * If the double is upper the maximum of the given bounds, the maximum is returned.
  *
  * @param value  Double to limit
@@ -507,9 +531,12 @@ fun limit(number: Double, bound1: Double, bound2: Double): Double =
                           number))
 
 /**
- * Limit an integer between 2 values.<br>
- * If the integer is between given bounds, the integer is returned.<br>
- * If the integer is lower the minimum of the given bounds, the minimum is returned.<br>
+ * Limit an integer between 2 values.
+ *
+ * If the integer is between given bounds, the integer is returned.
+ *
+ * If the integer is lower the minimum of the given bounds, the minimum is returned.
+ *
  * If the integer is upper the maximum of the given bounds, the maximum is returned.
  *
  * @param integer Integer to limit
@@ -523,9 +550,12 @@ fun limit(number: Long, bound1: Long, bound2: Long): Long =
                           number))
 
 /**
- * Limit a double between 2 values.<br>
- * If the double is between given bounds, the double is returned.<br>
- * If the double is lower the minimum of the given bounds, the minimum is returned.<br>
+ * Limit a double between 2 values.
+ *
+ * If the double is between given bounds, the double is returned.
+ *
+ * If the double is lower the minimum of the given bounds, the minimum is returned.
+ *
  * If the double is upper the maximum of the given bounds, the maximum is returned.
  *
  * @param value  Double to limit
@@ -761,7 +791,8 @@ fun modulo(real: Double, modulo: Double) = moduloInterval(real, 0.0, modulo)
 fun modulo(real: Float, modulo: Float) = moduloInterval(real, 0f, modulo)
 
 /**
- * Mathematical modulo.<br></br>
+ * Mathematical modulo.
+ *
  * For computer -1 modulo 2 is -1, but in Mathematic -1[2]=1 (-1[2] : -1 modulo 2)
  *
  * @param integer Integer to modulate
@@ -782,7 +813,28 @@ fun modulo(integer: Int, modulo: Int): Int
 }
 
 /**
- * Mathematical modulo.<br></br>
+ * Modulate an integer inside an interval
+ *
+ * @param integer Integer to modulate
+ * @param min  Minimum of interval
+ * @param max  Maximum of interval
+ * @return Modulated value
+ */
+fun moduloInterval(integer: Int, min: Int, max: Int) = min + modulo(integer - min, max - min + 1)
+
+/**
+ * Modulate an integer inside an interval
+ *
+ * @param integer Integer to modulate
+ * @param min  Minimum of interval
+ * @param max  Maximum of interval
+ * @return Modulated value
+ */
+fun moduloInterval(integer: Long, min: Long, max: Long) = min + modulo(integer - min, max - min + 1L)
+
+/**
+ * Mathematical modulo.
+ *
  * For computer -1 modulo 2 is -1, but in Mathematic -1[2]=1 (-1[2] : -1 modulo 2)
  *
  * @param integer Integer to modulate
@@ -1173,7 +1225,8 @@ fun radianToDegree(radian: Double) = radian * 180.0 / Math.PI
 fun radianToGrade(radian: Double) = radian * 200.0 / Math.PI
 
 /**
- * Sign of a number.<br></br>
+ * Sign of a number.
+ *
  * It returns:
  *
  *  * -1 : if number is negative
@@ -1193,7 +1246,8 @@ fun sign(value: Double) =
         }
 
 /**
- * Sign of a number.<br></br>
+ * Sign of a number.
+ *
  * It returns:
  *
  *  * -1 : if number is negative
@@ -1213,7 +1267,8 @@ fun sign(value: Float) =
         }
 
 /**
- * Sign of a number.<br>
+ * Sign of a number.
+ *
  * It returns:
  * <ul>
  * <li>-1 : if number is negative </li>
@@ -1233,7 +1288,8 @@ fun sign(value: Long) =
         }
 
 /**
- * Sign of a number.<br>
+ * Sign of a number.
+ *
  * It returns:
  * <ul>
  * <li>-1 : if number is negative </li>

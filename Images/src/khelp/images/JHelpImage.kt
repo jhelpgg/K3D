@@ -1,3 +1,5 @@
+@file:Suppress("NAME_SHADOWING")
+
 package khelp.images
 
 import khelp.images.pcx.PCX
@@ -18,6 +20,9 @@ import khelp.thread.Mutex
 import khelp.ui.AFFINE_TRANSFORM
 import khelp.ui.FLATNESS
 import khelp.util.BLACK_ALPHA_MASK
+import khelp.util.COLOR_MASK
+import khelp.util.ColorInt
+import khelp.util.Pixels
 import java.awt.Component
 import java.awt.Graphics
 import java.awt.Image
@@ -46,7 +51,7 @@ import javax.imageio.ImageReader
 import javax.imageio.stream.ImageInputStream
 import javax.swing.Icon
 
-private inline fun Long.int() = this.toInt()
+private fun Long.int() = this.toInt()
 /**
  * Represents an image.
  *
@@ -61,8 +66,12 @@ private inline fun Long.int() = this.toInt()
  * @param pixels Image pixels in ARGB format
  * @throws IllegalArgumentException If width or height not at least 1 or pixels array size is not width*height
  */
-class JHelpImage(val width: Int, val height: Int,
-                 private val pixels: IntArray = IntArray(width * height)) : RasterImage, Icon
+class JHelpImage(
+        /**Image width*/
+        val width: Int,
+        /**Image height*/
+        val height: Int,
+        private val pixels: Pixels = Pixels(width * height)) : RasterImage, Icon
 {
     companion object
     {
@@ -351,16 +360,16 @@ class JHelpImage(val width: Int, val height: Int,
         }
 
         /**
-         * Comput distance betwwen 2 colors
+         * Comput distance between 2 colors
          *
          * @param color1 First color
          * @param color2 Second color
          * @return Color distance
          */
-        private fun distanceColor(color1: Int, color2: Int) =
-                maximum(Math.abs((color1 shr 16 and 0xFF) - (color2 shr 16 and 0xFF)),
-                        Math.abs((color1 shr 8 and 0xFF) - (color2 shr 8 and 0xFF)),
-                        Math.abs((color1 and 0xFF) - (color2 and 0xFF)))
+        private fun distanceColor(color1: ColorInt, color2: ColorInt) =
+                maximum(Math.abs((color1.red()) - (color2.red())),
+                        Math.abs((color1.green()) - (color2.green())),
+                        Math.abs((color1.blue()) - (color2.blue())))
 
         /**
          * Compare 2 images and compute if they "look" the same in compare the image border. That is to say if we obtain
@@ -538,8 +547,8 @@ class JHelpImage(val width: Int, val height: Int,
             }
 
             val length = width1 * height1
-            var color1: Int
-            var color2: Int
+            var color1: ColorInt
+            var color2: ColorInt
             var difference = 0
 
             for (pix in length - 1 downTo 0)
@@ -547,22 +556,22 @@ class JHelpImage(val width: Int, val height: Int,
                 color1 = image1.pixels[pix]
                 color2 = image2.pixels[pix]
 
-                if (Math.abs((color1 shr 24 and 0xFF) - (color2 shr 24 and 0xFF)) > colorPartPrecision)
+                if (Math.abs((color1.alpha()) - (color2.alpha())) > colorPartPrecision)
                 {
                     difference++
                 }
 
-                if (Math.abs((color1 shr 16 and 0xFF) - (color2 shr 16 and 0xFF)) > colorPartPrecision)
+                if (Math.abs((color1.red()) - (color2.red())) > colorPartPrecision)
                 {
                     difference++
                 }
 
-                if (Math.abs((color1 shr 8 and 0xFF) - (color2 shr 8 and 0xFF)) > colorPartPrecision)
+                if (Math.abs((color1.green()) - (color2.green())) > colorPartPrecision)
                 {
                     difference++
                 }
 
-                if (Math.abs((color1 and 0xFF) - (color2 and 0xFF)) > colorPartPrecision)
+                if (Math.abs((color1.blue()) - (color2.blue())) > colorPartPrecision)
                 {
                     difference++
                 }
@@ -758,7 +767,7 @@ class JHelpImage(val width: Int, val height: Int,
             val width = bufferedImage.width
             val height = bufferedImage.height
 
-            var pixels = IntArray(width * height)
+            var pixels = Pixels(width * height)
             pixels = bufferedImage.getRGB(0, 0, width, height, pixels, 0, width)
 
             val imageLoaded = JHelpImage(width, height, pixels)
@@ -781,7 +790,7 @@ class JHelpImage(val width: Int, val height: Int,
 
             val width = bufferedImage.width
             val height = bufferedImage.height
-            var pixels = IntArray(width * height)
+            var pixels = Pixels(width * height)
 
             pixels = bufferedImage.getRGB(0, 0, width, height, pixels, 0, width)
 
@@ -862,7 +871,7 @@ class JHelpImage(val width: Int, val height: Int,
                 bufferedImage = bufferedImageTemp
             }
 
-            var pixels = IntArray(width * height)
+            var pixels = Pixels(width * height)
 
             pixels = bufferedImage.getRGB(0, 0, width, height, pixels, 0, width)
 
@@ -911,7 +920,7 @@ class JHelpImage(val width: Int, val height: Int,
                 bufferedImage = bufferedImageTemp
             }
 
-            var pixels = IntArray(width * height)
+            var pixels = Pixels(width * height)
             pixels = bufferedImage.getRGB(0, 0, width, height, pixels, 0, width)
             val image = JHelpImage(width, height, pixels)
             bufferedImage.flush()
@@ -920,7 +929,7 @@ class JHelpImage(val width: Int, val height: Int,
 
         /**
          * Save an image to a stream in PNG format
-
+         *
          * Note : If the image is not in draw mode, all visible sprite will be consider as a part of the image
          *
          * @param outputStream Stream where write, not closed by this method
@@ -1049,17 +1058,16 @@ class JHelpImage(val width: Int, val height: Int,
         if (this.width < 1 || this.height < 1)
         {
             throw IllegalArgumentException(
-                    "width and height must be >= 1, but it is specify : " + this.width + "x" + this.height)
+                    "width and height must be >= 1, but it is specify : ${this.width}x${this.height}")
         }
 
         if (this.width * this.height != this.pixels.size)
         {
             throw IllegalArgumentException(
-                    "The pixels array size must be width*height, but it is specify width=" + this.width +
-                            " height=" + this.height + " pixels.length=" + this.pixels.size)
+                    "The pixels array size must be width*height, but it is specify width=${this.width} height=${this.height} pixels.length=${this.pixels.size}")
         }
 
-        this.memoryImageSource = MemoryImageSource(width, height, pixels, 0, width)
+        this.memoryImageSource = MemoryImageSource(this.width, this.height, this.pixels, 0, this.width)
         this.memoryImageSource.setAnimated(true)
         this.memoryImageSource.setFullBufferUpdates(true)
 
@@ -1076,7 +1084,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param height Image height
      * @param color Color to fill the image
      */
-    constructor(width: Int, height: Int, color: Int) : this(width, height)
+    constructor(width: Int, height: Int, color: ColorInt) : this(width, height)
     {
         this.drawMode = true
         this.clear(color)
@@ -1092,8 +1100,8 @@ class JHelpImage(val width: Int, val height: Int,
      * @param imageWidth  Image created width
      * @param imageHeight Image created height
      */
-    constructor(width: Int, height: Int, pixels: IntArray, imageWidth: Int, imageHeight: Int) : this(imageWidth,
-                                                                                                     imageHeight)
+    constructor(width: Int, height: Int, pixels: Pixels, imageWidth: Int, imageHeight: Int) : this(imageWidth,
+                                                                                                   imageHeight)
     {
         this.fillRectangleScale(0, 0, imageWidth, imageHeight, pixels, width, height)
     }
@@ -1138,14 +1146,14 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw a shape on center it
-
+     *
      * MUST be in draw mode
      *
      * @param shape      Shape to draw
      * @param color      Color to use
      * @param doAlphaMix Indicates if alpha mix is on
      */
-    private fun drawShapeCenter(shape: Shape, color: Int, doAlphaMix: Boolean)
+    private fun drawShapeCenter(shape: Shape, color: ColorInt, doAlphaMix: Boolean)
     {
         if (!this.drawMode)
         {
@@ -1213,7 +1221,7 @@ class JHelpImage(val width: Int, val height: Int,
      */
     private fun fillRectangleScale(
             x: Int, y: Int, width: Int, height: Int,
-            pixels: IntArray, pixelsWidth: Int, pixelsHeight: Int)
+            pixels: Pixels, pixelsWidth: Int, pixelsHeight: Int)
     {
         if (width <= 0 || height <= 0)
         {
@@ -1324,11 +1332,11 @@ class JHelpImage(val width: Int, val height: Int,
      * @param alpha Alpha to do the mix
      * @param color Color to mix with
      */
-    private fun mixColor(pixel: Int, alpha: Int, color: Int) = this.mixColor(pixel,
-                                                                             alpha,
-                                                                             (color shr 16) and 0xFF,
-                                                                             (color shr 8) and 0xFF,
-                                                                             color and 0xFF)
+    private fun mixColor(pixel: Int, alpha: Int, color: ColorInt) = this.mixColor(pixel,
+                                                                                  alpha,
+                                                                                  color.red(),
+                                                                                  color.green(),
+                                                                                  color.blue())
 
     /**
      * Mix an image pixel with a color
@@ -1342,16 +1350,16 @@ class JHelpImage(val width: Int, val height: Int,
     {
         val colorThis = this.pixels[pixel]
         val ahpla = 256 - alpha
-        this.pixels[pixel] = (Math.min(255, alpha + ((colorThis shr 24) and 0xFF)) shl 24) or
-                (((red * alpha + ((colorThis shr 16) and 0xFF) * ahpla) shr 8) shl 16) or
-                (((green * alpha + ((colorThis shr 8) and 0xFF) * ahpla) shr 8) shl 8) or
-                ((blue * alpha + (colorThis and 0xFF) * ahpla) shr 8)
+        this.pixels[pixel] = (Math.min(255, alpha + colorThis.alpha()) shl 24) or
+                (((red * alpha + colorThis.red() * ahpla) shr 8) shl 16) or
+                (((green * alpha + colorThis.green() * ahpla) shr 8) shl 8) or
+                ((blue * alpha + colorThis.blue() * ahpla) shr 8)
 
     }
 
     /**
      * Draw a part of an image on this image
-
+     *
      * MUST be in draw mode
      *
      * @param x          X on this image
@@ -1363,8 +1371,8 @@ class JHelpImage(val width: Int, val height: Int,
      * @param height     Part height
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    internal fun drawImageInternal(
-            x: Int, y: Int, image: JHelpImage, xImage: Int, yImage: Int, width: Int, height: Int, doAlphaMix: Boolean)
+    internal fun drawImageInternal(x: Int, y: Int, image: JHelpImage,
+                                   xImage: Int, yImage: Int, width: Int, height: Int, doAlphaMix: Boolean)
     {
         var x = x
         var y = y
@@ -1420,7 +1428,7 @@ class JHelpImage(val width: Int, val height: Int,
         var lineImage = xImage + yImage * image.width
         var pixImage: Int
 
-        var colorImage: Int
+        var colorImage: ColorInt
         var alpha: Int
 
         for (yy in 0 until h)
@@ -1431,7 +1439,7 @@ class JHelpImage(val width: Int, val height: Int,
             for (xx in 0 until w)
             {
                 colorImage = image.pixels[pixImage]
-                alpha = (colorImage shr 24) and 0xFF
+                alpha = colorImage.alpha()
 
                 if (alpha == 255)
                 {
@@ -1465,9 +1473,8 @@ class JHelpImage(val width: Int, val height: Int,
      * @param height Height of image part
      * @param alpha  Alpha to use
      */
-    internal fun drawImageInternal(
-            x: Int, y: Int, image: JHelpImage,
-            xImage: Int, yImage: Int, width: Int, height: Int, alpha: Int)
+    internal fun drawImageInternal(x: Int, y: Int, image: JHelpImage,
+                                   xImage: Int, yImage: Int, width: Int, height: Int, alpha: Int)
     {
         var x = x
         var y = y
@@ -1547,7 +1554,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw apart of image over this image (just override)
-
+     *
      * MUST be in draw mode
      *
      * @param x      X on this image
@@ -1621,9 +1628,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Add an other image
-
+     *
      * This image and the given one MUST have same dimension
-
+     *
      * Note : if this image or given one not in draw mode, all visible sprites (of the image) are consider like a part
      * of the image
      *
@@ -1636,18 +1643,17 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalArgumentException("We can only add with an image of same size")
         }
 
-        var colorThis: Int
-        var colorImage: Int
+        var colorThis: ColorInt
+        var colorImage: ColorInt
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            colorThis = this.pixels[pix]
-            colorImage = image.pixels[pix]
+        this.pixels.indices.forEach {
+            colorThis = this.pixels[it]
+            colorImage = image.pixels[it]
 
-            this.pixels[pix] = colorThis and 0xFFFF0000.toInt() or
-                    (limit0_255((colorThis shr 16 and 0xFF) + (colorImage shr 16 and 0xFF)) shl 16) or
-                    (limit0_255((colorThis shr 8 and 0xFF) + (colorImage shr 8 and 0xFF)) shl 8) or
-                    limit0_255((colorThis and 0xFF) + (colorImage and 0xFF))
+            this.pixels[it] = colorThis and BLACK_ALPHA_MASK or
+                    (limit0_255((colorThis.red()) + (colorImage.red())) shl 16) or
+                    (limit0_255((colorThis.green()) + (colorImage.green())) shl 8) or
+                    limit0_255((colorThis.blue()) + (colorImage.blue()))
         }
     }
 
@@ -1669,11 +1675,14 @@ class JHelpImage(val width: Int, val height: Int,
         return copy
     }
 
+    private fun gauss(c00: Int, c10: Int, c20: Int, c01: Int, c11: Int, c21: Int, c02: Int, c12: Int, c22: Int) =
+            (c00 + (c10 shl 1) + c20 + (c01 shl 1) + (c11 shl 2) + (c21 shl 1) + c02 + (c12 shl 1) + c22) shr 4
+
     /**
      * Apply Gauss filter 3x3 in the image.
-
+     *
      * MUST be in draw mode
-
+     *
      * Note filter is
      *
      *     +-+-+-+
@@ -1684,7 +1693,7 @@ class JHelpImage(val width: Int, val height: Int,
      *     |1|2|1|
      *     +-+-+-+
      *
-     * When apply the filter to filter, it considers the pixel as thee center of above table.
+     * When apply the filter to a pixel. It considers the pixel as the center of above table.
      * Other cells are pixel neighbor, the number represents the influence of each pixel
      */
     fun applyGauss3x3()
@@ -1696,7 +1705,7 @@ class JHelpImage(val width: Int, val height: Int,
 
         val w = this.width + 2
         val h = this.height + 2
-        val pix = IntArray(w * h)
+        val pix = Pixels(w * h)
 
         var lineThis = 0
         var linePix = 1 + w
@@ -1718,15 +1727,15 @@ class JHelpImage(val width: Int, val height: Int,
         var p20: Int
         var p21: Int
         var p22: Int
-        var c00: Int
-        var c10: Int
-        var c20: Int
-        var c01: Int
-        var c11: Int
-        var c21: Int
-        var c02: Int
-        var c12: Int
-        var c22: Int
+        var c00: ColorInt
+        var c10: ColorInt
+        var c20: ColorInt
+        var c01: ColorInt
+        var c11: ColorInt
+        var c21: ColorInt
+        var c02: ColorInt
+        var c12: ColorInt
+        var c22: ColorInt
         var p = 0
 
         for (y in 0 until this.height)
@@ -1752,27 +1761,21 @@ class JHelpImage(val width: Int, val height: Int,
 
                 this.pixels[p] =
                         // Alpha
-                        (((c00 shr 24 and 0xFF) + (c10 shr 24 and 0xFF shl 1) + (c20 shr 24 and 0xFF)
-                                + (c01 shr 24 and 0xFF shl 1) + (c11 shr 24 and 0xFF shl 2)
-                                + (c21 shr 24 and 0xFF shl 1) + (c02 shr 24 and 0xFF)
-                                + (c12 shr 24 and 0xFF shl 1) + (c22 shr 24 and 0xFF)) shr 4 shl 24
-                                or
-                                // Red
-                                (((c00 shr 16 and 0xFF) + (c10 shr 16 and 0xFF shl 1) + (c20 shr 16 and 0xFF)
-                                        + (c01 shr 16 and 0xFF shl 1) + (c11 shr 16 and 0xFF shl 2)
-                                        + (c21 shr 16 and 0xFF shl 1) + (c02 shr 16 and 0xFF) +
-                                        (c12 shr 16 and 0xFF shl 1) + (c22 shr 16 and 0xFF)) shr 4 shl 16)
-                                or
-                                // Green
-                                (((c00 shr 8 and 0xFF) + (c10 shr 8 and 0xFF shl 1) + (c20 shr 8 and 0xFF)
-                                        + (c01 shr 8 and 0xFF shl 1) + (c11 shr 8 and 0xFF shl 2)
-                                        + (c21 shr 8 and 0xFF shl 1) + (c02 shr 8 and 0xFF)
-                                        + (c12 shr 8 and 0xFF shl 1) + (c22 shr 8 and 0xFF)) shr 4 shl 8)
-                                or
-                                // Blue
-                                (((c00 and 0xFF) + (c10 and 0xFF shl 1) + (c20 and 0xFF) + (c01 and 0xFF shl 1)
-                                        + (c11 and 0xFF shl 2) + (c21 and 0xFF shl 1) + (c02 and 0xFF)
-                                        + (c12 and 0xFF shl 1) + (c22 and 0xFF)) shr 4))
+                        (gauss(c00.alpha(), c10.alpha(), c20.alpha(),
+                               c01.alpha(), c11.alpha(), c21.alpha(),
+                               c02.alpha(), c12.alpha(), c22.alpha()) shl 24) or
+                        // Red
+                        (gauss(c00.red(), c10.red(), c20.red(),
+                               c01.red(), c11.red(), c21.red(),
+                               c02.red(), c12.red(), c22.red()) shl 16) or
+                        // Green
+                        (gauss(c00.green(), c10.green(), c20.green(),
+                               c01.green(), c11.green(), c21.green(),
+                               c02.green(), c12.green(), c22.green()) shl 8) or
+                        // Blue
+                        gauss(c00.blue(), c10.blue(), c20.blue(),
+                              c01.blue(), c11.blue(), c21.blue(),
+                              c02.blue(), c12.blue(), c22.blue())
 
                 c00 = c10
                 c10 = c20
@@ -1798,7 +1801,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill with the palette different area
-
+     *
      * MUST be in draw mode
      *
      * @param precision Precision to use for distinguish 2 area
@@ -1839,7 +1842,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Put the image brighter
-
+     *
      * MUST be in draw mode
      *
      * @param factor Factor of bright
@@ -1853,20 +1856,19 @@ class JHelpImage(val width: Int, val height: Int,
 
         var color: Int
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            color = this.pixels[pix]
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
 
-            this.pixels[pix] = color and 0xFFFF0000.toInt() or
-                    (limit0_255((color shr 16 and 0xFF) + factor) shl 16) or
-                    (limit0_255((color shr 8 and 0xFF) + factor) shl 8) or
-                    limit0_255((color and 0xFF) + factor)
+            this.pixels[it] = color and BLACK_ALPHA_MASK or
+                    (limit0_255((color.red()) + factor) shl 16) or
+                    (limit0_255((color.green()) + factor) shl 8) or
+                    limit0_255((color.blue()) + factor)
         }
     }
 
     /**
      * Change image brightness
-
+     *
      * MUST be in draw mode
      *
      * @param factor Brightness factor
@@ -1878,7 +1880,7 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
         var red: Int
         var green: Int
         var blue: Int
@@ -1886,19 +1888,18 @@ class JHelpImage(val width: Int, val height: Int,
         var u: Double
         var v: Double
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            color = this.pixels[pix]
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
 
-            red = color shr 16 and 0xFF
-            green = color shr 8 and 0xFF
-            blue = color and 0xFF
+            red = color.red()
+            green = color.green()
+            blue = color.blue()
 
             y = JHelpImage.computeY(red, green, blue) * factor
             u = JHelpImage.computeU(red, green, blue)
             v = JHelpImage.computeV(red, green, blue)
 
-            this.pixels[pix] = color and 0xFFFF0000.toInt() or
+            this.pixels[it] = color and BLACK_ALPHA_MASK or
                     (JHelpImage.computeRed(y, u, v) shl 16) or
                     (JHelpImage.computeGreen(y, u, v) shl 8) or
                     JHelpImage.computeBlue(y, u, v)
@@ -1907,7 +1908,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Colorize all near color with same color
-
+     *
      * MUST be in draw mode
      *
      * @param precision Precision to use
@@ -1945,7 +1946,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Colorize with 3 colors, one used for "dark" colors, one for "gray" colors and last for "white" colors
-
+     *
      * MUST be in draw mode
      *
      * @param colorLow    Color for dark
@@ -1953,36 +1954,30 @@ class JHelpImage(val width: Int, val height: Int,
      * @param colorHigh   Color for white
      * @param precision   Precision for decide witch are gray
      */
-    fun categorizeByY(colorLow: Int, colorMiddle: Int, colorHigh: Int, precision: Double)
+    fun categorizeByY(colorLow: ColorInt, colorMiddle: ColorInt, colorHigh: ColorInt, precision: Double)
     {
         if (!this.drawMode)
         {
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
-        var red: Int
-        var green: Int
-        var blue: Int
-        var index: Int
-        var yAverage: Double
         var y: Double
 
-        index = this.pixels.size - 1
-        color = this.pixels[index]
-        red = color shr 16 and 0xFF
-        green = color shr 8 and 0xFF
-        blue = color and 0xFF
+        var index = this.pixels.size - 1
+        var color = this.pixels[index]
+        var red = color.red()
+        var green = color.green()
+        var blue = color.blue()
 
-        yAverage = JHelpImage.computeY(red, green, blue)
+        var yAverage = JHelpImage.computeY(red, green, blue)
 
         index--
         while (index >= 0)
         {
             color = this.pixels[index]
-            red = color shr 16 and 0xFF
-            green = color shr 8 and 0xFF
-            blue = color and 0xFF
+            red = color.red()
+            green = color.green()
+            blue = color.blue()
 
             yAverage += JHelpImage.computeY(red, green, blue)
 
@@ -1991,26 +1986,25 @@ class JHelpImage(val width: Int, val height: Int,
 
         val ymil = yAverage / this.pixels.size
 
-        for (i in this.pixels.indices.reversed())
-        {
-            color = this.pixels[i]
-            red = color shr 16 and 0xFF
-            green = color shr 8 and 0xFF
-            blue = color and 0xFF
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            red = color.red()
+            green = color.green()
+            blue = color.blue()
 
             y = JHelpImage.computeY(red, green, blue)
 
             if (Math.abs(y - ymil) <= precision)
             {
-                this.pixels[i] = colorMiddle
+                this.pixels[it] = colorMiddle
             }
             else if (y < ymil)
             {
-                this.pixels[i] = colorLow
+                this.pixels[it] = colorLow
             }
             else
             {
-                this.pixels[i] = colorHigh
+                this.pixels[it] = colorHigh
             }
         }
     }
@@ -2022,17 +2016,14 @@ class JHelpImage(val width: Int, val height: Int,
      *
      * @param color Color to use
      */
-    fun clear(color: Int)
+    fun clear(color: ColorInt)
     {
         if (!this.drawMode)
         {
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            this.pixels[pix] = color
-        }
+        this.pixels.indices.forEach { this.pixels[it] = color }
     }
 
     /**
@@ -2057,7 +2048,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Create a couple of sprite and associated animated image
-
+     *
      * MUST NOT be in draw mode
      *
      * @param x             X position
@@ -2078,7 +2069,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Create a sprite
-
+     *
      * MUST NOT be in draw mode
      *
      * @param x      Start X of sprite
@@ -2102,7 +2093,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw a line
-
+     *
      * MUST be in draw mode
      *
      * @param x1         X of first point
@@ -2113,7 +2104,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
     fun drawLine(
-            x1: Int, y1: Int, x2: Int, y2: Int, color: Int, doAlphaMix: Boolean = true)
+            x1: Int, y1: Int, x2: Int, y2: Int, color: ColorInt, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -2134,7 +2125,7 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val alpha = color shr 24 and 0xFF
+        val alpha = color.alpha()
 
         if (alpha == 0 && doAlphaMix)
         {
@@ -2235,9 +2226,9 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val red = (color shr 16 and 0xFF) * alpha
-        val green = (color shr 8 and 0xFF) * alpha
-        val blue = (color and 0xFF) * alpha
+        val red = (color.red()) * alpha
+        val green = (color.green()) * alpha
+        val blue = (color.blue()) * alpha
 
         if (dx >= dy)
         {
@@ -2283,7 +2274,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Colorize with automatic palette
-
+     *
      * MUST be in draw mode
      *
      * @param precision Precision to use
@@ -2298,8 +2289,8 @@ class JHelpImage(val width: Int, val height: Int,
 
         val size = this.pixels.size
         val result = IntArray(size)
-        var indexPalette = 0xFFFF0000.toInt() // 0;
-        var color: Int
+        var indexPalette = 0
+        var color: ColorInt
         var reference: Int
         var red: Int
         var green: Int
@@ -2314,13 +2305,13 @@ class JHelpImage(val width: Int, val height: Int,
         {
             if (result[pix] == 0)
             {
-                color = indexPalette
+                color = JHelpImage.PALETTE[indexPalette % JHelpImage.PALETTE_SIZE]
                 indexPalette++
 
                 reference = this.pixels[pix]
-                red = reference shr 16 and 0xFF
-                green = reference shr 8 and 0xFF
-                blue = reference and 0xFF
+                red = reference.red()
+                green = reference.green()
+                blue = reference.blue()
 
                 stack.push(Point(x, y))
 
@@ -2367,12 +2358,12 @@ class JHelpImage(val width: Int, val height: Int,
 
         System.arraycopy(result, 0, this.pixels, 0, size)
 
-        return indexPalette and 0x00FFFFFF
+        return indexPalette
     }
 
     /**
      * Change image contrast by using the middle of the minimum and maximum
-
+     *
      * MUST be in draw mode
      *
      * @param factor Factor to apply to the contrast
@@ -2384,31 +2375,24 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
-        var red: Int
-        var green: Int
-        var blue: Int
-        var index: Int
-        var yMin: Double
-        var yMax: Double
         var y: Double
 
-        index = this.pixels.size - 1
-        color = this.pixels[index]
-        red = color shr 16 and 0xFF
-        green = color shr 8 and 0xFF
-        blue = color and 0xFF
+        var index = this.pixels.size - 1
+        var color = this.pixels[index]
+        var red = color.red()
+        var green = color.green()
+        var blue = color.blue()
 
-        yMax = JHelpImage.computeY(red, green, blue)
-        yMin = yMax
+        var yMax = JHelpImage.computeY(red, green, blue)
+        var yMin = yMax
 
         index--
         while (index >= 0)
         {
             color = this.pixels[index]
-            red = color shr 16 and 0xFF
-            green = color shr 8 and 0xFF
-            blue = color and 0xFF
+            red = color.red()
+            green = color.green()
+            blue = color.blue()
 
             y = JHelpImage.computeY(red, green, blue)
 
@@ -2422,12 +2406,11 @@ class JHelpImage(val width: Int, val height: Int,
         var u: Double
         var v: Double
 
-        for (i in this.pixels.indices.reversed())
-        {
-            color = this.pixels[i]
-            red = color shr 16 and 0xFF
-            green = color shr 8 and 0xFF
-            blue = color and 0xFF
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            red = color.red()
+            green = color.green()
+            blue = color.blue()
 
             y = JHelpImage.computeY(red, green, blue)
             u = JHelpImage.computeU(red, green, blue)
@@ -2435,7 +2418,7 @@ class JHelpImage(val width: Int, val height: Int,
 
             y = yMil + factor * (y - yMil)
 
-            this.pixels[i] = (color and 0xFFFF0000.toInt()
+            this.pixels[it] = (color and BLACK_ALPHA_MASK
                     or (JHelpImage.computeRed(y, u, v) shl 16)
                     or (JHelpImage.computeGreen(y, u, v) shl 8)
                     or JHelpImage.computeBlue(y, u, v))
@@ -2456,29 +2439,23 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
-        var red: Int
-        var green: Int
-        var blue: Int
-        var index: Int
-        var yAverage: Double
         var y: Double
 
-        index = this.pixels.size - 1
-        color = this.pixels[index]
-        red = color shr 16 and 0xFF
-        green = color shr 8 and 0xFF
-        blue = color and 0xFF
+        var index = this.pixels.size - 1
+        var color = this.pixels[index]
+        var red = color.red()
+        var green = color.green()
+        var blue = color.blue()
 
-        yAverage = JHelpImage.computeY(red, green, blue)
+        var yAverage = JHelpImage.computeY(red, green, blue)
 
         index--
         while (index >= 0)
         {
             color = this.pixels[index]
-            red = color shr 16 and 0xFF
-            green = color shr 8 and 0xFF
-            blue = color and 0xFF
+            red = color.red()
+            green = color.green()
+            blue = color.blue()
 
             yAverage += JHelpImage.computeY(red, green, blue)
 
@@ -2489,12 +2466,11 @@ class JHelpImage(val width: Int, val height: Int,
         var u: Double
         var v: Double
 
-        for (i in this.pixels.indices.reversed())
-        {
-            color = this.pixels[i]
-            red = color shr 16 and 0xFF
-            green = color shr 8 and 0xFF
-            blue = color and 0xFF
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            red = color.red()
+            green = color.green()
+            blue = color.blue()
 
             y = JHelpImage.computeY(red, green, blue)
             u = JHelpImage.computeU(red, green, blue)
@@ -2502,7 +2478,7 @@ class JHelpImage(val width: Int, val height: Int,
 
             y = ymil + factor * (y - ymil)
 
-            this.pixels[i] = (color and 0xFFFF0000.toInt()
+            this.pixels[it] = (color and BLACK_ALPHA_MASK
                     or (JHelpImage.computeRed(y, u, v) shl 16)
                     or (JHelpImage.computeGreen(y, u, v) shl 8)
                     or JHelpImage.computeBlue(y, u, v))
@@ -2511,9 +2487,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Copy the image is this one
-
+     *
      * This image and the given one MUST have same dimension
-
+     *
      * Note : if this image or given one not in draw mode, all visible sprites (of the image) are consider like a part
      * of the
      * image
@@ -2532,20 +2508,17 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Indicates if draw mode is locked.
-
+     *
      * If the draw mode is locked, it is impossible to change the draw mode status
      *
      * @return `true` if draw mode is locked.
      */
-    fun drawModeLocked(): Boolean
-    {
-        return this.drawModeLocked
-    }
+    fun drawModeLocked() = this.drawModeLocked
 
     /**
      * Create an image copy
-
-     * Note : if this image is not in draw mode, al visible sprites will be consider like a part of this image
+     *
+     * Note : if this image is not in draw mode, all visible sprites will be consider like a part of this image
      *
      * @return The copy
      */
@@ -2572,12 +2545,12 @@ class JHelpImage(val width: Int, val height: Int,
         var precision = precision
         precision = Math.max(0, precision)
         val mask = JHelpMask(this.width, this.height)
-        val alpha = positiveColor shr 24 and 0xFF
-        val red = positiveColor shr 16 and 0xFF
-        val green = positiveColor shr 8 and 0xFF
-        val blue = positiveColor and 0xFF
+        val alpha = positiveColor.alpha()
+        val red = positiveColor.red()
+        val green = positiveColor.green()
+        val blue = positiveColor.blue()
         var pix = 0
-        var color: Int
+        var color: ColorInt
         var a: Int
         var r: Int
         var g: Int
@@ -2588,10 +2561,10 @@ class JHelpImage(val width: Int, val height: Int,
             for (x in 0 until this.width)
             {
                 color = this.pixels[pix]
-                a = color shr 24 and 0xFF
-                r = color shr 16 and 0xFF
-                g = color shr 8 and 0xFF
-                b = color and 0xFF
+                a = color.alpha()
+                r = color.red()
+                g = color.green()
+                b = color.blue()
 
                 if (Math.abs(alpha - a) <= precision && Math.abs(red - r) <= precision
                         && Math.abs(green - g) <= precision && Math.abs(blue - b) <= precision)
@@ -2608,14 +2581,14 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw an empty shape
-
+     *
      * MUST be in draw mode
      *
      * @param shape      Shape to draw
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun drawShape(shape: Shape, color: Int, doAlphaMix: Boolean)
+    fun drawShape(shape: Shape, color: ColorInt, doAlphaMix: Boolean)
     {
         if (!this.drawMode)
         {
@@ -2668,7 +2641,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Create sprite with initial image inside
-
+     *
      * MUST NOT be in draw mode
      *
      * @param x      X
@@ -2676,16 +2649,11 @@ class JHelpImage(val width: Int, val height: Int,
      * @param source Initial image
      * @return Created sprite
      */
-    fun createSprite(x: Int, y: Int, source: JHelpImage?): JHelpSprite
+    fun createSprite(x: Int, y: Int, source: JHelpImage): JHelpSprite
     {
         if (this.drawMode)
         {
             throw IllegalStateException("MUST NOT be in draw mode !")
-        }
-
-        if (source == null)
-        {
-            throw NullPointerException("source MUST NOT be null")
         }
 
         val index = this.sprites.size
@@ -2696,7 +2664,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Make image darker
-
+     *
      * MUST be in draw mode
      *
      * @param factor Darker factor in [0, 255]
@@ -2708,24 +2676,22 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            color = this.pixels[pix]
-
-            this.pixels[pix] = color and 0xFFFF0000.toInt() or
-                    (limit0_255((color shr 16 and 0xFF) - factor) shl 16) or
-                    (limit0_255((color shr 8 and 0xFF) - factor) shl 8) or
-                    limit0_255((color and 0xFF) - factor)
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            this.pixels[it] = color and BLACK_ALPHA_MASK or
+                    (limit0_255((color.red()) - factor) shl 16) or
+                    (limit0_255((color.green()) - factor) shl 8) or
+                    limit0_255((color.blue()) - factor)
         }
     }
 
     /**
      * Divide an other image
-
+     *
      * This image and the given one MUST have same dimension
-
+     *
      * Note : if this image or given one not in draw mode, all visible sprites (of the image) are consider like a part
      * of the
      * image
@@ -2739,18 +2705,17 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalArgumentException("We can only multiply with an image of same size")
         }
 
-        var colorThis: Int
-        var colorImage: Int
+        var colorThis: ColorInt
+        var colorImage: ColorInt
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            colorThis = this.pixels[pix]
-            colorImage = image.pixels[pix]
+        this.pixels.indices.forEach {
+            colorThis = this.pixels[it]
+            colorImage = image.pixels[it]
 
-            this.pixels[pix] = colorThis and 0xFFFF0000.toInt() or
-                    ((colorThis shr 16 and 0xFF) * 256 / ((colorImage shr 16 and 0xFF) + 1) shl 16) or
-                    ((colorThis shr 8 and 0xFF) * 256 / ((colorImage shr 8 and 0xFF) + 1) shl 8) or
-                    (colorThis and 0xFF) * 256 / ((colorImage and 0xFF) + 1)
+            this.pixels[it] = colorThis and BLACK_ALPHA_MASK or
+                    ((colorThis.red()) * 256 / ((colorImage.red()) + 1) shl 16) or
+                    ((colorThis.green()) * 256 / ((colorImage.green()) + 1) shl 8) or
+                    (colorThis.blue()) * 256 / ((colorImage.blue()) + 1)
         }
     }
 
@@ -2774,7 +2739,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw an ellipse
-
+     *
      * MUST be in draw mode
      *
      * @param x          X of upper left corner
@@ -2784,7 +2749,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun drawEllipse(x: Int, y: Int, width: Int, height: Int, color: Int, doAlphaMix: Boolean = true)
+    fun drawEllipse(x: Int, y: Int, width: Int, height: Int, color: ColorInt, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -2797,7 +2762,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw horizontal line
-
+     *
      * MUST be in draw mode
      *
      * @param x1         X start
@@ -2806,7 +2771,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun drawHorizontalLine(x1: Int, x2: Int, y: Int, color: Int, doAlphaMix: Boolean = true)
+    fun drawHorizontalLine(x1: Int, x2: Int, y: Int, color: ColorInt, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -2829,7 +2794,7 @@ class JHelpImage(val width: Int, val height: Int,
         var start = xMin
         var end = xMax
 
-        val alpha = color shr 24 and 0xFF
+        val alpha = color.alpha()
 
         if (alpha == 0 && doAlphaMix)
         {
@@ -2850,9 +2815,9 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val red = (color shr 16 and 0xFF) * alpha
-        val green = (color shr 8 and 0xFF) * alpha
-        val blue = (color and 0xFF) * alpha
+        val red = (color.red()) * alpha
+        val green = (color.green()) * alpha
+        val blue = (color.blue()) * alpha
 
         for (pix in start..end)
         {
@@ -2862,7 +2827,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw a part off image
-
+     *
      * MUST be in draw mode
      *
      * @param x          X on this
@@ -2889,7 +2854,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw a part of image with a specific alpha
-
+     *
      * MUST be in draw mode
      *
      * @param x      X position
@@ -3003,9 +2968,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw an image with a given transformation.
-
+     *
      * Image MUST be in draw mode.
-
+     *
      * Given image and transformation MUST have same sizes
      *
      * @param x              X
@@ -3060,7 +3025,7 @@ class JHelpImage(val width: Int, val height: Int,
         var lineImage = xImage + yImage * image.width
         var pixImage: Int
         var pixThis: Int
-        var colorImage: Int
+        var colorImage: ColorInt
         var alpha: Int
         var vector: Vector
         var tx: Int
@@ -3086,7 +3051,7 @@ class JHelpImage(val width: Int, val height: Int,
                     pixThis = tx + ty * this.width
                     colorImage = image.pixels[pixImage]
 
-                    alpha = colorImage shr 24 and 0xFF
+                    alpha = colorImage.alpha()
 
                     if (alpha == 255 || !doAlphaMix)
                     {
@@ -3119,7 +3084,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param thickness Thick of the line
      * @param color     Color to use on line
      */
-    fun drawThickLine(x1: Int, y1: Int, x2: Int, y2: Int, thickness: Int, color: Int)
+    fun drawThickLine(x1: Int, y1: Int, x2: Int, y2: Int, thickness: Int, color: ColorInt)
     {
         if (thickness < 2)
         {
@@ -3140,12 +3105,8 @@ class JHelpImage(val width: Int, val height: Int,
      * @param thickness Thick of the line
      * @param texture   Texture to use on line
      */
-    fun drawThickLine(
-            x1: Int, y1: Int, x2: Int, y2: Int, thickness: Int,
-            texture: JHelpImage)
-    {
-        this.fillShape(this.createThickLine(x1, y1, x2, y2, thickness), texture)
-    }
+    fun drawThickLine(x1: Int, y1: Int, x2: Int, y2: Int, thickness: Int, texture: JHelpImage) =
+            this.fillShape(this.createThickLine(x1, y1, x2, y2, thickness), texture)
 
     /**
      * Draw shape with thick border
@@ -3154,7 +3115,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param thickness Border thick
      * @param color     Color to use on border
      */
-    fun drawThickShape(shape: Shape, thickness: Int, color: Int)
+    fun drawThickShape(shape: Shape, thickness: Int, color: ColorInt)
     {
         if (!this.drawMode)
         {
@@ -3212,7 +3173,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw a neon path.
-
+     *
      * Image MUST be in draw mode
      *
      * @param path         Path to draw
@@ -3221,7 +3182,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param percentStart Path percent to start drawing in [0, 1]
      * @param percentEnd   Path percent to stop drawing in [0, 1]
      */
-    fun drawNeon(path: Path, thin: Int, color: Int, percentStart: Double, percentEnd: Double)
+    fun drawNeon(path: Path, thin: Int, color: ColorInt, percentStart: Double, percentEnd: Double)
     {
         var thin = thin
         var color = color
@@ -3237,10 +3198,10 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val alpha = color and 0xFFFF0000.toInt()
-        var red = color shr 16 and 0xFF
-        var green = color shr 8 and 0xFF
-        var blue = color and 0xFF
+        val alpha = color and BLACK_ALPHA_MASK
+        var red = color.red()
+        var green = color.green()
+        var blue = color.blue()
         var y = JHelpImage.computeY(red, green, blue)
         val u = JHelpImage.computeU(red, green, blue)
         val v = JHelpImage.computeV(red, green, blue)
@@ -3270,7 +3231,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Repeat an image along a path.
-
+     *
      * Image MUST be in draw mode
      *
      * @param path         Path to follow
@@ -3292,7 +3253,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw a polygon
-
+     *
      * MUST be in draw mode
      *
      * @param xs         Polygon X list
@@ -3306,7 +3267,7 @@ class JHelpImage(val width: Int, val height: Int,
     fun drawPolygon(xs: IntArray, offsetX: Int = 0,
                     ys: IntArray, offsetY: Int = 0,
                     length: Int = Math.min(xs.size, ys.size),
-                    color: Int, doAlphaMix: Boolean = true)
+                    color: ColorInt, doAlphaMix: Boolean = true)
     {
         var offsetX = offsetX
         var offsetY = offsetY
@@ -3363,7 +3324,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw an empty rectangle
-
+     *
      * MUST be in draw mode
      *
      * @param x          X of top-left
@@ -3373,7 +3334,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun drawRectangle(x: Int, y: Int, width: Int, height: Int, color: Int, doAlphaMix: Boolean = true)
+    fun drawRectangle(x: Int, y: Int, width: Int, height: Int, color: ColorInt, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -3408,7 +3369,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if do alpha mixing or just overwrite
      */
-    fun drawRoundRectangle(x: Int, y: Int, width: Int, height: Int, arcWidth: Int, arcHeight: Int, color: Int,
+    fun drawRoundRectangle(x: Int, y: Int, width: Int, height: Int, arcWidth: Int, arcHeight: Int, color: ColorInt,
                            doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
@@ -3487,7 +3448,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw a string
-
+     *
      * MUST be in draw mode
      *
      * @param x          X of top-left
@@ -3497,7 +3458,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun drawString(x: Int, y: Int, string: String, font: JHelpFont, color: Int, doAlphaMix: Boolean = true)
+    fun drawString(x: Int, y: Int, string: String, font: JHelpFont, color: ColorInt, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -3517,7 +3478,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw a string center on given point
-
+     *
      * MUST be in draw mode
      *
      * @param x          String center X
@@ -3527,7 +3488,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if use alpha mix
      */
-    fun drawStringCenter(x: Int, y: Int, string: String, font: JHelpFont, color: Int, doAlphaMix: Boolean = true)
+    fun drawStringCenter(x: Int, y: Int, string: String, font: JHelpFont, color: ColorInt, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -3556,9 +3517,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param thickness Thick of the border
      * @param color     Color to use on border
      */
-    fun drawThickEllipse(
-            x: Int, y: Int, width: Int, height: Int, thickness: Int,
-            color: Int)
+    fun drawThickEllipse(x: Int, y: Int, width: Int, height: Int, thickness: Int, color: ColorInt)
     {
         if (!this.drawMode)
         {
@@ -3614,7 +3573,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw a vertical line
-
+     *
      * MUST be in draw mode
      *
      * @param x          X
@@ -3623,7 +3582,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun drawVerticalLine(x: Int, y1: Int, y2: Int, color: Int, doAlphaMix: Boolean = true)
+    fun drawVerticalLine(x: Int, y1: Int, y2: Int, color: ColorInt, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -3651,7 +3610,7 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val alpha = color shr 24 and 0xFF
+        val alpha = color.alpha()
 
         if (alpha == 0 && doAlphaMix)
         {
@@ -3670,9 +3629,9 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val red = (color shr 16 and 0xFF) * alpha
-        val green = (color shr 8 and 0xFF) * alpha
-        val blue = (color and 0xFF) * alpha
+        val red = (color.red()) * alpha
+        val green = (color.green()) * alpha
+        val blue = (color.blue()) * alpha
 
         var pix = start
         while (pix <= end)
@@ -3684,9 +3643,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Stop the draw mode and refresh the image
-
-     * Don't call this method if image is locked. Use [.drawModeLocked] to know.
-
+     *
+     * Don't call this method if image is locked. Use [drawModeLocked] to know.
+     *
      * The image is locked if we are inside a task launch by [JHelpImage.playInDrawMode] or [JHelpImage.playOutDrawMode]
      *
      * @throws IllegalStateException If draw mode is locked
@@ -3749,7 +3708,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Draw a thick polygon
-
+     *
      * MUST be in draw mode
      *
      * @param xs        Polygon X list
@@ -3763,7 +3722,7 @@ class JHelpImage(val width: Int, val height: Int,
     fun drawThickPolygon(xs: IntArray, offsetX: Int = 0,
                          ys: IntArray, offsetY: Int = 0,
                          length: Int = Math.min(xs.size, ys.size),
-                         thickness: Int, color: Int)
+                         thickness: Int, color: ColorInt)
     {
         var offsetX = offsetX
         var offsetY = offsetY
@@ -3966,7 +3925,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param thickness Border thick
      * @param color     Color to use on border
      */
-    fun drawThickRectangle(x: Int, y: Int, width: Int, height: Int, thickness: Int, color: Int)
+    fun drawThickRectangle(x: Int, y: Int, width: Int, height: Int, thickness: Int, color: ColorInt)
     {
         val x2 = x + width
         val y2 = y + height
@@ -4030,7 +3989,7 @@ class JHelpImage(val width: Int, val height: Int,
      */
     fun drawThickRoundRectangle(x: Int, y: Int, width: Int, height: Int,
                                 arcWidth: Int, arcHeight: Int,
-                                thickness: Int, color: Int)
+                                thickness: Int, color: ColorInt)
     {
         if (!this.drawMode)
         {
@@ -4093,9 +4052,8 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Extract a sub image from the image
-
-     * Note : If one of image is not in draw mode, all visible sprite (of this image) will be consider as a part of the
-     * image
+     *
+     * Note : If the image is not in draw mode, all visible sprite will be consider as a part of the image
      *
      * @param x      X of upper left corner of the area to extract
      * @param y      Y of upper left corner of the area to extract
@@ -4248,14 +4206,14 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a shape
-
+     *
      * MUST be in draw mode
      *
      * @param shape      Shape to fill
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun fillShape(shape: Shape, color: Int, doAlphaMix: Boolean = true)
+    fun fillShape(shape: Shape, color: ColorInt, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -4287,7 +4245,7 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val alpha = color shr 24 and 0xFF
+        val alpha = color.alpha()
 
         if (alpha == 0 && doAlphaMix)
         {
@@ -4319,9 +4277,9 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val red = (color shr 16 and 0xFF) * alpha
-        val green = (color shr 8 and 0xFF) * alpha
-        val blue = (color and 0xFF) * alpha
+        val red = (color.red()) * alpha
+        val green = (color.green()) * alpha
+        val blue = (color.blue()) * alpha
 
         for (yy in startY..endY)
         {
@@ -4343,7 +4301,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Filter on using a palette color
-
+     *
      * MUST be on draw mode
      *
      * @param index   Palette color indes
@@ -4357,11 +4315,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill pixels of image withc color.
-
+     *
      * The start point indicates the color to fill, and all neighboards pixels with color distance of precision will be
      * colored
      *
-
+     *
      * Must be in draw mode
      *
      * @param x         Start X
@@ -4370,7 +4328,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param precision Precision for color difference
      * @param alphaMix  Indicates if alpha mix or replace
      */
-    fun fillColor(x: Int, y: Int, color: Int, precision: Int, alphaMix: Boolean = true)
+    fun fillColor(x: Int, y: Int, color: ColorInt, precision: Int, alphaMix: Boolean = true)
     {
         var precision = precision
         if (!this.drawMode)
@@ -4383,7 +4341,7 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val alpha = color shr 24 and 0xFF
+        val alpha = color.alpha()
         if (alpha == 0 && alphaMix)
         {
             return
@@ -4438,9 +4396,9 @@ class JHelpImage(val width: Int, val height: Int,
         val stack = Stack<Point>()
         stack.push(Point(x, y))
         var point: Point
-        val red = (color shr 16 and 0xFF) * alpha
-        val green = (color shr 8 and 0xFF) * alpha
-        val blue = (color and 0xFF) * alpha
+        val red = (color.red()) * alpha
+        val green = (color.green()) * alpha
+        val blue = (color.blue()) * alpha
         var pix: Int
 
         while (!stack.isEmpty())
@@ -4478,7 +4436,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill an ellipse
-
+     *
      * MUST be in draw mode
      *
      * @param x          X of bounds top-left
@@ -4488,9 +4446,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun fillEllipse(
-            x: Int, y: Int, width: Int, height: Int,
-            color: Int, doAlphaMix: Boolean = true)
+    fun fillEllipse(x: Int, y: Int, width: Int, height: Int, color: ColorInt, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -4503,9 +4459,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill ellipse with a texture
-
-     * Note : if the texture is not in draw moe, all of it's visible sprte will be condider like a part of he texture
-
+     *
+     * Note : if the texture is not in draw moe, all of it's visible sprite will be consider like a part of he texture
+     *
      * MUST be in draw mode
      *
      * @param x          X of bounds top-left
@@ -4515,9 +4471,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param texture    Texture to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun fillEllipse(
-            x: Int, y: Int, width: Int, height: Int,
-            texture: JHelpImage, doAlphaMix: Boolean = true)
+    fun fillEllipse(x: Int, y: Int, width: Int, height: Int, texture: JHelpImage, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -4530,7 +4484,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill an ellipse
-
+     *
      * MUST be in draw mode
      *
      * @param x          X
@@ -4540,9 +4494,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param paint      Paint to use
      * @param doAlphaMix Indicates if do alpha mixing or just overwrite
      */
-    fun fillEllipse(
-            x: Int, y: Int, width: Int, height: Int, paint: JHelpPaint,
-            doAlphaMix: Boolean = true)
+    fun fillEllipse(x: Int, y: Int, width: Int, height: Int, paint: JHelpPaint, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -4555,7 +4507,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a polygon
-
+     *
      * MUST be in draw mode
      *
      * @param xs         X list
@@ -4566,9 +4518,10 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun fillPolygon(
-            xs: IntArray, offsetX: Int = 0, ys: IntArray, offsetY: Int = 0,
-            length: Int = Math.min(xs.size - offsetX, ys.size - offsetY), color: Int, doAlphaMix: Boolean = true)
+    fun fillPolygon(xs: IntArray, offsetX: Int = 0,
+                    ys: IntArray, offsetY: Int = 0,
+                    length: Int = Math.min(xs.size - offsetX, ys.size - offsetY),
+                    color: ColorInt, doAlphaMix: Boolean = true)
     {
         var offsetX = offsetX
         var offsetY = offsetY
@@ -4607,9 +4560,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a polygon
-
+     *
      * Note : if the texture is not in draw moe, all of it's visible sprte will be condider like a part of he texture
-
+     *
      * MUST be in draw mode
      *
      * @param xs         X list
@@ -4662,7 +4615,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a polygon
-
+     *
      * MUST be in draw mode
      *
      * @param xs         X coordinates
@@ -4714,7 +4667,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a rectangle
-
+     *
      * MUST be in draw mode
      *
      * @param x          X top-left
@@ -4724,7 +4677,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun fillRectangle(x: Int, y: Int, width: Int, height: Int, color: Int, doAlphaMix: Boolean = true)
+    fun fillRectangle(x: Int, y: Int, width: Int, height: Int, color: ColorInt, doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -4749,7 +4702,7 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val alpha = color shr 24 and 0xFF
+        val alpha = color.alpha()
 
         if (alpha == 0 && doAlphaMix)
         {
@@ -4778,9 +4731,9 @@ class JHelpImage(val width: Int, val height: Int,
             return
         }
 
-        val red = (color shr 16 and 0xFF) * alpha
-        val green = (color shr 8 and 0xFF) * alpha
-        val blue = (color and 0xFF) * alpha
+        val red = (color.red()) * alpha
+        val green = (color.green()) * alpha
+        val blue = (color.blue()) * alpha
 
         for (yy in startY..endY)
         {
@@ -4837,12 +4790,11 @@ class JHelpImage(val width: Int, val height: Int,
 
         var line = startX + startY * this.width
         var pix: Int
-        var color: Int
 
         val startXTexture = (startX - x) % texture.width
         var yTexture = (startY - y) % texture.height
         var pixTexture: Int
-        var colorTexture: Int
+        var colorTexture: ColorInt
 
         var alpha: Int
 
@@ -4858,7 +4810,7 @@ class JHelpImage(val width: Int, val height: Int,
             {
                 colorTexture = texture.pixels[pixTexture + xTexture]
 
-                alpha = colorTexture shr 24 and 0xFF
+                alpha = colorTexture.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -4882,7 +4834,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a rectangle
-
+     *
      * MUST be in draw mode
      *
      * @param x          X
@@ -4921,11 +4873,10 @@ class JHelpImage(val width: Int, val height: Int,
 
         var line = startX + startY * this.width
         var pix: Int
-        var color: Int
 
         val startXPaint = startX - x
         var yPaint = startY - y
-        var colorPaint: Int
+        var colorPaint: ColorInt
 
         var alpha: Int
 
@@ -4940,7 +4891,7 @@ class JHelpImage(val width: Int, val height: Int,
             {
                 colorPaint = paint.obtainColor(xPaint, yPaint)
 
-                alpha = colorPaint shr 24 and 0xFF
+                alpha = colorPaint.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -4997,7 +4948,7 @@ class JHelpImage(val width: Int, val height: Int,
 
         var line: Int = startX + startY * this.width
         var pix: Int
-        var color: Int
+        var color: ColorInt
 
         for (yy in startY..endY)
         {
@@ -5006,7 +4957,7 @@ class JHelpImage(val width: Int, val height: Int,
             for (xx in startX..endX)
             {
                 color = this.pixels[pix]
-                this.pixels[pix] = color and 0xFF000000.toInt() or (color.inv() and 0x00FFFFFF)
+                this.pixels[pix] = color and BLACK_ALPHA_MASK or (color.inv() and COLOR_MASK)
 
                 pix++
             }
@@ -5017,11 +4968,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a rectangle with an image.
-
+     *
      * The image is scaled to fit rectangle size
-
+     *
      * Note : if the texture is not in draw mode, all of it's visible sprite will be consider like a part of he texture
-
+     *
      * MUST be in draw mode
      *
      * @param x          X
@@ -5057,32 +5008,23 @@ class JHelpImage(val width: Int, val height: Int,
         }
 
         var line = startX + startY * this.width
-        var pix: Int
-        var color: Int
-
         val startXT = startX - x
         var yt = startY - y
         var yTexture = yt * texture.height / height
-        var pixTexture: Int
-        var colorTexture: Int
-
-        var alpha: Int
-        var ahpla: Int
-
         var yy = startY
+
         while (yy <= endY)
         {
-            pixTexture = yTexture * texture.width
-            pix = line
-
+            val pixTexture = yTexture * texture.width
+            var pix = line
             var xx = startX
             var xt = startXT
             var xTexture = 0
+
             while (xx < endX)
             {
-                colorTexture = texture.pixels[pixTexture + xTexture]
-
-                alpha = colorTexture shr 24 and 0xFF
+                val colorTexture = texture.pixels[pixTexture + xTexture]
+                val alpha = colorTexture.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -5108,14 +5050,14 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a rectangle with an image.
-
+     *
      * The image is scaled to fit rectangle size.
-
+     *
      * The result is nicer than [.fillRectangleScale] but it is slower
      * and take temporary more memory
-
+     *
      * Note : if the texture is not in draw mode, all of it's visible sprite will be consider like a part of the texture
-
+     *
      * MUST be in draw mode
      *
      * @param x          X
@@ -5150,7 +5092,7 @@ class JHelpImage(val width: Int, val height: Int,
 
         graphics2d.drawImage(texture.image, 0, 0, width, height, null)
 
-        var pixels = IntArray(width * height)
+        var pixels = Pixels(width * height)
         pixels = bufferedImage.getRGB(0, 0, width, height, pixels, 0, width)
 
         val image = JHelpImage(width, height, pixels)
@@ -5169,24 +5111,20 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill the image with a color on respect the alpha.
-
+     *
      * That is to say the given color alpha is no use, but original image alpha for given a pixel
      *
      * @param color Color for fill
      */
-    fun fillRespectAlpha(color: Int)
+    fun fillRespectAlpha(color: ColorInt)
     {
         if (!this.drawMode)
         {
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        val pure = color and 0x00FFFFFF
-
-        for (pix in this.pixels.indices.reversed())
-        {
-            this.pixels[pix] = this.pixels[pix] and 0xFFFF0000.toInt() or pure
-        }
+        val pure = color and COLOR_MASK
+        this.pixels.indices.forEach { this.pixels[it] = (this.pixels[it] and BLACK_ALPHA_MASK) or pure }
     }
 
     /**
@@ -5203,7 +5141,7 @@ class JHelpImage(val width: Int, val height: Int,
 
         paint.initializePaint(this.width, this.height)
         var pix = 0
-        var color: Int
+        var color: ColorInt
 
         for (y in 0 until this.height)
         {
@@ -5218,7 +5156,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a round rectangle
-
+     *
      * MUST be in draw mode
      *
      * @param x          X
@@ -5230,10 +5168,8 @@ class JHelpImage(val width: Int, val height: Int,
      * @param color      Color to use
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      */
-    fun fillRoundRectangle(
-            x: Int, y: Int, width: Int, height: Int, arcWidth: Int,
-            arcHeight: Int, color: Int,
-            doAlphaMix: Boolean = true)
+    fun fillRoundRectangle(x: Int, y: Int, width: Int, height: Int, arcWidth: Int, arcHeight: Int, color: ColorInt,
+                           doAlphaMix: Boolean = true)
     {
         if (!this.drawMode)
         {
@@ -5246,9 +5182,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a round rectangle
-
+     *
      * Note : if the texture is not in draw mode, all of it's visible sprite will be consider like a part of he texture
-
+     *
      * MUST be in draw mode
      *
      * @param x          X
@@ -5276,7 +5212,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a round rectangle
-
+     *
      * MUST be in draw mode
      *
      * @param x          X
@@ -5314,9 +5250,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a shape
-
+     *
      * Note : if the texture is not in draw mode, all of it's visible sprite will be consider like a part of he texture
-
+     *
      * MUST be in draw mode
      *
      * @param shape      Shape to fill
@@ -5361,7 +5297,7 @@ class JHelpImage(val width: Int, val height: Int,
         val startTextureX = (startX - x) % texture.width
         var yTexture = (startY - y) % texture.height
         var pixTexture: Int
-        var colorTexture: Int
+        var colorTexture: ColorInt
 
         var alpha: Int
 
@@ -5379,7 +5315,7 @@ class JHelpImage(val width: Int, val height: Int,
                 {
                     colorTexture = texture.pixels[pixTexture + xTexture]
 
-                    alpha = colorTexture shr 24 and 0xFF
+                    alpha = colorTexture.alpha()
 
                     if (alpha == 255 || !doAlphaMix)
                     {
@@ -5404,7 +5340,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a shape
-
+     *
      * MUST be in draw mode
      *
      * @param shape      Shape to fill
@@ -5450,7 +5386,7 @@ class JHelpImage(val width: Int, val height: Int,
 
         val startXPaint = startX - x
         var yPaint = startY - y
-        var colorPaint: Int
+        var colorPaint: ColorInt
 
         var alpha: Int
 
@@ -5467,7 +5403,7 @@ class JHelpImage(val width: Int, val height: Int,
                 {
                     colorPaint = paint.obtainColor(xPaint, yPaint)
 
-                    alpha = colorPaint shr 24 and 0xFF
+                    alpha = colorPaint.alpha()
 
                     if (alpha == 255 || !doAlphaMix)
                     {
@@ -5492,7 +5428,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a string
-
+     *
      * MUST be in draw mode
      *
      * @param x          X top-left
@@ -5504,7 +5440,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      * @return Bounds where string just draw
      */
-    fun fillString(x: Int, y: Int, string: String, font: JHelpFont, color: Int,
+    fun fillString(x: Int, y: Int, string: String, font: JHelpFont, color: ColorInt,
                    textAlign: JHelpTextAlign = JHelpTextAlign.LEFT,
                    doAlphaMix: Boolean = true): Rectangle
     {
@@ -5531,9 +5467,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a string
-
+     *
      * Note : if the texture is not in draw mode, all of it's visible sprite will be consider like a part of he texture
-
+     *
      * MUST be in draw mode
      *
      * @param x          X top-left
@@ -5546,7 +5482,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      * @return Bounds where string just draw
      */
-    fun fillString(x: Int, y: Int, string: String, font: JHelpFont, texture: JHelpImage, color: Int,
+    fun fillString(x: Int, y: Int, string: String, font: JHelpFont, texture: JHelpImage, color: ColorInt,
                    textAlign: JHelpTextAlign = JHelpTextAlign.LEFT, doAlphaMix: Boolean = true): Rectangle
     {
         if (!this.drawMode)
@@ -5579,7 +5515,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Fill a string
-
+     *
      * MUST be on draw mode
      *
      * @param x          X
@@ -5592,7 +5528,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param doAlphaMix Indicates if we do the mixing `true`, or we just override `false`
      * @return Bounds where string just draw
      */
-    fun fillString(x: Int, y: Int, string: String, font: JHelpFont, paint: JHelpPaint, color: Int,
+    fun fillString(x: Int, y: Int, string: String, font: JHelpFont, paint: JHelpPaint, color: ColorInt,
                    textAlign: JHelpTextAlign = JHelpTextAlign.LEFT, doAlphaMix: Boolean = true): Rectangle
     {
         if (!this.drawMode)
@@ -5623,7 +5559,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Filter image on blue channel
-
+     *
      * MUST be on draw mode
      */
     fun filterBlue()
@@ -5633,21 +5569,20 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
         var blue: Int
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            color = this.pixels[pix]
-            blue = color and 0xFF
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            blue = color.blue()
 
-            this.pixels[pix] = color and 0xFF0000FF.toInt() or (blue shl 16) or (blue shl 8)
+            this.pixels[it] = color and 0xFF0000FF.toInt() or (blue shl 16) or (blue shl 8)
         }
     }
 
     /**
      * Filter image on green channel
-
+     *
      * MUST be on draw mode
      */
     fun filterGreen()
@@ -5657,50 +5592,48 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
         var green: Int
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            color = this.pixels[pix]
-            green = color shr 8 and 0xFF
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            green = color.green()
 
-            this.pixels[pix] = color and 0xFF00FF00.toInt() or (green shl 16) or green
+            this.pixels[it] = color and 0xFF00FF00.toInt() or (green shl 16) or green
         }
     }
 
     /**
      * Filter image on a specific color
-
+     *
      * MUST be on draw mode
      *
      * @param color   Color search
      * @param colorOK Color to use if corresponds
      * @param colorKO Colo to use if failed
      */
-    fun filterOn(color: Int, colorOK: Int, colorKO: Int)
+    fun filterOn(color: ColorInt, colorOK: ColorInt, colorKO: ColorInt)
     {
         if (!this.drawMode)
         {
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        for (i in this.pixels.indices.reversed())
-        {
-            if (color == this.pixels[i])
+        this.pixels.indices.forEach {
+            if (color == this.pixels[it])
             {
-                this.pixels[i] = colorOK
+                this.pixels[it] = colorOK
             }
             else
             {
-                this.pixels[i] = colorKO
+                this.pixels[it] = colorKO
             }
         }
     }
 
     /**
      * filter image on a specific color
-
+     *
      * MUST be on draw mode
      *
      * @param color     Color search
@@ -5708,24 +5641,23 @@ class JHelpImage(val width: Int, val height: Int,
      * @param colorOK   Color if corresponds
      * @param colorKO   Color if not corresponds
      */
-    fun filterOn(color: Int, precision: Int, colorOK: Int, colorKO: Int)
+    fun filterOn(color: ColorInt, precision: Int, colorOK: ColorInt, colorKO: ColorInt)
     {
         if (!this.drawMode)
         {
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        val refrence = Color(color)
+        val reference = Color(color)
 
-        for (i in this.pixels.indices.reversed())
-        {
-            if (refrence.near(Color(this.pixels[i]), precision))
+        this.pixels.indices.forEach {
+            if (reference.near(Color(this.pixels[it]), precision))
             {
-                this.pixels[i] = colorOK
+                this.pixels[it] = colorOK
             }
             else
             {
-                this.pixels[i] = colorKO
+                this.pixels[it] = colorKO
             }
         }
     }
@@ -5737,7 +5669,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Filter image on red channel
-
+     *
      * MUST be on draw mode
      */
     fun filterRed()
@@ -5747,21 +5679,19 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
         var red: Int
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            color = this.pixels[pix]
-            red = color shr 16 and 0xFF
-
-            this.pixels[pix] = color and 0xFFFF0000.toInt() or (red shl 8) or red
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            red = color.red()
+            this.pixels[it] = color and 0xFFFF0000.toInt() or (red shl 8) or red
         }
     }
 
     /**
      * Filter image on U part
-
+     *
      * MUST be on draw mode
      */
     fun filterU()
@@ -5771,23 +5701,19 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
         var u: Int
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            color = this.pixels[pix]
-
-            u = limit0_255(
-                    JHelpImage.computeU(color shr 16 and 0xFF, color shr 8 and 0xFF, color and 0xFF).toInt())
-
-            this.pixels[pix] = color and 0xFF000000.toInt() or (u shl 16) or (u shl 8) or u
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            u = limit0_255(JHelpImage.computeU(color.red(), color.green(), color.blue()).toInt())
+            this.pixels[it] = color and BLACK_ALPHA_MASK or (u shl 16) or (u shl 8) or u
         }
     }
 
     /**
      * Filter image on V part
-
+     *
      * MUST be on draw mode
      */
     fun filterV()
@@ -5797,23 +5723,19 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
         var v: Int
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            color = this.pixels[pix]
-
-            v = limit0_255(
-                    JHelpImage.computeV(color shr 16 and 0xFF, color shr 8 and 0xFF, color and 0xFF).toInt())
-
-            this.pixels[pix] = color and 0xFF000000.toInt() or (v shl 16) or (v shl 8) or v
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            v = limit0_255(JHelpImage.computeV(color.red(), color.green(), color.blue()).toInt())
+            this.pixels[it] = color and BLACK_ALPHA_MASK or (v shl 16) or (v shl 8) or v
         }
     }
 
     /**
      * Filter image on Y part
-
+     *
      * MUST be on draw mode
      */
     fun filterY()
@@ -5823,28 +5745,26 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
         var y: Int
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            color = this.pixels[pix]
-
-            y = limit0_255(
-                    JHelpImage.computeY(color shr 16 and 0xFF, color shr 8 and 0xFF, color and 0xFF).toInt())
-
-            this.pixels[pix] = color and 0xFF000000.toInt() or (y shl 16) or (y shl 8) or y
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            y = limit0_255(JHelpImage.computeY(color.red(), color.green(), color.blue()).toInt())
+            this.pixels[it] = color and BLACK_ALPHA_MASK or (y shl 16) or (y shl 8) or y
         }
     }
 
     /**
      * Flip the image horizontally and vertically in same time.
-
-     * Visually its same result as : `
-     * image.flipHorizontal();
-     * image.flipVertical();
-    ` *  But its done faster
-
+     *
+     * Visually its same result as :
+     *
+     *     image.flipHorizontal();
+     *     image.flipVertical();
+     *
+     * But its done faster
+     *
      * MUST be on draw mode
      */
     fun flipBoth()
@@ -5856,7 +5776,7 @@ class JHelpImage(val width: Int, val height: Int,
 
         val length = this.pixels.size
         val mpix = length shr 1
-        var color: Int
+        var color: ColorInt
 
         var pixS = 0
         var pixE = length - 1
@@ -5872,7 +5792,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Flip the image horizontally
-
+     *
      * MUST be on draw mode
      */
     fun flipHorizontal()
@@ -5886,7 +5806,7 @@ class JHelpImage(val width: Int, val height: Int,
         var line = 0
         var pixL: Int
         var pixR: Int
-        var color: Int
+        var color: ColorInt
 
         for (y in 0 until this.height)
         {
@@ -5909,7 +5829,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Flip the image vertically
-
+     *
      * MUST be on draw mode
      */
     fun flipVertical()
@@ -5944,9 +5864,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Extract an array of pixels from the image.
-
+     *
      * The returned array will have some additional free integer at start, the number depends on the given offset.
-
+     *
      * If the image is no in draw mode, sprites will be consider as part of image
      *
      * @param x      X up-left corner
@@ -5954,11 +5874,10 @@ class JHelpImage(val width: Int, val height: Int,
      * @param width  Rectangle width
      * @param height Rectangle height
      * @param offset Offset where start copy the pixels, so before integers are "free", so it could be see also as the
-     * number of free
-     * integers
+     * number of free integers
      * @return Extracted pixels
      */
-    fun pixels(x: Int, y: Int, width: Int, height: Int, offset: Int = 0): IntArray
+    fun pixels(x: Int, y: Int, width: Int, height: Int, offset: Int = 0): Pixels
     {
         var x = x
         var y = y
@@ -5982,7 +5901,7 @@ class JHelpImage(val width: Int, val height: Int,
 
         if (x > this.width || width < 1)
         {
-            return IntArray(0)
+            return Pixels(0)
         }
 
         if (y < 0)
@@ -5998,7 +5917,7 @@ class JHelpImage(val width: Int, val height: Int,
 
         if (y > this.height || height < 1)
         {
-            return IntArray(0)
+            return Pixels(0)
         }
 
         val size = width * height
@@ -6019,7 +5938,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Convert image in gray version
-
+     *
      * MUST be on draw mode
      */
     fun gray()
@@ -6029,22 +5948,18 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
         var y: Int
-        for (i in this.pixels.indices.reversed())
-        {
-            color = this.pixels[i]
-
-            y = limit0_255(
-                    JHelpImage.computeY(color shr 16 and 0xFF, color shr 8 and 0xFF, color and 0xFF).toInt())
-
-            this.pixels[i] = (color and BLACK_ALPHA_MASK) or (y shl 16) or (y shl 8) or y
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            y = limit0_255(JHelpImage.computeY(color.red(), color.green(), color.blue()).toInt())
+            this.pixels[it] = (color and BLACK_ALPHA_MASK) or (y shl 16) or (y shl 8) or y
         }
     }
 
     /**
      * Convert image in gray invert version
-
+     *
      * MUST be on draw mode
      */
     fun grayInvert()
@@ -6054,23 +5969,22 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
         var y: Int
-        for (i in this.pixels.indices.reversed())
-        {
-            color = this.pixels[i]
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
 
-            y = 255 - limit0_255(JHelpImage.computeY(color shr 16 and 0xFF,
-                                                     color shr 8 and 0xFF,
-                                                     color and 0xFF).toInt())
+            y = 255 - limit0_255(JHelpImage.computeY(color.red(),
+                                                     color.green(),
+                                                     color.blue()).toInt())
 
-            this.pixels[i] = color and 0xFFFF0000.toInt() or (y shl 16) or (y shl 8) or y
+            this.pixels[it] = color and BLACK_ALPHA_MASK or (y shl 16) or (y shl 8) or y
         }
     }
 
     /**
      * Invert image colors
-
+     *
      * MUST be on draw mode
      */
     fun invertColors()
@@ -6080,18 +5994,14 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
-        for (i in this.pixels.indices.reversed())
-        {
-            color = this.pixels[i]
+        var color: ColorInt
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
 
-            this.pixels[i] = color and 0xFFFF0000.toInt() or //
-
-                    (255 - (color shr 16 and 0xFF) shl 16) or //
-
-                    (255 - (color shr 8 and 0xFF) shl 8) or //
-
-                    255 - (color and 0xFF)
+            this.pixels[it] = color and BLACK_ALPHA_MASK or
+                    (255 - (color.red()) shl 16) or
+                    (255 - (color.green()) shl 8) or
+                    255 - (color.blue())
         }
     }
 
@@ -6118,7 +6028,7 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
+        var color: ColorInt
         var red: Int
         var green: Int
         var blue: Int
@@ -6126,18 +6036,17 @@ class JHelpImage(val width: Int, val height: Int,
         var u: Double
         var v: Double
 
-        for (i in this.pixels.indices.reversed())
-        {
-            color = this.pixels[i]
-            red = color shr 16 and 0xFF
-            green = color shr 8 and 0xFF
-            blue = color and 0xFF
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            red = color.red()
+            green = color.green()
+            blue = color.blue()
 
             y = JHelpImage.computeY(red, green, blue)
             u = JHelpImage.computeU(red, green, blue)
             v = JHelpImage.computeV(red, green, blue)
 
-            this.pixels[i] = (color and 0xFFFF0000.toInt()
+            this.pixels[it] = (color and BLACK_ALPHA_MASK
                     or (JHelpImage.computeRed(y, v, u) shl 16)
                     or (JHelpImage.computeGreen(y, v, u) shl 8)
                     or JHelpImage.computeBlue(y, v, u))
@@ -6153,7 +6062,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Remove all color part except blue
-
+     *
      * MUST be on draw mode
      */
     fun keepBlue()
@@ -6163,15 +6072,12 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            this.pixels[pix] = this.pixels[pix] and 0xFF0000FF.toInt()
-        }
+        this.pixels.indices.forEach { this.pixels[it] = this.pixels[it] and 0xFF0000FF.toInt() }
     }
 
     /**
      * Remove all color part except green
-
+     *
      * MUST be on draw mode
      */
     fun keepGreen()
@@ -6181,15 +6087,12 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            this.pixels[pix] = this.pixels[pix] and 0xFF00FF00.toInt()
-        }
+        this.pixels.indices.forEach { this.pixels[it] = this.pixels[it] and 0xFF00FF00.toInt() }
     }
 
     /**
      * Remove all color part except red
-
+     *
      * MUST be on draw mode
      */
     fun keepRed()
@@ -6199,21 +6102,18 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            this.pixels[pix] = this.pixels[pix] and 0xFFFF0000.toInt()
-        }
+        this.pixels.indices.forEach { this.pixels[it] = this.pixels[it] and 0xFFFF0000.toInt() }
     }
 
     /**
      * Take the maximum between this image and given one
-
+     *
      * Note : if the given image is not in draw mode, all of it's visible sprite will be consider like a part of the
      * given image
      *
-
+     *
      * Given image MUST have same dimension of this
-
+     *
      * MUST be in draw mode
      *
      * @param image Image reference
@@ -6230,18 +6130,17 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var colorThis: Int
-        var colorImage: Int
+        var colorThis: ColorInt
+        var colorImage: ColorInt
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            colorThis = this.pixels[pix]
-            colorImage = image.pixels[pix]
+        this.pixels.indices.forEach {
+            colorThis = this.pixels[it]
+            colorImage = image.pixels[it]
 
-            this.pixels[pix] = colorThis and 0xFF000000.toInt() or
-                    (Math.max(colorThis shr 16 and 0xFF, colorImage shr 16 and 0xFF) shl 16) or //
-                    (Math.max(colorThis shr 8 and 0xFF, colorImage shr 8 and 0xFF) shl 8) or //
-                    Math.max(colorThis and 0xFF, colorImage and 0xFF)
+            this.pixels[it] = colorThis and BLACK_ALPHA_MASK or
+                    (Math.max(colorThis.red(), colorImage.red()) shl 16) or //
+                    (Math.max(colorThis.green(), colorImage.green()) shl 8) or //
+                    Math.max(colorThis.blue(), colorImage.blue())
         }
     }
 
@@ -6261,13 +6160,13 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Take the middle between this image and given one
-
+     *
      * Note : if the given image is not in draw mode, all of it's visible sprite will be consider like a part of the
      * given image
      *
-
+     *
      * Given image MUST have same dimension of this
-
+     *
      * MUST be in draw mode
      *
      * @param image Image reference
@@ -6284,18 +6183,17 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var colorThis: Int
-        var colorImage: Int
+        var colorThis: ColorInt
+        var colorImage: ColorInt
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            colorThis = this.pixels[pix]
-            colorImage = image.pixels[pix]
+        this.pixels.indices.forEach {
+            colorThis = this.pixels[it]
+            colorImage = image.pixels[it]
 
-            this.pixels[pix] = colorThis and 0xFF000000.toInt() or //
-                    ((colorThis shr 16 and 0xFF) + (colorImage shr 16 and 0xFF) shr 1 shl 16) or //
-                    ((colorThis shr 8 and 0xFF) + (colorImage shr 8 and 0xFF) shr 1 shl 8) or //
-                    ((colorThis and 0xFF) + (colorImage and 0xFF) shr 1)
+            this.pixels[it] = colorThis and BLACK_ALPHA_MASK or
+                    ((colorThis.red()) + (colorImage.red()) shr 1 shl 16) or
+                    ((colorThis.green()) + (colorImage.green()) shr 1 shl 8) or
+                    ((colorThis.blue()) + (colorImage.blue()) shr 1)
         }
     }
 
@@ -6315,13 +6213,13 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Take the minimum between this image and given one
-
+     *
      * Note : if the given image is not in draw mode, all of it's visible sprite will be consider like a part of the
      * given image
      *
-
+     *
      * Given image MUST have same dimension of this
-
+     *
      * MUST be in draw mode
      *
      * @param image Image reference
@@ -6338,18 +6236,17 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var colorThis: Int
-        var colorImage: Int
+        var colorThis: ColorInt
+        var colorImage: ColorInt
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            colorThis = this.pixels[pix]
-            colorImage = image.pixels[pix]
+        this.pixels.indices.forEach {
+            colorThis = this.pixels[it]
+            colorImage = image.pixels[it]
 
-            this.pixels[pix] = colorThis and 0xFF000000.toInt() or //
-                    (Math.min(colorThis shr 16 and 0xFF, colorImage shr 16 and 0xFF) shl 16) or //
-                    (Math.min(colorThis shr 8 and 0xFF, colorImage shr 8 and 0xFF) shl 8) or //
-                    Math.min(colorThis and 0xFF, colorImage and 0xFF)
+            this.pixels[it] = colorThis and BLACK_ALPHA_MASK or //
+                    (Math.min(colorThis.red(), colorImage.red()) shl 16) or //
+                    (Math.min(colorThis.green(), colorImage.green()) shl 8) or //
+                    Math.min(colorThis.blue(), colorImage.blue())
         }
     }
 
@@ -6369,13 +6266,13 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Multiply the image with an other one
-
+     *
      * Note : if the given image is not in draw mode, all of it's visible sprite will be consider like a part of the
      * given image
      *
-
+     *
      * Given image MUST have same dimension of this
-
+     *
      * MUST be in draw mode
      *
      * @param image Image to multiply
@@ -6392,18 +6289,17 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var colorThis: Int
-        var colorImage: Int
+        var colorThis: ColorInt
+        var colorImage: ColorInt
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            colorThis = this.pixels[pix]
-            colorImage = image.pixels[pix]
+        this.pixels.indices.forEach {
+            colorThis = this.pixels[it]
+            colorImage = image.pixels[it]
 
-            this.pixels[pix] = colorThis and 0xFF000000.toInt() or //
-                    ((colorThis shr 16 and 0xFF) * (colorImage shr 16 and 0xFF) / 255 shl 16) or //
-                    ((colorThis shr 8 and 0xFF) * (colorImage shr 8 and 0xFF) / 255 shl 8) or //
-                    (colorThis and 0xFF) * (colorImage and 0xFF) / 255
+            this.pixels[it] = colorThis and BLACK_ALPHA_MASK or
+                    ((colorThis.red()) * (colorImage.red()) / 255 shl 16) or
+                    ((colorThis.green()) * (colorImage.green()) / 255 shl 8) or
+                    (colorThis.blue()) * (colorImage.blue()) / 255
         }
     }
 
@@ -6427,11 +6323,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint the image on using an other as alpha mask
-
+     *
      * Alpha mask image can be imagine like a paper with holes that we put on the main image, we paint, and remove the
      * image,
      * only holes are paint on final image.
-
+     *
      * Holes are here pixels with alpha more than 0x80
      *
      * @param x          Where put the left corner X of alpha mask
@@ -6441,7 +6337,8 @@ class JHelpImage(val width: Int, val height: Int,
      * @param background Color for fill background
      * @param doAlphaMix Indicates if do alpha mixing (`true`) or just overwrite (`false`)
      */
-    fun paintAlphaMask(x: Int, y: Int, alphaMask: JHelpImage, color: Int, background: Int, doAlphaMix: Boolean = true)
+    fun paintAlphaMask(x: Int, y: Int, alphaMask: JHelpImage, color: ColorInt, background: ColorInt,
+                       doAlphaMix: Boolean = true)
     {
         this.fillRectangle(x, y, alphaMask.width, alphaMask.height, background, doAlphaMix)
         this.paintAlphaMask(x, y, alphaMask, color)
@@ -6449,11 +6346,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint the image on using an other as alpha mask
-
+     *
      * Alpha mask image can be imagine like a paper with holes that we put on the main image, we paint, and remove the
      * image,
      * only holes are paint on final image.
-
+     *
      * Holes are here pixels with alpha more than 0x80
      *
      * @param x         Where put the left corner X of alpha mask
@@ -6510,7 +6407,7 @@ class JHelpImage(val width: Int, val height: Int,
 
             for (xxx in xx until width)
             {
-                alphaAlpha = alphaMask.pixels[pixAlpha] shr 24 and 0xFF
+                alphaAlpha = alphaMask.pixels[pixAlpha].alpha()
 
                 if (alphaAlpha > 0x80)
                 {
@@ -6528,11 +6425,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint the image on using an other as alpha mask
-
+     *
      * Alpha mask image can be imagine like a paper with holes that we put on the main image, we paint, and remove the
      * image,
      * only holes are paint on final image.
-
+     *
      * Holes are here pixels with alpha more than 0x80
      *
      * @param x         Where put the left corner X of alpha mask
@@ -6595,7 +6492,7 @@ class JHelpImage(val width: Int, val height: Int,
 
             for (xxx in xx until width)
             {
-                alphaAlpha = alphaMask.pixels[pixAlpha] shr 24 and 0xFF
+                alphaAlpha = alphaMask.pixels[pixAlpha].alpha()
 
                 if (alphaAlpha > 0x80)
                 {
@@ -6613,11 +6510,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint the image on using an other as alpha mask
-
+     *
      * Alpha mask image can be imagine like a paper with holes that we put on the main image, we paint, and remove the
      * image,
      * only holes are paint on final image.
-
+     *
      * Holes are here pixels with alpha more than 0x80
      *
      * @param x         Where put the left corner X of alpha mask
@@ -6676,7 +6573,7 @@ class JHelpImage(val width: Int, val height: Int,
 
             for (xxx in xx until width)
             {
-                alphaAlpha = alphaMask.pixels[pixAlpha] shr 24 and 0xFF
+                alphaAlpha = alphaMask.pixels[pixAlpha].alpha()
 
                 if (alphaAlpha > 0x80)
                 {
@@ -6723,7 +6620,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint a mask
-
+     *
      * MUST be in draw mode
      *
      * @param x          X
@@ -6733,7 +6630,8 @@ class JHelpImage(val width: Int, val height: Int,
      * @param background Background color
      * @param doAlphaMix Indicates if do alpha mixing (`true`) or just overwrite (`false`)
      */
-    fun paintMask(x: Int, y: Int, mask: JHelpMask, foreground: Int, background: Int, doAlphaMix: Boolean = true)
+    fun paintMask(x: Int, y: Int, mask: JHelpMask, foreground: ColorInt, background: ColorInt,
+                  doAlphaMix: Boolean = true)
     {
         var x = x
         var y = y
@@ -6770,23 +6668,21 @@ class JHelpImage(val width: Int, val height: Int,
 
         var line = x + y * this.width
         var pix: Int
-        var color: Int
-        var col: Int
+        var color: ColorInt
         var alpha: Int
-        var ahpla: Int
         var red: Int
         var blue: Int
         var green: Int
 
-        val alphaFore = foreground shr 24 and 0xFF
-        val redFore = (foreground shr 16 and 0xFF) * alphaFore
-        val greenFore = (foreground shr 8 and 0xFF) * alphaFore
-        val blueFore = (foreground and 0xFF) * alphaFore
+        val alphaFore = foreground.alpha()
+        val redFore = foreground.red() * alphaFore
+        val greenFore = foreground.green() * alphaFore
+        val blueFore = foreground.blue() * alphaFore
 
-        val alphaBack = background shr 24 and 0xFF
-        val redBack = (background shr 16 and 0xFF) * alphaBack
-        val greenBack = (background shr 8 and 0xFF) * alphaBack
-        val blueBack = (background and 0xFF) * alphaBack
+        val alphaBack = background.alpha()
+        val redBack = background.red() * alphaBack
+        val greenBack = background.green() * alphaBack
+        val blueBack = background.blue() * alphaBack
 
         for (yyy in yy until height)
         {
@@ -6829,11 +6725,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint a mask with unify foreground color and part of image in background
-
+     *
      * Note : if the background is not in draw mode, all of it's visible sprite will be consider like a part of the
      * background
      *
-
+     *
      * MUST be in draw mode
      *
      * @param x           X
@@ -6845,7 +6741,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param backgroundY Y start in background image
      * @param doAlphaMix  Indicates if do alpha mixing (`true`) or just overwrite (`false`)
      */
-    fun paintMask(x: Int, y: Int, mask: JHelpMask, foreground: Int,
+    fun paintMask(x: Int, y: Int, mask: JHelpMask, foreground: ColorInt,
                   background: JHelpImage, backgroundX: Int, backgroundY: Int,
                   doAlphaMix: Boolean = true)
     {
@@ -6902,7 +6798,7 @@ class JHelpImage(val width: Int, val height: Int,
         var line = x + y * this.width
         var pixBack: Int
         var pix: Int
-        var color: Int
+        var color: ColorInt
         var alpha: Int
 
         for (yyy in yy until height)
@@ -6916,7 +6812,7 @@ class JHelpImage(val width: Int, val height: Int,
                     foreground
                 else
                     background.pixels[pixBack]
-                alpha = color shr 24 and 0xFF
+                alpha = color.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -6938,7 +6834,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint a mask with unify color as foreground and paint as background
-
+     *
      * MUST be in draw mode
      *
      * @param x          X
@@ -6948,7 +6844,8 @@ class JHelpImage(val width: Int, val height: Int,
      * @param background Background paint
      * @param doAlphaMix Indicates if do alpha mixing (`true`) or just overwrite (`false`)
      */
-    fun paintMask(x: Int, y: Int, mask: JHelpMask, foreground: Int, background: JHelpPaint, doAlphaMix: Boolean = true)
+    fun paintMask(x: Int, y: Int, mask: JHelpMask, foreground: ColorInt, background: JHelpPaint,
+                  doAlphaMix: Boolean = true)
     {
         var x = x
         var y = y
@@ -6987,7 +6884,7 @@ class JHelpImage(val width: Int, val height: Int,
 
         var line = x + y * this.width
         var pix: Int
-        var color: Int
+        var color: ColorInt
         var alpha: Int
 
         for (yyy in yy until height)
@@ -7000,7 +6897,7 @@ class JHelpImage(val width: Int, val height: Int,
                     foreground
                 else
                     background.obtainColor(xxx, yyy)
-                alpha = color shr 24 and 0xFF
+                alpha = color.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -7020,11 +6917,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint a mask with part of image as foreground and unify color as background
-
+     *
      * Note : if the foreground is not in draw mode, all of it's visible sprite will be consider like a part of the
      * foreground
      *
-
+     *
      * MUST be in draw mode
      *
      * @param x           X
@@ -7038,7 +6935,7 @@ class JHelpImage(val width: Int, val height: Int,
      */
     fun paintMask(x: Int, y: Int, mask: JHelpMask,
                   foreground: JHelpImage, foregroundX: Int, foregroundY: Int,
-                  background: Int, doAlphaMix: Boolean = true)
+                  background: ColorInt, doAlphaMix: Boolean = true)
     {
         var x = x
         var y = y
@@ -7093,7 +6990,7 @@ class JHelpImage(val width: Int, val height: Int,
         var line = x + y * this.width
         var pixFore: Int
         var pix: Int
-        var color: Int
+        var color: ColorInt
         var alpha: Int
 
         for (yyy in yy until height)
@@ -7107,7 +7004,7 @@ class JHelpImage(val width: Int, val height: Int,
                     foreground.pixels[pixFore]
                 else
                     background
-                alpha = color shr 24 and 0xFF
+                alpha = color.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -7129,11 +7026,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint a mask with 2 images, one for "foreground" pixels, one for "background" ones
-
+     *
      * Note : if the foreground or background is not in draw mode, all of it's visible sprite will be consider like a
      * part of the
      * foreground or background
-
+     *
      * MUST be in draw mode
      *
      * @param x           X position for the mask
@@ -7223,7 +7120,7 @@ class JHelpImage(val width: Int, val height: Int,
         var pixFore: Int
         var pixBack: Int
         var pix: Int
-        var color: Int
+        var color: ColorInt
         var alpha: Int
 
         for (yyy in yy until height)
@@ -7238,7 +7135,7 @@ class JHelpImage(val width: Int, val height: Int,
                     foreground.pixels[pixFore]
                 else
                     background.pixels[pixBack]
-                alpha = color shr 24 and 0xFF
+                alpha = color.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -7262,11 +7159,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint a mask with image in foreground and paint in background
-
+     *
      * Note : if the foreground is not in draw mode, all of it's visible sprite will be consider like a part of the
      * foreground
      *
-
+     *
      * MUST be in draw mode
      *
      * @param x           X where paint the mask
@@ -7336,7 +7233,7 @@ class JHelpImage(val width: Int, val height: Int,
         var line = x + y * this.width
         var pixFore: Int
         var pix: Int
-        var color: Int
+        var color: ColorInt
         var alpha: Int
 
         for (yyy in yy until height)
@@ -7350,7 +7247,7 @@ class JHelpImage(val width: Int, val height: Int,
                     foreground.pixels[pixFore]
                 else
                     background.obtainColor(xxx, yyy)
-                alpha = color shr 24 and 0xFF
+                alpha = color.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -7372,7 +7269,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint mask with paint in foreground and color in background
-
+     *
      * MUST be in draw mode
      *
      * @param x          X where paint the mask
@@ -7420,10 +7317,8 @@ class JHelpImage(val width: Int, val height: Int,
         foreground.initializePaint(width, height)
         var line = x + y * this.width
         var pix: Int
-        var color: Int
-        var col: Int
+        var color: ColorInt
         var alpha: Int
-        var ahpla: Int
 
         for (yyy in yy until height)
         {
@@ -7435,7 +7330,7 @@ class JHelpImage(val width: Int, val height: Int,
                     foreground.obtainColor(xxx, yyy)
                 else
                     background
-                alpha = color shr 24 and 0xFF
+                alpha = color.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -7455,11 +7350,11 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint a mask with paint in foreground and image in background
-
+     *
      * Note : if the background is not in draw mode, all of it's visible sprite will be consider like a part of the
      * background
      *
-
+     *
      * MUST be in draw mode
      *
      * @param x           X position for mask
@@ -7529,10 +7424,8 @@ class JHelpImage(val width: Int, val height: Int,
         var line = x + y * this.width
         var pixBack: Int
         var pix: Int
-        var color: Int
-        var col: Int
+        var color: ColorInt
         var alpha: Int
-        var ahpla: Int
 
         for (yyy in yy until height)
         {
@@ -7545,7 +7438,7 @@ class JHelpImage(val width: Int, val height: Int,
                     foreground.obtainColor(xxx, yyy)
                 else
                     background.pixels[pixBack]
-                alpha = color shr 24 and 0xFF
+                alpha = color.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -7567,7 +7460,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Paint mask with paint in foreground and background
-
+     *
      * MUST be in draw mode
      *
      * @param x          X position for mask
@@ -7617,10 +7510,8 @@ class JHelpImage(val width: Int, val height: Int,
         background.initializePaint(width, height)
         var line = x + y * this.width
         var pix: Int
-        var color: Int
-        var col: Int
+        var color: ColorInt
         var alpha: Int
-        var ahpla: Int
 
         for (yyy in yy until height)
         {
@@ -7632,7 +7523,7 @@ class JHelpImage(val width: Int, val height: Int,
                     foreground.obtainColor(xxx, yyy)
                 else
                     background.obtainColor(xxx, yyy)
-                alpha = color shr 24 and 0xFF
+                alpha = color.alpha()
 
                 if (alpha == 255 || !doAlphaMix)
                 {
@@ -7652,7 +7543,7 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Pick a color inside the image
-
+     *
      * Note : if the image is not in draw mode, all visible sprite are consider as a part of image, so may obtain a
      * sprite pixel
      *
@@ -7665,8 +7556,7 @@ class JHelpImage(val width: Int, val height: Int,
         if (x < 0 || x >= this.width || y < 0 || y >= this.height)
         {
             throw IllegalArgumentException(
-                    "Coordinates of peek point must be in [0, " + this.width + "[ x [0, " + this.height + "[ not (" + x
-                            + ", " + y + ")")
+                    "Coordinates of peek point must be in [0, ${this.width}[ x [0, ${this.height}[ not ($x, $y")
         }
 
         return this.pixels[x + (y * this.width)]
@@ -7674,9 +7564,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Do a task in draw mode.
-
+     *
      * Don't call this method if image is locked. Use [.drawModeLocked] to know.
-
+     *
      * The image is locked if we are inside a task launch by [.playInDrawMode] or [.playOutDrawMode]
      *
      * @param task Task to do. The parameter will be this image locked in draw mode
@@ -7708,9 +7598,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Do a task not in draw mode.
-
+     *
      * Don't call this method if image is locked. Use [.drawModeLocked] to know.
-
+     *
      * The image is locked if we are inside a task launch by [.playInDrawMode] or [.playOutDrawMode]
      *
      * @param task Task to do. The parameter will be this image locked in not draw mode
@@ -7742,9 +7632,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Play a task when image enter in draw mode.
-
+     *
      * If image already in draw mode, the task is played immediately.
-
+     *
      * If image not in draw mode, task will be played next time someone call [.startDrawMode]
      *
      * @param task Task to play in draw mode
@@ -7766,9 +7656,9 @@ class JHelpImage(val width: Int, val height: Int,
 
     /**
      * Play task when image exit from draw mode.
-
+     *
      * If image already not in draw mode, the task is played immediately.
-
+     *
      * If image in draw mode, task will be played next time someone call [.endDrawMode]
      *
      * @param task Task to play in draw mode
@@ -7811,12 +7701,9 @@ class JHelpImage(val width: Int, val height: Int,
      * @param width  Clip width
      * @param height Clip height
      */
-    fun pushClip(x: Int, y: Int, width: Int, height: Int)
-    {
-        this.pushClip(
-                Clip(Math.max(x, 0), Math.min(x + width - 1, this.width - 1), Math.max(y, 0), Math.min(y + height - 1,
-                                                                                                       this.height - 1)))
-    }
+    fun pushClip(x: Int, y: Int, width: Int, height: Int) =
+            this.pushClip(Clip(Math.max(x, 0), Math.min(x + width - 1, this.width - 1),
+                               Math.max(y, 0), Math.min(y + height - 1, this.height - 1)))
 
     /**
      * Push clip in the stack
@@ -7838,10 +7725,8 @@ class JHelpImage(val width: Int, val height: Int,
      * @param width  Clip width
      * @param height Clip height
      */
-    fun pushClipIntersect(x: Int, y: Int, width: Int, height: Int)
-    {
-        this.pushClipIntersect(Clip(x, x + width - 1, y, y + height - 1))
-    }
+    fun pushClipIntersect(x: Int, y: Int, width: Int, height: Int) =
+            this.pushClipIntersect(Clip(x, x + width - 1, y, y + height - 1))
 
     /**
      * Push intersection of current clip and given one
@@ -7901,10 +7786,7 @@ class JHelpImage(val width: Int, val height: Int,
                                      this.visibilities!!.size - index - 1)
                 }
 
-                for (i in this.sprites.indices.reversed())
-                {
-                    this.sprites[i].spriteIndex(i)
-                }
+                this.sprites.indices.forEach { this.sprites[it].spriteIndex(it) }
             }
 
             this.update()
@@ -8067,24 +7949,24 @@ class JHelpImage(val width: Int, val height: Int,
      * @param newColor       New color
      * @param near           Distance maximum from color searched to consider to color is near
      */
-    fun replaceColor(colorToReplace: Int, newColor: Int, near: Int)
+    fun replaceColor(colorToReplace: ColorInt, newColor: ColorInt, near: Int)
     {
         if (!this.drawMode)
         {
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var color: Int
-        for (i in this.pixels.indices.reversed())
-        {
-            color = this.pixels[i]
+        var color: ColorInt
 
-            if (Math.abs((colorToReplace shr 24 and 0xFF) - (color shr 24 and 0xFF)) <= near
-                    && Math.abs((colorToReplace shr 16 and 0xFF) - (color shr 16 and 0xFF)) <= near
-                    && Math.abs((colorToReplace shr 8 and 0xFF) - (color shr 8 and 0xFF)) <= near
-                    && Math.abs((colorToReplace and 0xFF) - (color and 0xFF)) <= near)
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+
+            if (Math.abs((colorToReplace.alpha()) - (color.alpha())) <= near
+                    && Math.abs((colorToReplace.red()) - (color.red())) <= near
+                    && Math.abs((colorToReplace.green()) - (color.green())) <= near
+                    && Math.abs((colorToReplace.blue()) - (color.blue())) <= near)
             {
-                this.pixels[i] = newColor
+                this.pixels[it] = newColor
             }
         }
     }
@@ -8101,7 +7983,7 @@ class JHelpImage(val width: Int, val height: Int,
         val width = this.width
         val height = this.height
         val length = width * height
-        val pixels = IntArray(length)
+        val pixels = Pixels(length)
 
         var pix = 0
         var pixR = length - 1
@@ -8126,7 +8008,7 @@ class JHelpImage(val width: Int, val height: Int,
     {
         val width = this.height
         val height = this.width
-        val pixels = IntArray(width * height)
+        val pixels = Pixels(width * height)
 
         var xr = width - 1
         val yr = 0
@@ -8163,7 +8045,7 @@ class JHelpImage(val width: Int, val height: Int,
     {
         val width = this.height
         val height = this.width
-        val pixels = IntArray(width * height)
+        val pixels = Pixels(width * height)
 
         var xr = 0
         val yr = height - 1
@@ -8201,11 +8083,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param height Area to extract height
      * @return Result image
      */
-    fun rotatedPart180(x: Int, y: Int, width: Int, height: Int): JHelpImage
-    {
-        return this.extractSubImage(x, y, width, height)
-                .rotate180()
-    }
+    fun rotatedPart180(x: Int, y: Int, width: Int, height: Int) = this.extractSubImage(x, y, width, height).rotate180()
 
     /**
      * Extract a sub image and then rotate it from 270 degree
@@ -8218,11 +8096,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param height Area to extract height
      * @return Result image
      */
-    fun rotatedPart270(x: Int, y: Int, width: Int, height: Int): JHelpImage
-    {
-        return this.extractSubImage(x, y, width, height)
-                .rotate270()
-    }
+    fun rotatedPart270(x: Int, y: Int, width: Int, height: Int) = this.extractSubImage(x, y, width, height).rotate270()
 
     /**
      * Extract a sub image and then rotate it from 90 degree
@@ -8235,11 +8109,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param height Area to extract height
      * @return Result image
      */
-    fun rotatedPart90(x: Int, y: Int, width: Int, height: Int): JHelpImage
-    {
-        return this.extractSubImage(x, y, width, height)
-                .rotate90()
-    }
+    fun rotatedPart90(x: Int, y: Int, width: Int, height: Int) = this.extractSubImage(x, y, width, height).rotate90()
 
     /**
      * Change one pixel color.
@@ -8250,7 +8120,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param y     Y
      * @param color Color
      */
-    fun setPixel(x: Int, y: Int, color: Int)
+    fun setPixel(x: Int, y: Int, color: ColorInt)
     {
         if (!this.drawMode)
         {
@@ -8266,7 +8136,8 @@ class JHelpImage(val width: Int, val height: Int,
     }
 
     /**
-     * Change a pixels area.<br>
+     * Change a pixels area.
+     *
      * MUST be in draw mode
      *
      * @param x      X up-left corner
@@ -8276,7 +8147,7 @@ class JHelpImage(val width: Int, val height: Int,
      * @param pixels Pixels array
      * @param offset Offset where start read pixels data
      */
-    fun pixels(x: Int, y: Int, width: Int, height: Int, pixels: IntArray, offset: Int = 0)
+    fun pixels(x: Int, y: Int, width: Int, height: Int, pixels: Pixels, offset: Int = 0)
     {
         if (!this.drawMode)
         {
@@ -8342,12 +8213,11 @@ class JHelpImage(val width: Int, val height: Int,
         }
 
         val alphaPart = limit0_255(alpha) shl 24
-        var color: Int
+        var color: ColorInt
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            color = this.pixels[pix]
-            this.pixels[pix] = alphaPart or (color and 0x00FFFFFF)
+        this.pixels.indices.forEach {
+            color = this.pixels[it]
+            this.pixels[it] = alphaPart or (color and COLOR_MASK)
         }
     }
 
@@ -8375,7 +8245,7 @@ class JHelpImage(val width: Int, val height: Int,
             index += size
         }
 
-        val temp = IntArray(size)
+        val temp = Pixels(size)
         System.arraycopy(this.pixels, 0, temp, 0, size)
 
         for (i in 0 until size)
@@ -8523,18 +8393,17 @@ class JHelpImage(val width: Int, val height: Int,
             throw IllegalStateException("Must be in draw mode !")
         }
 
-        var colorThis: Int
-        var colorImage: Int
+        var colorThis: ColorInt
+        var colorImage: ColorInt
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            colorThis = this.pixels[pix]
-            colorImage = image.pixels[pix]
+        this.pixels.indices.forEach {
+            colorThis = this.pixels[it]
+            colorImage = image.pixels[it]
 
-            this.pixels[pix] = colorThis and 0xFF000000.toInt() or //
-                    (limit0_255((colorThis shr 16 and 0xFF) - (colorImage shr 16 and 0xFF)) shl 16) or //
-                    (limit0_255((colorThis shr 8 and 0xFF) - (colorImage shr 8 and 0xFF)) shl 8) or //
-                    limit0_255((colorThis and 0xFF) - (colorImage and 0xFF))
+            this.pixels[it] = colorThis and BLACK_ALPHA_MASK or
+                    (limit0_255((colorThis.red()) - (colorImage.red())) shl 16) or
+                    (limit0_255((colorThis.green()) - (colorImage.green())) shl 8) or
+                    limit0_255((colorThis.blue()) - (colorImage.blue()))
         }
     }
 
@@ -8563,20 +8432,19 @@ class JHelpImage(val width: Int, val height: Int,
      *
      * @param color Color to tint with
      */
-    fun tint(color: Int)
+    fun tint(color: ColorInt)
     {
         this.gray()
-        val red = color shr 16 and 0xFF
-        val green = color shr 8 and 0xFF
-        val blue = color and 0xFF
+        val red = color.red()
+        val green = color.green()
+        val blue = color.blue()
         var col: Int
         var gray: Int
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            col = this.pixels[pix]
-            gray = col and 0xFF
-            this.pixels[pix] = col and -0x1000000 or (red * gray shr 8 shl 16) or (green * gray shr 8 shl 8) or (blue * gray shr 8)
+        this.pixels.indices.forEach {
+            col = this.pixels[it]
+            gray = col.blue()
+            this.pixels[it] = col and BLACK_ALPHA_MASK or (red * gray shr 8 shl 16) or (green * gray shr 8 shl 8) or (blue * gray shr 8)
         }
     }
 
@@ -8588,25 +8456,24 @@ class JHelpImage(val width: Int, val height: Int,
      * @param colorHigh Color for "high" value
      * @param colorLow  Color for "low" value
      */
-    fun tint(colorHigh: Int, colorLow: Int)
+    fun tint(colorHigh: ColorInt, colorLow: ColorInt)
     {
         this.gray()
-        val redHigh = colorHigh shr 16 and 0xFF
-        val greenHigh = colorHigh shr 8 and 0xFF
-        val blueHigh = colorHigh and 0xFF
-        val redLow = colorLow shr 16 and 0xFF
-        val greenLow = colorLow shr 8 and 0xFF
-        val blueLow = colorLow and 0xFF
-        var col: Int
+        val redHigh = colorHigh.red()
+        val greenHigh = colorHigh.green()
+        val blueHigh = colorHigh.blue()
+        val redLow = colorLow.red()
+        val greenLow = colorLow.green()
+        val blueLow = colorLow.blue()
+        var col: ColorInt
         var gray: Int
         var yarg: Int
 
-        for (pix in this.pixels.indices.reversed())
-        {
-            col = this.pixels[pix]
+        this.pixels.indices.forEach {
+            col = this.pixels[it]
             gray = col and 0xFF
             yarg = 256 - gray
-            this.pixels[pix] = (col and -0x1000000
+            this.pixels[it] = (col and BLACK_ALPHA_MASK
                     or (redHigh * gray + redLow * yarg shr 8 shl 16)
                     or (greenHigh * gray + greenLow * yarg shr 8 shl 8)
                     or (blueHigh * gray + blueLow * yarg shr 8))

@@ -29,6 +29,9 @@ abstract class Layout<C : Constraints> : Iterable<Component>
     private val mutex = Mutex()
     private val components = ArrayList<ComponentConstraints>()
 
+    internal fun obtainComponentConstraintsUnsafe(constraints: C) =
+            this.components.firstOrNull { it.constraints == constraints }
+
     internal fun obtainComponentConstraints(constraints: C) =
             this.mutex.playInCriticalSection { this.components.firstOrNull { it.constraints == constraints } }
 
@@ -55,8 +58,9 @@ abstract class Layout<C : Constraints> : Iterable<Component>
         }
     }
 
-    operator fun get(constraints: C) =
-            this.mutex.playInCriticalSection { this.obtainComponentConstraints(constraints)?.component }
+    internal fun obtainComponentUnsafe(constraints: C) = this.obtainComponentConstraintsUnsafe(constraints)?.component
+
+    operator fun get(constraints: C) = this.obtainComponentConstraints(constraints)?.component
 
     fun obtainConstraints(component: Component) =
             this.mutex.playInCriticalSection { (this.components.firstOrNull { it.component == component })?.constraints }

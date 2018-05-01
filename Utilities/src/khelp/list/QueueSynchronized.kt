@@ -1,7 +1,8 @@
 package khelp.list
 
 /**
- * Link between tow elements in the queue <br></br>
+ * Link between tow elements in the queue
+ *
  */
 internal class Link<E>(val element: E)
 {

@@ -423,9 +423,12 @@ class JHelpFont(val font: Font, val underline: Boolean = false)
     }
 
     /**
-     * Indicates if an object is equals to this font <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Indicates if an object is equals to this font
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param other Compared object

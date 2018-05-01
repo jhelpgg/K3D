@@ -37,7 +37,7 @@ class Scene
     var redBackground = 1f
     var blueBackground = 1f
     var greenBackground = 1f
-    private val root = Node()
+    val root = Node()
     private var nodeList: Array<Node>? = null
 
     init
@@ -45,7 +45,7 @@ class Scene
         this.root.name = "ROOT"
     }
 
-    private fun refresh()
+    fun refresh()
     {
         this.nodeList = null
     }

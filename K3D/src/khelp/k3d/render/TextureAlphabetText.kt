@@ -98,7 +98,8 @@ class TextureAlphabetText : Texture
     fun hasNext() = this.alphabetText.hasNext()
     fun hasPrevious() = this.alphabetText.hasPrevious()
     /**
-     * Draw next part of the text (Margin is kept).<br></br>
+     * Draw next part of the text (Margin is kept).
+     *
      * Does nothing if no next part
      */
     fun next()
@@ -113,7 +114,8 @@ class TextureAlphabetText : Texture
     }
 
     /**
-     * Draw previous part of the text (Margin is kept).<br></br>
+     * Draw previous part of the text (Margin is kept).
+     *
      * Does nothing if no previous part
      */
     fun previous()
@@ -130,7 +132,8 @@ class TextureAlphabetText : Texture
     fun refresh() = this.updateImage(false)
 
     /**
-     * Change the text to draw.<br></br>
+     * Change the text to draw.
+     *
      * Margin will be deleted to empty
      *
      * @param text New text

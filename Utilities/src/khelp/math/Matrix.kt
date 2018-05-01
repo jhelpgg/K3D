@@ -238,7 +238,8 @@ class Matrix(private val width: Int, private val height: Int)
     }
 
     /**
-     * Exchange 2 row.<br></br>
+     * Exchange 2 row.
+     *
      * The determinant not change except by the sign (y1 and y2 are inside matrix and different)
      *
      * @param y1 First row
@@ -574,9 +575,12 @@ class Matrix(private val width: Int, private val height: Int)
     fun height() = this.height
 
     /**
-     * Matrix hash code <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Matrix hash code
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @return Matrix hash code
@@ -588,9 +592,12 @@ class Matrix(private val width: Int, private val height: Int)
     }
 
     /**
-     * Compare the matrix to an other <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Compare the matrix to an other
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param other Object to compare with
@@ -628,9 +635,12 @@ class Matrix(private val width: Int, private val height: Int)
     }
 
     /**
-     * String representation <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * String representation
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @return String representation
@@ -939,8 +949,10 @@ class Matrix(private val width: Int, private val height: Int)
     }
 
     /**
-     * Push list of values inside the matrix, from up left, left to right, then up to down.<br></br>
-     * If not enough value are given, the rest of the matrix is fill by 0.<br></br>
+     * Push list of values inside the matrix, from up left, left to right, then up to down.
+     *
+     * If not enough value are given, the rest of the matrix is fill by 0.
+     *
      * If to much value is given, the matrix is fill and other values are ignored
      *
      * @param values Values for fill the matrix

@@ -3,6 +3,10 @@ package khelp.k3d.render
 import khelp.debug.exception
 import khelp.debug.warning
 import khelp.images.JHelpImage
+import khelp.images.alpha
+import khelp.images.blue
+import khelp.images.green
+import khelp.images.red
 import khelp.k3d.util.BYTE_0
 import khelp.k3d.util.BYTE_255
 import khelp.k3d.util.TEMPORARY_BYTE_BUFFER
@@ -876,10 +880,10 @@ open class Texture internal constructor(name: String, reference: String)
         while (index < nb)
         {
             color = pixels[index]
-            bytePixels[pix++] = ((color shr 16) and 0xFF).toByte()
-            bytePixels[pix++] = ((color shr 8) and 0xFF).toByte()
-            bytePixels[pix++] = (color and 0xFF).toByte()
-            bytePixels[pix++] = ((color shr 24) and 0xFF).toByte()
+            bytePixels[pix++] = color.red().toByte()
+            bytePixels[pix++] = color.green().toByte()
+            bytePixels[pix++] = color.blue().toByte()
+            bytePixels[pix++] = color.alpha().toByte()
             index++
         }
 
@@ -1556,7 +1560,8 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Add a texture (pixel by pixel).<br></br>
+     * Add a texture (pixel by pixel).
+     *
      * Added texture must have same dimensions
      *
      * @param texture Texture to add
@@ -1588,8 +1593,10 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Developer additional information.<br></br>
-     * Its an opaque value, that can be use by the API user.<br></br>
+     * Developer additional information.
+     *
+     * Its an opaque value, that can be use by the API user.
+     *
      * The texture just carry it
      *
      * @return Developer additional information
@@ -1600,8 +1607,10 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Modify developer additional information.<br></br>
-     * Its an opaque value, that can be use by the API user.<br></br>
+     * Modify developer additional information.
+     *
+     * Its an opaque value, that can be use by the API user.
+     *
      * The texture just carry it
      *
      * @param additionalInformation Information to carry
@@ -1612,7 +1621,8 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Apply an alpha map.<br></br>
+     * Apply an alpha map.
+     *
      * Alpha map must have same dimensions
      *
      * @param texture Alpha map
@@ -1805,7 +1815,8 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Compute `first + second - 128` limit in [0, 255] pixel by pixel of tow texture.<br></br>
+     * Compute `first + second - 128` limit in [0, 255] pixel by pixel of tow texture.
+     *
      * Textures must have same dimension
      *
      * @param texture Second texture
@@ -1837,7 +1848,8 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Change texture contrast.<br></br>
+     * Change texture contrast.
+     *
      * If factor is :
      *
      *  * `0 <= factor <1` : contrast go down
@@ -1926,7 +1938,8 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Destroy the texture.<br></br>
+     * Destroy the texture.
+     *
      * WARNING: It is public for the system. If use, be extremely sure of what it does.
      * For remove texture prefer use  [Window3D.removeFromMemory]
      */
@@ -1942,7 +1955,8 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Divide by texture.<br></br>
+     * Divide by texture.
+     *
      * Textures must have same dimensions
      *
      * @param texture Texture to divide with
@@ -2640,7 +2654,8 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Multiply by a texture.<br></br>
+     * Multiply by a texture.
+     *
      * Textures must have same dimensions
      *
      * @param texture Texture to multiply with
@@ -2745,7 +2760,8 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Try to reduce texture in memory, <br></br>
+     * Try to reduce texture in memory,
+     *
      * The texture will take less memory, but will be less defined also
      */
     fun reduce()
@@ -2826,11 +2842,12 @@ open class Texture internal constructor(name: String, reference: String)
      */
     fun setPixels(width: Int, height: Int, pixels: ByteArray)
     {
-        val nb = width * height * 4
-        if (nb != pixels.size)
+        if ((width * height * 4) != pixels.size)
         {
-            throw IllegalArgumentException("The pixels' array length is not width*height*4 !")
+            throw IllegalArgumentException(
+                    "The pixels' array length(${pixels.size}) is not width($width)*height($height)*4=${width * height * 4}")
         }
+
         this.width = width
         this.height = height
         this.pixels = pixels
@@ -2847,28 +2864,34 @@ open class Texture internal constructor(name: String, reference: String)
     fun setPixels(width: Int, height: Int, pixels: IntArray)
     {
         val nb = width * height
+
         if (nb != pixels.size)
         {
-            throw IllegalArgumentException("The pixels' array length is not width*height !")
+            throw IllegalArgumentException(
+                    "The pixels' array length(${pixels.size}) is not width($width)*height($height)=${width * height}")
         }
+
         this.width = width
         this.height = height
         var color: Int
         this.pixels = ByteArray(nb * 4)
         var index = 0
+
         for (i in 0 until nb)
         {
             color = pixels[i]
-            this.pixels[index++] = ((color shr 16) and 0xFF).toByte()
-            this.pixels[index++] = ((color shr 8) and 0xFF).toByte()
-            this.pixels[index++] = (color and 0xFF).toByte()
-            this.pixels[index++] = ((color shr 24) and 0xFF).toByte()
+            this.pixels[index++] = color.red().toByte()
+            this.pixels[index++] = color.green().toByte()
+            this.pixels[index++] = color.blue().toByte()
+            this.pixels[index++] = color.alpha().toByte()
         }
+
         this.needToRefresh = true
     }
 
     /**
-     * Override by an other texture.<br></br>
+     * Override by an other texture.
+     *
      * If dimensions are different, the texture dimension will change
      *
      * @param texture Texture that override
@@ -2879,12 +2902,10 @@ open class Texture internal constructor(name: String, reference: String)
         {
             this.width = texture.width
             this.height = texture.height
-
             this.pixels = ByteArray(this.width * this.height * 4)
         }
 
         System.arraycopy(texture.pixels, 0, this.pixels, 0, this.pixels.size)
-
         this.needToRefresh = true
     }
 
@@ -2927,7 +2948,8 @@ open class Texture internal constructor(name: String, reference: String)
     }
 
     /**
-     * Subtract a texture.<br></br>
+     * Subtract a texture.
+     *
      * Textures must have same dimensions
      *
      * @param texture Texture to subtract

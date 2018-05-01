@@ -19,11 +19,7 @@ class AnimationList(numberOfLoop: Int = 1) : Animation
     fun addAnimation(animation: Animation) = this.animations.add(animation)
 
     /**
-     * Called when animation list is playing <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
-     * {@inheritDoc}
-     *
+     * Called when animation list is playing
      * @param absoluteFrame Absolute frame
      * @return `false` if animation list finished and no more loop left
      * @see Animation.animate
@@ -72,11 +68,7 @@ class AnimationList(numberOfLoop: Int = 1) : Animation
     }
 
     /**
-     * Called when animation initialize <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
-     * {@inheritDoc}
-     *
+     * Called when animation initialize
      * @param startAbsoluteFrame Start ABSOLUTE frame
      * @see Animation.startAbsoluteFrame
      */

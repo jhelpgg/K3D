@@ -169,7 +169,8 @@ const val PATH_SEPARATOR = '/'
 val PREVIOUS_DIRECTORY = ".."
 
 /**
- * Create a double from a byte array.<br></br>
+ * Create a double from a byte array.
+ *
  * Work good with byte array generated with [.doubleToByteArray]
  *
  * @param array Array to convert
@@ -178,7 +179,8 @@ val PREVIOUS_DIRECTORY = ".."
 fun byteArrayToDouble(array: ByteArray) = java.lang.Double.longBitsToDouble(byteArrayToLong(array))
 
 /**
- * Create a long from a byte array.<br></br>
+ * Create a long from a byte array.
+ *
  * Work good with byte array generated with [.longToByteArray]
  *
  * @param array Array to convert
@@ -693,7 +695,8 @@ fun createFile(file: File?): Boolean
 }
 
 /**
- * Create a temporary directory.<br></br>
+ * Create a temporary directory.
+ *
  * That is to say, a new empty directory inside the temporary directory
  *
  * @return Created directory
@@ -721,7 +724,8 @@ fun createTemporaryDirectory(): File
 }
 
 /**
- * Create a temporary file.<br></br>
+ * Create a temporary file.
+ *
  * That is to say, a file inside the temporary directory
  *
  * @param string File name
@@ -743,7 +747,8 @@ fun createTemporaryFile(string: String): File
 }
 
 /**
- * Delete a file or a directory.<br></br>
+ * Delete a file or a directory.
+ *
  * If it is a directory, its delete all children first
  *
  * @param file File/directory to delete
@@ -801,7 +806,8 @@ fun delete(file: File?): Boolean
 }
 
 /**
- * Create a byte array from double.<br></br>
+ * Create a byte array from double.
+ *
  * Can be revert with [.byteArrayToDouble]
  *
  * @param d Double to convert
@@ -813,7 +819,8 @@ fun doubleToByteArray(d: Double): ByteArray
 }
 
 /**
- * Write a base 64 String to stream as decoded binary.<br></br>
+ * Write a base 64 String to stream as decoded binary.
+ *
  * Stream not close by the method
  *
  * @param base64       Base 64 string
@@ -857,7 +864,8 @@ fun isVirtualLink(file: File): Boolean
 }
 
 /**
- * Create a byte array from long.<br></br>
+ * Create a byte array from long.
+ *
  * Can be revert with [.byteArrayToLong]
  *
  * @param l Long to convert
@@ -880,7 +888,8 @@ fun longToByteArray(l: Long): ByteArray
 }
 
 /**
- * Obtain a file outside of the code.<br></br>
+ * Obtain a file outside of the code.
+ *
  * If this class is in a jar called A.jar, and this jar is in /My/Path/A.jar then the file will be relative to /My/Path
  *
  * @param path Relative path
@@ -998,7 +1007,8 @@ fun obtainLocalInetAddress(onlyIPv4: Boolean): InetAddress?
 }
 
 /**
- * Read a [BigInteger] from a stream.<br></br>
+ * Read a [BigInteger] from a stream.
+ *
  * Previously write with [.writeBigInteger]
  *
  * @param inputStream Stream to read
@@ -1017,7 +1027,8 @@ fun readBigInteger(inputStream: InputStream): BigInteger
 }
 
 /**
- * Read a [Binarizable] inside a stream.<br></br>
+ * Read a [Binarizable] inside a stream.
+ *
  * The [Binarizable] should be previously written by [.writeBinarizable]
  *
  * @param <B>         [Binarizable] type
@@ -1044,7 +1055,8 @@ fun <B : Binarizable> readBinarizable(clas: Class<B>, inputStream: InputStream):
 }
 
 /**
- * Read a [Binarizable] inside a stream.<br></br>
+ * Read a [Binarizable] inside a stream.
+ *
  * The [Binarizable] should be previously written by [.writeBinarizableNamed]
  *
  * @param <B>         [Binarizable] type
@@ -1262,8 +1274,10 @@ fun readLong(inputStream: InputStream): Long
 }
 
 /**
- * Read stream and fill an array.<br>
- * The write in array start at the offset specify.<br>
+ * Read stream and fill an array.
+ *
+ * The write in array start at the offset specify.
+ *
  * It stop to read stream if stream reach its end or the specify length is reach
  *
  * @param inputStream Stream to read
@@ -1390,7 +1404,8 @@ fun rename(source: File, destination: File)
 }
 
 /**
- * Try skip bytes from given stream (unread bytes).<br></br>
+ * Try skip bytes from given stream (unread bytes).
+ *
  * It stop if reach the end of stream or if manage to skip the number of byte asked
  *
  * @param inputStream Stream to skip some bytes
@@ -1443,7 +1458,8 @@ fun skip(inputStream: InputStream, count: Int): Int
 }
 
 /**
- * Transform a binary stream to base 64 string.<br></br>
+ * Transform a binary stream to base 64 string.
+ *
  * Stream not close by the method
  *
  * @param inputStream Stream to read
@@ -1826,7 +1842,8 @@ fun write(fileSource: File, outputStream: OutputStream)
 }
 
 /**
- * Write a [BigInteger] in stream.<br></br>
+ * Write a [BigInteger] in stream.
+ *
  * To read later, you can use [.readBigInteger]
  *
  * @param bigInteger   [BigInteger] to write
@@ -1842,7 +1859,8 @@ fun writeBigInteger(bigInteger: BigInteger, outputStream: OutputStream)
 }
 
 /**
- * Write a [Binarizable] inside a stream.<br></br>
+ * Write a [Binarizable] inside a stream.
+ *
  * To read it later, use [.readBinarizable]
  *
  * @param binarizable  [Binarizable] to write
@@ -1858,7 +1876,8 @@ fun writeBinarizable(binarizable: Binarizable, outputStream: OutputStream)
 }
 
 /**
- * Write a [Binarizable] inside a stream.<br></br>
+ * Write a [Binarizable] inside a stream.
+ *
  * To read it later, use [.readBinarizableNamed]
  *
  * @param binarizable  [Binarizable] to write

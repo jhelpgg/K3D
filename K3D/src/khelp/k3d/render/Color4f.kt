@@ -1,8 +1,13 @@
 package khelp.k3d.render
 
+import khelp.images.alpha
+import khelp.images.blue
+import khelp.images.green
+import khelp.images.red
 import khelp.k3d.util.TEMPORARY_FLOAT_BUFFER
 import khelp.k3d.util.ThreadOpenGL
 import khelp.k3d.util.equal
+import khelp.util.ColorInt
 import khelp.util.HashCode
 import org.lwjgl.opengl.GL11
 import java.awt.Color
@@ -71,8 +76,10 @@ val WHITE = Color4f.makeDefaultColor(1f)
 val YELLOW = Color4f.makeDefaultColor(1f, 1f, 0f)
 
 /**
- * OpenGL color.<br>
- * Two color's types are considered, default color and other.<br>
+ * OpenGL color.
+ *
+ * Two color's types are considered, default color and other.
+ *
  * You can't modify a default color, read access only, other read and write are possible
  *
  * @author JHelp
@@ -93,10 +100,10 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
 
     private var defaultColor = false
 
-    constructor(color: Int) : this(((color shr 16) and 0xFF).toFloat() / 255f,
-                                   ((color shr 8) and 0xFF).toFloat() / 255f,
-                                   (color and 0xFF).toFloat() / 255f,
-                                   ((color shr 24) and 0xFF).toFloat() / 255f)
+    constructor(color: ColorInt) : this(color.red().toFloat() / 255f,
+                                        color.green().toFloat() / 255f,
+                                        color.blue().toFloat() / 255f,
+                                        color.alpha().toFloat() / 255f)
 
     constructor(color: Color4f) : this(color.red, color.green, color.blue, color.alpha)
     constructor(color: Color) : this(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)

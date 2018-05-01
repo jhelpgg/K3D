@@ -6,7 +6,7 @@ import khelp.thread.parallel
 import khelp.util.WHITE
 import java.util.concurrent.atomic.AtomicBoolean
 
-class TextureFrame(name: String, val layout: Layout<*>) : Texture(name, 1024, 1024)
+class TextureFrame<C : Constraints>(name: String, val layout: Layout<C>) : Texture(name, 1024, 1024)
 {
     private val image = JHelpImage(1024, 1024, WHITE)
     var background = WHITE
@@ -26,6 +26,10 @@ class TextureFrame(name: String, val layout: Layout<*>) : Texture(name, 1024, 10
                     val startTime = System.currentTimeMillis()
                     this.image.startDrawMode()
                     this.image.clear(this.background)
+                    this.container.x = 0
+                    this.container.y = 0;
+                    this.container.width = this.width
+                    this.container.height = this.height
                     this.container.drawComponent(this.image, 0, 0)
                     this.image.endDrawMode()
                     this.drawImage(0, 0, this.image)

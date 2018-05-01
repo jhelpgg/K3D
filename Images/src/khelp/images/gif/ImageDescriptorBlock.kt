@@ -346,9 +346,12 @@ internal class ImageDescriptorBlock internal constructor(val colorResolution: In
     }
 
     /**
-     * Read image descriptor block <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Read image descriptor block
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param inputStream Stream to read

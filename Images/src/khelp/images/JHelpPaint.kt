@@ -11,7 +11,8 @@ package khelp.images
 interface JHelpPaint
 {
     /**
-     * Initialize the shape.<br></br>
+     * Initialize the shape.
+     *
      * It is called just before fill shape with this paint.
      *
      * @param width  Shape bounding box width
@@ -20,7 +21,8 @@ interface JHelpPaint
     abstract fun initializePaint(width: Int, height: Int)
 
     /**
-     * Compute color to use for a specific point.<br></br>
+     * Compute color to use for a specific point.
+     *
      * Coordinate are relative to the bounding box upper left corner
      *
      * @param x X of the pixel coordinate

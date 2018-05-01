@@ -104,7 +104,8 @@ class ArrayInt(initialSize: Int = 128) : Iterable<Int>
     operator fun contains(integer: Int) = this.index(integer) >= 0
 
     /**
-     * Indicates if an integer is in the array.<br></br>
+     * Indicates if an integer is in the array.
+     *
      * Search is in O(LN(n)) but work only if the array is sorted
      *
      * @param integer Integer search

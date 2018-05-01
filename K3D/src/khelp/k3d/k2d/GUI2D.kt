@@ -108,7 +108,8 @@ class GUI2D
             this.detectOver3D(x, y) ?: if (this.exclusiveObject == null) this.detectUnder3D(x, y) else null
 
     /**
-     * For the detection restricted to only one object<br></br>
+     * For the detection restricted to only one object
+     *
      * This object will be the only one detected
      *
      * @param object2d Object to detect exclusively (Can use `null` for detect all objects)

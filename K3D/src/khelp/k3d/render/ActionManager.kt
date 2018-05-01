@@ -265,7 +265,8 @@ class ActionManager internal constructor(private val preferences: Preferences)
     }
 
     /**
-     * Associate a key code to an action.<br></br>
+     * Associate a key code to an action.
+     *
      * If an action was previously associated to this key code, it is returned
      *
      * @param actionCode Action to associate
@@ -282,7 +283,8 @@ class ActionManager internal constructor(private val preferences: Preferences)
     }
 
     /**
-     * Associate a joystick code to an action.<br></br>
+     * Associate a joystick code to an action.
+     *
      * If an action was previously associated to this joystick code, it is returned
      *
      * @param actionCode   Action to associate

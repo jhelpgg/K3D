@@ -1,6 +1,7 @@
 package khelp.k3d.render
 
 import com.sun.javafx.geom.Vec3d
+import khelp.math.isNul
 
 val NEG_X_AXIS = Vec3f(-1.0f, 0.0f, 0.0f)
 val NEG_Y_AXIS = Vec3f(0.0f, -1.0f, 0.0f)
@@ -100,25 +101,26 @@ class Vec3f(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
 
     fun normalize()
     {
-        val var1 = this.length()
-        if (var1 != 0.0f)
+        val length = this.length()
+
+        if (!isNul(length))
         {
-            this.scale(1.0f / var1)
+            this.scale(1.0f / length)
         }
     }
 
-    fun plus(var1: Vec3f): Vec3f
+    operator fun plus(toAdd: Vec3f): Vec3f
     {
-        var var2 = Vec3f();
-        var2.add(this, var1);
-        return var2;
+        var result = Vec3f();
+        result.add(this, toAdd);
+        return result;
     }
 
-    fun scale(var1: Float)
+    fun scale(scale: Float)
     {
-        this.x *= var1;
-        this.y *= var1;
-        this.z *= var1;
+        this.x *= scale;
+        this.y *= scale;
+        this.z *= scale;
     }
 
     fun set(var1: Vec3f)

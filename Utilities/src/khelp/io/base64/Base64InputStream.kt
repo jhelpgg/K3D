@@ -39,9 +39,12 @@ class Base64InputStream(private val inputStream: InputStream) : InputStream()
     private var step: Int = Base64InputStream.STEP_1
 
     /**
-     * Read one byte <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Read one byte
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @return Byte read
@@ -160,9 +163,12 @@ class Base64InputStream(private val inputStream: InputStream) : InputStream()
     }
 
     /**
-     * Skip some bytes <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Skip some bytes
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param n Number of bytes to skip
@@ -195,9 +201,12 @@ class Base64InputStream(private val inputStream: InputStream) : InputStream()
 
     /**
      * Returns an estimate of the number of bytes that can be read (or skipped over) from this input stream without blocking by
-     * the next invocation of a method for this input stream <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * the next invocation of a method for this input stream
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @return Estimate of the number of bytes that can be read (or skipped over) from this input stream without blocking by the
@@ -209,9 +218,12 @@ class Base64InputStream(private val inputStream: InputStream) : InputStream()
     override fun available() = this.inputStream.available()
 
     /**
-     * Close the stream <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Close the stream
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @throws IOException On closing issue

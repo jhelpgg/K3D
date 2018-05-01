@@ -39,7 +39,7 @@ class JHelpGradientAlphaCircle(color: Int, val multiplier: Double) : JHelpPaint
     }
 
     /**Color alpha part*/
-    private val alpha = (color shr 24) and 0xFF
+    private val alpha = color.alpha()
     /**Color parts without alpha*/
     private val colorPart = color and 0x00FFFFFF
     /**Current area center X*/

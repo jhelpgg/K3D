@@ -5,8 +5,10 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
 
 /**
- * Cube map.<br>
- * A cube map is compose on six textures, place on each face of a cube.<br>
+ * Cube map.
+ *
+ * A cube map is compose on six textures, place on each face of a cube.
+ *
  * It use for having reflection, or simulate "mirror environment" in objects
  *
  * @author JHelp
@@ -51,7 +53,8 @@ class CubeMap()
     var zNegative: Texture = Texture.DUMMY
     var zPositive: Texture = Texture.DUMMY
     /**
-     * Apply the cube map.<br></br>
+     * Apply the cube map.
+     *
      * If the cube map is not complete, nothing is done
      */
     @ThreadOpenGL
@@ -122,12 +125,18 @@ class CubeMap()
     }
 
     /**
-     * Cut a cross texture for fill the cube map.<br></br>
-     * Cross suppose be like : `<br></br>
-     * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+X<br></br>
-     * &nbsp;+Y&nbsp;&nbsp;+Z&nbsp;&nbsp;-Y<br></br>
-     * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-X<br></br>
-     * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-Z<br></br>
+     * Cut a cross texture for fill the cube map.
+     *
+     * Cross suppose be like : `
+     *
+     * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+X
+     *
+     * &nbsp;+Y&nbsp;&nbsp;+Z&nbsp;&nbsp;-Y
+     *
+     * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-X
+     *
+     * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-Z
+     *
     ` *
      *
      * @param texture Texture to cut
@@ -181,7 +190,8 @@ class CubeMap()
     }
 
     /**
-     * Flush last changes.<br></br>
+     * Flush last changes.
+     *
      * Use it if you have modified one of its texture pixels
      */
     fun flush()

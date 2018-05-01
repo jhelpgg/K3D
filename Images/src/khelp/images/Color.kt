@@ -34,9 +34,9 @@ class Color(val color: Int) : Comparable<Color>
         fun brightness(color: Int, factor: Double): Int
         {
             val alpha = color and BLACK_ALPHA_MASK
-            val red = (color shr 16) and 0xFF
-            val green = (color shr 8) and 0xFF
-            val blue = color and 0xFF
+            val red = color.red()
+            val green = color.green()
+            val blue = color.blue()
             val y = JHelpImage.computeY(red, green, blue) * factor
             val u = JHelpImage.computeU(red, green, blue)
             val v = JHelpImage.computeV(red, green, blue)
@@ -57,9 +57,9 @@ class Color(val color: Int) : Comparable<Color>
          * @return `true` if colors are similar
          */
         fun isNear(red: Int, green: Int, blue: Int, color: Int, precision: Int) =
-                (Math.abs(red - ((color shr 16) and 0xFF)) <= precision
-                        && Math.abs(green - ((color shr 8) and 0xFF)) <= precision
-                        && Math.abs(blue - (color and 0xFF)) <= precision)
+                (Math.abs(red - color.red()) <= precision
+                        && Math.abs(green - color.green()) <= precision
+                        && Math.abs(blue - color.blue()) <= precision)
 
         /**
          * Indicates if 2 colors are similar
@@ -94,13 +94,13 @@ class Color(val color: Int) : Comparable<Color>
                                                                             or (blue and 0xFF))
 
     /**Color alpha part*/
-    val alpha = (this.color shr 24) and 0xFF
+    val alpha = this.color.alpha()
     /**Color red part*/
-    val red = (this.color shr 16) and 0xFF
+    val red = this.color.red()
     /**Color green part*/
-    val green = (this.color shr 8) and 0xFF
+    val green = this.color.green()
     /**Color blue part*/
-    val blue = this.color and 0xFF
+    val blue = this.color.blue()
     /**Additional information, have meaning for the one who set it*/
     var info = 0
 

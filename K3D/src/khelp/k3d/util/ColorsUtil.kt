@@ -91,7 +91,8 @@ fun changeBright(color: Color, factor: Float): Color
 }
 
 /**
- * Take the integer part of a number and put it in [0, 255]<br></br>
+ * Take the integer part of a number and put it in [0, 255]
+ *
  * That is to say if integer<0, return 0. If integer>255, return 2555. Return the integer on other case
  *
  * @param number Number to limit

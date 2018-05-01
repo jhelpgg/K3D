@@ -3,8 +3,10 @@ package khelp.k3d.render
 import khelp.k3d.util.ThreadOpenGL
 
 /**
- * A clone is an object who used the same mesh than other.<br>
- * The aim is to economize video memory if we use same mesh several times.<br>
+ * A clone is an object who used the same mesh than other.
+ *
+ * The aim is to economize video memory if we use same mesh several times.
+ *
  * But if the original object change its mesh, then this change also
  */
 class ObjectClone(private val reference: Object3D) : NodeWithMaterial()

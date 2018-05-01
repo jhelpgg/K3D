@@ -14,7 +14,8 @@ internal abstract class Block
         internal set
 
     /**
-     * Read block specific data.<br></br>
+     * Read block specific data.
+     *
      * Note : the type and eventual sub-type are already read and set
      *
      * @param inputStream Stream to read

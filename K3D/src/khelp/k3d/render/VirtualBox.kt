@@ -100,7 +100,8 @@ class VirtualBox
     fun add(point: Point3D) = this.add(point.x, point.y, point.z)
 
     /**
-     * Add a virtual box inside this box.<br></br>
+     * Add a virtual box inside this box.
+     *
      * It act like add each point of the box inside this box
      *
      * @param virtualBox Virtual box to add
@@ -117,7 +118,8 @@ class VirtualBox
     }
 
     /**
-     * Add a virtual box translated to a vector inside this box.<br></br>
+     * Add a virtual box translated to a vector inside this box.
+     *
      * It act like add each point of the box translated by the vector inside this box
      *
      * @param virtualBox Box to add

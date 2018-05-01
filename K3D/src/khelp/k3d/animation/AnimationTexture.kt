@@ -44,9 +44,12 @@ class AnimationTexture(numberOfFrame: Int, textureStart: Texture, textureEnd: Te
     private var startAbsoluteFrame = 0f
     private var wayUp = false
     /**
-     * Called each time animation refresh <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Called each time animation refresh
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param absoluteFrame Absolute frame
@@ -95,9 +98,12 @@ class AnimationTexture(numberOfFrame: Int, textureStart: Texture, textureEnd: Te
     }
 
     /**
-     * Called when animation initialized <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Called when animation initialized
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param startAbsoluteFrame Start ABSOLUTE frame

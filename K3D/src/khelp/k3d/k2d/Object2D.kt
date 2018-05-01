@@ -2,6 +2,7 @@ package khelp.k3d.k2d
 
 import khelp.k3d.k2d.event.Object2DListener
 import khelp.k3d.render.Texture
+import khelp.k3d.ui.TextureFrame
 import khelp.list.Queue
 import khelp.thread.Consumer
 import khelp.thread.MainPool
@@ -128,6 +129,14 @@ class Object2D
         this.toRemove = Queue<Object2DListener>()
         this.toAdd = Queue<Object2DListener>()
         this.over = false
+    }
+
+    fun stopTextureFrame()
+    {
+        if (this.texture != null && this.texture is TextureFrame<*>)
+        {
+            (this.texture as TextureFrame<*>).stopRender()
+        }
     }
 
     /**
@@ -384,7 +393,8 @@ class Object2D
     }
 
     /**
-     * Object's texture.<br></br>
+     * Object's texture.
+     *
      * If the object is not visible, the method return `null`
      *
      * @return Object's texture
@@ -435,7 +445,8 @@ class Object2D
     }
 
     /**
-     * Change object's visibility.<br></br>
+     * Change object's visibility.
+     *
      * Note: if the texture is `null` the object still invisible
      *
      * @param visible New visibility

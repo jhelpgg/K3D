@@ -35,9 +35,12 @@ class Base64OutputStream(private val outputStream: OutputStream) : OutputStream(
     private var step: Int = Base64OutputStream.STEP_1
 
     /**
-     * Write one byte <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Write one byte
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param b Byte to write
@@ -77,9 +80,12 @@ class Base64OutputStream(private val outputStream: OutputStream) : OutputStream(
     }
 
     /**
-     * Flush the stream <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Flush the stream
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @throws IOException On flushing issue
@@ -89,9 +95,12 @@ class Base64OutputStream(private val outputStream: OutputStream) : OutputStream(
     override fun flush() = this.outputStream.flush()
 
     /**
-     * Add the need = and Close the stream <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Add the need = and Close the stream
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @throws IOException On closing issue

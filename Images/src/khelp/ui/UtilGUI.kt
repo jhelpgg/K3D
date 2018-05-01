@@ -206,7 +206,8 @@ fun changeScreen(window: Window, screenIndex: Int)
 }
 
 /**
- * Compute the key code to use for short cut that use a given character.<br></br>
+ * Compute the key code to use for short cut that use a given character.
+ *
  * It is possible to use [.CHARACTER_DELETE] or [.CHARACTER_ESCAPE] character if you want build short cut
  * for respectively delete key, escape key
  *
@@ -634,7 +635,8 @@ fun obtainScreenIndex(window: Window): Int
 }
 
 /**
- * Put a window in it's pack size<br></br>
+ * Put a window in it's pack size
+ *
  * Size is automatic limited to the window's screen
  *
  * @param window Window to pack

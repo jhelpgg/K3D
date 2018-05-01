@@ -260,7 +260,8 @@ class DataGIF
 }
 
 /**
- * Compute size of an GIF image.<br></br>
+ * Compute size of an GIF image.
+ *
  * If the given file is not a GIF image file, `null` is return
  *
  * @param file Image GIF file

@@ -120,10 +120,10 @@ class JHelpGradientVertical(colorStart: Int, colorEnd: Int) : JHelpPaint
         val pos = yy - start
         val sop = length - pos
 
-        return ((col1 shr 24 and 0xFF) * sop + (col2 shr 24 and 0xFF) * pos) / length shl 24 or
-                (((col1 shr 16 and 0xFF) * sop + (col2 shr 16 and 0xFF) * pos) / length shl 16) or
-                (((col1 shr 8 and 0xFF) * sop + (col2 shr 8 and 0xFF) * pos) / length shl 8) or
-                ((col1 and 0xFF) * sop + (col2 and 0xFF) * pos) / length
+        return (col1.alpha() * sop + col2.alpha() * pos) / length shl 24 or
+                ((col1.red() * sop + col2.red() * pos) / length shl 16) or
+                ((col1.green() * sop + col2.green() * pos) / length shl 8) or
+                (col1.blue() * sop + col2.blue() * pos) / length
     }
 
     /**

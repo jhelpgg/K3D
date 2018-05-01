@@ -11,7 +11,8 @@ import java.util.Hashtable
 import javax.xml.parsers.SAXParserFactory
 
 /**
- * Parser of XML that describes a text resources for a language.<br>
+ * Parser of XML that describes a text resources for a language.
+ *
  * The XML look like :<code lang="xml"><!--
  * <Texts>
  * <Text key="textKey">
@@ -63,9 +64,12 @@ internal class ParserXMLText(private val texts: Hashtable<String, String>, url: 
     }
 
     /**
-     * Called each time a markup start <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Called each time a markup start
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param uri        URI source
@@ -97,9 +101,12 @@ internal class ParserXMLText(private val texts: Hashtable<String, String>, url: 
     }
 
     /**
-     * Called each time a end of markup arrive <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Called each time a end of markup arrive
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param uri       URI source
@@ -127,9 +134,12 @@ internal class ParserXMLText(private val texts: Hashtable<String, String>, url: 
     }
 
     /**
-     * Called each time a part of a text is read <br></br>
-     * <br></br>
-     * **Parent documentation:**<br></br>
+     * Called each time a part of a text is read
+     *
+     *
+     *
+     * **Parent documentation:**
+     *
      * {@inheritDoc}
      *
      * @param ch     Array of read characters

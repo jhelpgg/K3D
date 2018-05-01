@@ -1,12 +1,14 @@
 package khelp.k3d.render
 
 import java.awt.Color
+import java.awt.Font
 import java.awt.Polygon
 
 class TextureGirdUV(name: String, width: Int, height: Int) : Texture(name, width, height, 0xFFFFFFFF.toInt())
 {
     /**
-     * Shape description <br></br>
+     * Shape description
+     *
      *
      * Constructs Shape
      */
@@ -32,9 +34,9 @@ class TextureGirdUV(name: String, width: Int, height: Int) : Texture(name, width
             this.refreshShapes()
         }
 
-    fun colorOnShape(shape:Int) = this.shapes[shape].color
+    fun colorOnShape(shape: Int) = this.shapes[shape].color
 
-    fun colorOnShape(shape:Int,color:Int)
+    fun colorOnShape(shape: Int, color: Int)
     {
         this.shapes[shape].color = color
         this.refreshShapes()
@@ -45,14 +47,14 @@ class TextureGirdUV(name: String, width: Int, height: Int) : Texture(name, width
      *
      * @param mesh Mesh to "extract" grid
      */
-    fun createGird( mesh: Mesh)
+    fun createGird(mesh: Mesh)
     {
         this.shapes.clear()
-         mesh.obtainUVshapes(this.shapes, this.width, this.height)
+        mesh.obtainUVshapes(this.shapes, this.width, this.height)
         this.refreshShapes()
     }
 
-    fun createGird(object3D:Object3D) = this.createGird(object3D.mesh)
+    fun createGird(object3D: Object3D) = this.createGird(object3D.mesh)
 
     fun numberOfShape() = this.shapes.size
 
@@ -84,11 +86,17 @@ class TextureGirdUV(name: String, width: Int, height: Int) : Texture(name, width
     fun refreshShapes()
     {
         this.fillRect(0, 0, this.width, this.height, this.backgroundColor, false)
+        val font = Font("Courier", Font.BOLD, 12)
+        var index = 0
 
         for (shape in this.shapes)
         {
-            this.draw(shape.polygon, this.borderColor, false, 1)
             this.fill(shape.polygon, Color(shape.color, true), true)
+            this.draw(shape.polygon, this.borderColor, false, 1)
+            val bounds = shape.polygon.bounds
+            this.drawString(bounds.x + (bounds.width shr 3), bounds.y + (bounds.height shr 3), index.toString(),
+                            this.borderColor, font, true, 5)
+            index++
         }
 
         this.flush()

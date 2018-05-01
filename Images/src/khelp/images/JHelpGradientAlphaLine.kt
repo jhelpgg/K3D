@@ -21,7 +21,7 @@ import khelp.math.square
 class JHelpGradientAlphaLine(x1: Int, y1: Int, x2: Int, y2: Int, color: Int, val attenuation: Int) : JHelpPaint
 {
     /**Color alpha part*/
-    private val alpha = (color shr 24) and 0xFF
+    private val alpha = color.alpha()
     /**Color without alpha*/
     private val colorPart = color and 0x00FFFFFF
     /**

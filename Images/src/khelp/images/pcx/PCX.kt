@@ -1008,7 +1008,8 @@ val VERSION_PAINTBRUSH_V_3_0 = 5.toByte()
 val VERSION_PAINTBRUSH_WINDOWS = 4.toByte()
 
 /**
- * Compute size of an PCX image.<br></br>
+ * Compute size of an PCX image.
+ *
  * If the given file is not a PCX image file, `null` is return
  *
  * @param file Image PCX file

@@ -21,13 +21,13 @@ import khelp.math.square
 class JHelpGradientLightLine(x1: Int, y1: Int, x2: Int, y2: Int, color: Int, val attenuation: Int) : JHelpPaint
 {
     /**Color alpha part*/
-    private val alpha = (color shr 24) and 0xFF
+    private val alpha = color.alpha()
     /**Color red part*/
-    private val red = (color shr 16) and 0xFF
+    private val red = color.red()
     /**Color green part*/
-    private val green = (color shr 8) and 0xFF
+    private val green = color.green()
     /**Color blue part*/
-    private val blue = color and 0xFF
+    private val blue = color.blue()
     /**
      * a² (From aX+bY+c=0)
      */

@@ -142,9 +142,12 @@ class Path : Iterable<Segment>
     operator fun get(index: Int) = this.segments[index]
 
     /**
-     * Iterator on segments <br>
-     * <br>
-     * <b>Parent documentation:</b><br>
+     * Iterator on segments
+     *
+     *
+     *
+     * <b>Parent documentation:</b>
+     *
      * {@inheritDoc}
      *
      * @return Iterator on segments

@@ -19,40 +19,40 @@ class JHelpGradient(upLeft: Int, upRight: Int, downLeft: Int, downRight: Int) : 
     private var size = 0
 
     /**Alpha part of up left corner color*/
-    private val alphaUpLeft = (upLeft shr 24) and 0xFF
+    private val alphaUpLeft = upLeft.alpha()
     /**Red part of up left corner color*/
-    private val redUpLeft = (upLeft shr 16) and 0xFF
+    private val redUpLeft = upLeft.red()
     /**Green part of up left corner color*/
-    private val greenUpLeft = (upLeft shr 8) and 0xFF
+    private val greenUpLeft = upLeft.green()
     /**Blue part of up left corner color*/
-    private val blueUpLeft = upLeft and 0xFF
+    private val blueUpLeft = upLeft.blue()
 
     /**Alpha part of up right corner color*/
-    private val alphaUpRight = (upRight shr 24) and 0xFF
+    private val alphaUpRight = upRight.alpha()
     /**Red part of up right corner color*/
-    private val redUpRight = (upRight shr 16) and 0xFF
+    private val redUpRight = upRight.red()
     /**Green part of up right corner color*/
-    private val greenUpRight = (upRight shr 8) and 0xFF
+    private val greenUpRight = upRight.green()
     /**Blue part of up right corner color*/
-    private val blueUpRight = upRight and 0xFF
+    private val blueUpRight = upRight.blue()
 
     /**Alpha part of down left corner color*/
-    private val alphaDownLeft = (downLeft shr 24) and 0xFF
+    private val alphaDownLeft = downLeft.alpha()
     /**Red part of down left corner color*/
-    private val redDownLeft = (downLeft shr 16) and 0xFF
+    private val redDownLeft = downLeft.red()
     /**Green part of down left corner color*/
-    private val greenDownLeft = (downLeft shr 8) and 0xFF
+    private val greenDownLeft = downLeft.green()
     /**Blue part of down left corner color*/
-    private val blueDownLeft = downLeft and 0xFF
+    private val blueDownLeft = downLeft.blue()
 
     /**Alpha part of down right corner color*/
-    private val alphaDownRight = (downRight shr 24) and 0xFF
+    private val alphaDownRight = downRight.alpha()
     /**Red part of down right corner color*/
-    private val redDownRight = (downRight shr 16) and 0xFF
+    private val redDownRight = downRight.red()
     /**Green part of down right corner color*/
-    private val greenDownRight = (downRight shr 8) and 0xFF
+    private val greenDownRight = downRight.green()
     /**Blue part of down right corner color*/
-    private val blueDownRight = downRight and 0xFF
+    private val blueDownRight = downRight.blue()
 
     /**
      * Initialize the paint before fill a shape

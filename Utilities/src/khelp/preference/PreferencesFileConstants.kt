@@ -13,7 +13,8 @@ internal val MARKUP_PREFERENCES = "Preferences"
  */
 internal val PARAMETER_NAME = "name"
 /**
- * Parameter type of preference.<br></br>Can be ARRAY (byte[]), BOOLEAN (boolean), FILE (java.io.File), INTEGER (int) or STRING (java.lang.String)
+ * Parameter type of preference.
+ *Can be ARRAY (byte[]), BOOLEAN (boolean), FILE (java.io.File), INTEGER (int) or STRING (java.lang.String)
  */
 internal val PARAMETER_TYPE = "type"
 /**

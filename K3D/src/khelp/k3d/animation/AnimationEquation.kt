@@ -25,8 +25,10 @@ private fun checkOnlyUseT(function: Function)
 }
 
 /**
- * Animation based on 3D equation.<br>
- * The linked node, will follow the equation.<br>
+ * Animation based on 3D equation.
+ *
+ * The linked node, will follow the equation.
+ *
  * Equation is x=X(t), y=Y(t) and z=Z(t). Each equation use only the {@link #T t} variable
  *
  * @param functionX     X(t)
