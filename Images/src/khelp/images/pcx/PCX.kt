@@ -189,8 +189,7 @@ class PCX internal constructor()
     private fun fillPixels_1_BytePerPixel_3_ColorPlane(pixels: IntArray)
     {
         // The palette 16 index is dispatch like that, lower bits first, upper bits last (only first 8 colors (0-7) of
-        // the palette
-        // are used)
+        // the palette are used)
         val scanLine = IntArray(this.scanLineSize)
         val codes = IntArray(this.width)
         var lineData = 0
@@ -660,7 +659,6 @@ class PCX internal constructor()
             }
 
             start += this.numberBitsPerScanline
-            index = start
             write = pix
 
             x = 0
@@ -946,7 +944,7 @@ class PCX internal constructor()
                 3    -> this.fillPixels_1_BytePerPixel_3_ColorPlane(pixels)
                 4    -> this.fillPixels_1_BytePerPixel_4_ColorPlane(pixels)
                 else -> throw IllegalStateException(
-                        "Unknown how to convert numberBytePerPixel=" + this.numberBytePerPixel + " " +
+                        "Don' know how to convert numberBytePerPixel=" + this.numberBytePerPixel + " " +
                                 "numberOfColorPlane="
                                 + this.numberOfColorPlane)
             }
@@ -955,7 +953,7 @@ class PCX internal constructor()
                 1    -> this.fillPixels_4_BytePerPixel_1_ColorPlane(pixels)
                 4    -> this.fillPixels_4_BytePerPixel_4_ColorPlane(pixels)
                 else -> throw IllegalStateException(
-                        ("Unknown how to convert numberBytePerPixel=" + this.numberBytePerPixel + " " +
+                        ("Don' know how to convert numberBytePerPixel=" + this.numberBytePerPixel + " " +
                                 "numberOfColorPlane="
                                 + this.numberOfColorPlane))
             }
@@ -965,12 +963,12 @@ class PCX internal constructor()
                 3    -> this.fillPixels_8_BytePerPixel_3_ColorPlane(pixels)
                 4    -> this.fillPixels_8_BytePerPixel_4_ColorPlane(pixels)
                 else -> throw IllegalStateException(
-                        ("Unknown how to convert numberBytePerPixel=" + this.numberBytePerPixel +
+                        ("Don' know how to convert numberBytePerPixel=" + this.numberBytePerPixel +
                                 " numberOfColorPlane="
                                 + this.numberOfColorPlane))
             }
             else -> throw IllegalStateException(
-                    ("Unknown how to convert numberBytePerPixel=" + this.numberBytePerPixel + " numberOfColorPlane="
+                    ("Don' know how to convert numberBytePerPixel=" + this.numberBytePerPixel + " numberOfColorPlane="
                             + this.numberOfColorPlane))
         }
 

@@ -7,6 +7,9 @@ import khelp.images.raster.RasterImage
 
 /**
  * Information about an image inside an "ANI" image
+ * @param cursorImage Cursor image if information describes by a cursor
+ * @param iconImage Icon image if information describes by an icon
+ * @param rasterImage Raster image if information describes by a raster image
  */
 internal class AniImageInformation private constructor(private val cursorImage: CursorImage?,
                                                        private val iconImage: IconImage?,

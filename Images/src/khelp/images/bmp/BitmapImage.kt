@@ -17,6 +17,7 @@ import khelp.util.ifElse
 import java.awt.Dimension
 import java.io.File
 import java.io.FileInputStream
+import java.io.IOException
 import java.io.InputStream
 import java.util.Optional
 
@@ -43,6 +44,7 @@ class BitmapImage internal constructor(val bitmapHeader: BitmapHeader, val raste
  * @return Bitmap header read
  * @throws IOException If the stream not contains a valid bitmap header
  */
+@Throws(IOException::class)
 fun readBitmapHeader(inputStream: InputStream, jumpHeader: Boolean = false) = BitmapHeader(inputStream, jumpHeader)
 
 /**
@@ -87,6 +89,7 @@ fun bitmap(file: File) = obtainBitmapHeader(file).isPresent
  * @return Bitmap read
  * @throws IOException If the stream not contains a valid bitmap image
  */
+@Throws(IOException::class)
 fun parseBitmap(inputStream: InputStream): BitmapImage
 {
     val bitmapHeader = readBitmapHeader(inputStream)

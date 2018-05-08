@@ -21,11 +21,13 @@ import khelp.list.ArrayInt
 import java.io.IOException
 import java.io.InputStream
 
+/**Enable/disable verbose logs*/
 internal const val DEBUG = false
 
 /**
  * Represents an image with **"ANI"** file format
  * @param inputStream Stream where read the image
+ * @throws IOException If stream not describes a valid **ANI** image or stream read failed (By example in remote case the network down while reading)
  */
 class AniImage(inputStream: InputStream) : Riff(inputStream), DynamicAnimation, Positionable
 {
@@ -403,6 +405,10 @@ class AniImage(inputStream: InputStream) : Riff(inputStream), DynamicAnimation, 
      */
     override fun position(position: Position) = this.position(position.x, position.y)
 
+    /**
+     * String representation for debug purpose
+     * @return String representation for debug purpose
+     */
     override fun toString(): String
     {
         return "ANI ${this.width}x${this.height}:\n${super<Riff>.toString()}"

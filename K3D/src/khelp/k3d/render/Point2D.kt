@@ -5,11 +5,24 @@ import khelp.k3d.util.equal
 import khelp.util.HashCode
 import org.lwjgl.opengl.GL11
 
+/**
+ * Position in 2D
+ * @param x X abscissa
+ * @param y Y ordinate
+ */
 class Point2D(var x: Float = 0f, var y: Float = 0f)
 {
+    /**
+     * Create position copy to an other one
+     * @param point2D Point to copy
+     */
     constructor(point2D: Point2D) : this(point2D.x, point2D.y)
 
+    /**
+     * Point copy
+     */
     fun copy() = Point2D(this)
+
     /**
      * Indicates if an object is equal to this point
      *
@@ -36,6 +49,9 @@ class Point2D(var x: Float = 0f, var y: Float = 0f)
         else this.equals(obj)
     }
 
+    /**
+     * Hash code
+     */
     override fun hashCode() = HashCode.computeHashCode(this.x, this.y)
 
     /**
@@ -60,8 +76,7 @@ class Point2D(var x: Float = 0f, var y: Float = 0f)
      * @param point Point compare
      * @return {@code true} on equality
      */
-    fun equals(point: Point2D) = equal(this.x, point.x) && equal(this.y,
-                                                                 point.y);
+    fun equals(point: Point2D) = equal(this.x, point.x) && equal(this.y, point.y)
 
     /**
      * Apply like UV in OpenGL
@@ -103,5 +118,4 @@ class Point2D(var x: Float = 0f, var y: Float = 0f)
         this.x += x
         this.y += y
     }
-
 }

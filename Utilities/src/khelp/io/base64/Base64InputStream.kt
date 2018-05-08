@@ -40,13 +40,6 @@ class Base64InputStream(private val inputStream: InputStream) : InputStream()
 
     /**
      * Read one byte
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @return Byte read
      * @throws IOException On reading issue
      * @see InputStream.read
@@ -164,13 +157,6 @@ class Base64InputStream(private val inputStream: InputStream) : InputStream()
 
     /**
      * Skip some bytes
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param n Number of bytes to skip
      * @return Number of skipped bytes
      * @throws IOException On skipping bytes
@@ -202,13 +188,6 @@ class Base64InputStream(private val inputStream: InputStream) : InputStream()
     /**
      * Returns an estimate of the number of bytes that can be read (or skipped over) from this input stream without blocking by
      * the next invocation of a method for this input stream
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @return Estimate of the number of bytes that can be read (or skipped over) from this input stream without blocking by the
      * next invocation of a method for this input stream
      * @throws IOException On computing issue
@@ -219,13 +198,6 @@ class Base64InputStream(private val inputStream: InputStream) : InputStream()
 
     /**
      * Close the stream
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @throws IOException On closing issue
      * @see InputStream.close
      */

@@ -14,16 +14,24 @@ import khelp.math.limit
 import khelp.util.ORANGE
 import java.util.concurrent.atomic.AtomicInteger
 
+/**
+ * A sword
+ * @param size Sword size in `[2, 5]`
+ */
 class Sword(size: Float = 3.3f) : Node()
 {
     companion object
     {
+        /**Next sword ID*/
         internal val NEXT_ID = AtomicInteger(0)
     }
 
+    /**Sword ID*/
     val id = Sword.NEXT_ID.getAndIncrement()
-    val baseMaterial = Material("SwordBase${this.id}")
-    val bladeMaterial = Material("SwordBlade${this.id}")
+    /**Material on base*/
+    val baseMaterial = Material.obtainMaterialOrCreate("SwordBase${this.id}")
+    /**Material on blade*/
+    val bladeMaterial = Material.obtainMaterialOrCreate("SwordBlade${this.id}")
 
     init
     {
@@ -86,6 +94,11 @@ class Sword(size: Float = 3.3f) : Node()
         this.addChild(blade)
     }
 
+    /**
+     * Position sword to be attach in a [Robot] back
+     *
+     * @see Robot.putOnBack
+     */
     fun positionForBack()
     {
         this.angleX(180f)
@@ -94,6 +107,12 @@ class Sword(size: Float = 3.3f) : Node()
         this.position(0f, -0.4f, -0.05f)
     }
 
+    /**
+     * Position sword to be take by a [Robot] hand
+     *
+     * @see Robot.putOnLeftHand
+     * @see Robot.putOnRightHand
+     */
     fun positionForHand()
     {
         this.angleX(-90f)

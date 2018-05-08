@@ -21,13 +21,6 @@ internal class AnimationTextureFrame(val frame: Int,
      * Null results, they are in same place
      *
      * Positive means this frame is after given one
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param animationTextureFrame Frame to compare with
      * @return Comparison result
      * @see Comparable.compareTo
@@ -38,10 +31,17 @@ internal class AnimationTextureFrame(val frame: Int,
     }
 }
 
+/**
+ * Animation that transform a texture
+ * @param texture Texture to transform
+ */
 class AnimationTextureTransformation(private val texture: Texture) : Animation
 {
+    /**Transformation frames*/
     private val frames = SortedArray<AnimationTextureFrame>(AnimationTextureFrame::class.java, unique = true)
+    /**Current transformation index*/
     private var index = 0
+    /**Started absolute frame*/
     private var startAbsoluteFrame = 0f
 
     /**
@@ -53,6 +53,7 @@ class AnimationTextureTransformation(private val texture: Texture) : Animation
      * @param textureTransformation Texture transformation to add/replace
      * @throws IllegalArgumentException If frame is negative
      */
+    @Throws(IllegalArgumentException::class)
     fun addFrame(frame: Int, textureTransformation: TextureTransformation)
     {
         if (frame < 0)
@@ -75,13 +76,6 @@ class AnimationTextureTransformation(private val texture: Texture) : Animation
 
     /**
      * Play the animation
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param absoluteFrame Absolute frame
      * @return `true` if animation should continue
      * @see Animation.animate
@@ -115,13 +109,6 @@ class AnimationTextureTransformation(private val texture: Texture) : Animation
 
     /**
      * Called when animation start
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param startAbsoluteFrame Started frame
      * @see Animation.startAbsoluteFrame
      */

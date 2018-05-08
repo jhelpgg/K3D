@@ -576,13 +576,6 @@ class Matrix(private val width: Int, private val height: Int)
 
     /**
      * Matrix hash code
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @return Matrix hash code
      * @see Object.hashCode
      */
@@ -593,13 +586,6 @@ class Matrix(private val width: Int, private val height: Int)
 
     /**
      * Compare the matrix to an other
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param other Object to compare with
      * @return `true` if other is equals to this matrix
      * @see Object.equals

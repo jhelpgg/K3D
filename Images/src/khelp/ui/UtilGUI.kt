@@ -208,7 +208,7 @@ fun changeScreen(window: Window, screenIndex: Int)
 /**
  * Compute the key code to use for short cut that use a given character.
  *
- * It is possible to use [.CHARACTER_DELETE] or [.CHARACTER_ESCAPE] character if you want build short cut
+ * It is possible to use [CHARACTER_DELETE] or [CHARACTER_ESCAPE] character if you want build short cut
  * for respectively delete key, escape key
  *
  * @param character Character to compute the key code to use

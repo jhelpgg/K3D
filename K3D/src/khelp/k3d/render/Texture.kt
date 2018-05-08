@@ -7,6 +7,7 @@ import khelp.images.alpha
 import khelp.images.blue
 import khelp.images.green
 import khelp.images.red
+import khelp.io.parseFromStream
 import khelp.k3d.util.BYTE_0
 import khelp.k3d.util.BYTE_255
 import khelp.k3d.util.TEMPORARY_BYTE_BUFFER
@@ -15,6 +16,8 @@ import khelp.k3d.util.TEMPORARY_INT_BUFFER
 import khelp.k3d.util.ThreadOpenGL
 import khelp.k3d.util.transferByte
 import khelp.list.EnumerationIterator
+import khelp.util.ColorInt
+import khelp.util.Pixels
 import khelp.util.shl
 import khelp.util.toUnsignedInt
 import org.lwjgl.opengl.GL11
@@ -33,11 +36,17 @@ import java.awt.image.ColorModel
 import java.awt.image.PixelGrabber
 import java.io.File
 import java.io.FileInputStream
+import java.io.IOException
 import java.io.InputStream
 import java.util.Hashtable
 import javax.imageio.ImageIO
 import javax.swing.Icon
 
+/**
+ * Texture is an image can be used in [Material] or for draw a [khelp.k3d.k2d.Object2D].
+ * @param name Texture name (Must be unique over the all application)
+ * @param reference Texture reference, in other word describe where the texture comes from
+ */
 open class Texture internal constructor(name: String, reference: String)
 {
     companion object
@@ -114,7 +123,7 @@ open class Texture internal constructor(name: String, reference: String)
         /**
          * Reference for resources
          */
-        val REFERENCE_RESOURCES = "ReferecneResources"
+        val REFERENCE_RESOURCES = "ReferenceResources"
         /**
          * Reference for video
          */
@@ -126,21 +135,18 @@ open class Texture internal constructor(name: String, reference: String)
         /**
          * Font render context
          */
-        val CONTEXT = FontRenderContext(TRANSFORM, false,
-                                        false)
+        val CONTEXT = FontRenderContext(TRANSFORM, false, false)
 
         /**
-         * Compute Bernouilli number at t time
+         * Compute Bernoulli number at t time
          *
          * @param n N
          * @param m M
          * @param t Time
-         * @return Bernouilli number
+         * @return Bernoulli number
          */
-        private fun B(n: Int, m: Int, t: Double): Double
-        {
-            return Texture.C(n, m).toDouble() * Math.pow(t, m.toDouble()) * Math.pow(1.0 - t, (n - m).toDouble())
-        }
+        private fun Bernoulli(n: Int, m: Int, t: Double) =
+                Texture.combination(n, m).toDouble() * Math.pow(t, m.toDouble()) * Math.pow(1.0 - t, (n - m).toDouble())
 
         /**
          * Compute the number of combination of N element in M
@@ -149,10 +155,8 @@ open class Texture internal constructor(name: String, reference: String)
          * @param m M
          * @return Combination number
          */
-        private fun C(n: Int, m: Int): Long
-        {
-            return Texture.factorial(n) / (Texture.factorial(m) * Texture.factorial(n - m))
-        }
+        private fun combination(n: Int, m: Int) =
+                Texture.factorial(n) / (Texture.factorial(m) * Texture.factorial(n - m))
 
         /**
          * Compute cubic invoke at a given time
@@ -164,11 +168,11 @@ open class Texture internal constructor(name: String, reference: String)
          * @param t  Interpolation time
          * @return Interpolated value
          */
-        private fun PCubique(cp: Double, p1: Double, p2: Double, p3: Double, t: Double): Double
-        {
-            return Texture.B(3, 0, t) * cp + Texture.B(3, 1, t) * p1 + Texture.B(3, 2, t) * p2 +
-                    Texture.B(3, 3, t) * p3
-        }
+        private fun cubic(cp: Double, p1: Double, p2: Double, p3: Double, t: Double) =
+                Texture.Bernoulli(3, 0, t) * cp +
+                        Texture.Bernoulli(3, 1, t) * p1 +
+                        Texture.Bernoulli(3, 2, t) * p2 +
+                        Texture.Bernoulli(3, 3, t) * p3
 
         /**
          * Compute interpolated values cubic for a given precision
@@ -180,26 +184,28 @@ open class Texture internal constructor(name: String, reference: String)
          * @param precision Precision used
          * @return Interpolated values
          */
-        fun PCubiques(
-                cp: Double, p1: Double, p2: Double, p3: Double, precision: Int): DoubleArray
+        fun cubics(cp: Double, p1: Double, p2: Double, p3: Double, precision: Int): DoubleArray
         {
-            val cub = DoubleArray(precision)
+            val cubics = DoubleArray(precision)
             val step = 1.0 / (precision - 1.0)
             var actual = 0.0
+
             for (i in 0 until precision)
             {
                 if (i == precision - 1)
                 {
                     actual = 1.0
                 }
-                cub[i] = Texture.PCubique(cp, p1, p2, p3, actual)
+
+                cubics[i] = Texture.cubic(cp, p1, p2, p3, actual)
                 actual += step
             }
-            return cub
+
+            return cubics
         }
 
         /**
-         * Compute quadric invoke at a given time
+         * Compute quadratic invoke at a given time
          *
          * @param cp Current value
          * @param p1 Control value
@@ -207,13 +213,13 @@ open class Texture internal constructor(name: String, reference: String)
          * @param t  Interpolation time
          * @return Interpolated value
          */
-        private fun PQuadrique(cp: Double, p1: Double, p2: Double, t: Double): Double
-        {
-            return Texture.B(2, 0, t) * cp + Texture.B(2, 1, t) * p1 + Texture.B(2, 2, t) * p2
-        }
+        private fun quadratic(cp: Double, p1: Double, p2: Double, t: Double) =
+                Texture.Bernoulli(2, 0, t) * cp +
+                        Texture.Bernoulli(2, 1, t) * p1 +
+                        Texture.Bernoulli(2, 2, t) * p2
 
         /**
-         * Compute interpolated values quadric for a given precision
+         * Compute interpolated values quadratic for a given precision
          *
          * @param cp        Current value
          * @param p1        Control value
@@ -221,21 +227,24 @@ open class Texture internal constructor(name: String, reference: String)
          * @param precision Precision used
          * @return Interpolated values
          */
-        fun PQuadriques(cp: Double, p1: Double, p2: Double, precision: Int): DoubleArray
+        fun quadratics(cp: Double, p1: Double, p2: Double, precision: Int): DoubleArray
         {
-            val quad = DoubleArray(precision)
+            val quadratics = DoubleArray(precision)
             val step = 1.0 / (precision - 1.0)
             var actual = 0.0
+
             for (i in 0 until precision)
             {
                 if (i == precision - 1)
                 {
                     actual = 1.0
                 }
-                quad[i] = Texture.PQuadrique(cp, p1, p2, actual)
+
+                quadratics[i] = Texture.quadratic(cp, p1, p2, actual)
                 actual += step
             }
-            return quad
+
+            return quadratics
         }
 
         /**
@@ -303,17 +312,21 @@ open class Texture internal constructor(name: String, reference: String)
         private fun factorial(integer: Int): Long
         {
             var integer = integer
+
             if (integer < 2)
             {
                 return 1
             }
+
             var factorial = integer.toLong()
             integer--
+
             while (integer > 1)
             {
                 factorial *= integer.toLong()
                 integer--
             }
+
             return factorial
         }
 
@@ -323,34 +336,9 @@ open class Texture internal constructor(name: String, reference: String)
          * @param file Image file
          * @return The texture loaded
          */
-        fun load(file: File): Texture
-        {
-            var inputStream: InputStream? = null
-
-            try
-            {
-                inputStream = FileInputStream(file)
-                return Texture(file.absolutePath, Texture.REFERENCE_IMAGE, inputStream)
-            }
-            catch (exception: Exception)
-            {
-                return Texture.DUMMY
-            }
-            finally
-            {
-                if (inputStream != null)
-                {
-                    try
-                    {
-                        inputStream.close()
-                    }
-                    catch (ignored: Exception)
-                    {
-                    }
-
-                }
-            }
-        }
+        fun load(file: File) = parseFromStream({ FileInputStream(file) },
+                                               { Texture(file.absolutePath, Texture.REFERENCE_IMAGE, it) },
+                                               Texture.DUMMY)
 
         /**
          * Multiply 2 color parts
@@ -372,10 +360,7 @@ open class Texture internal constructor(name: String, reference: String)
          * @param name Texture name
          * @return The texture or `null` if no texture with the given name
          */
-        fun obtainTexture(name: String): Texture?
-        {
-            return Texture.hashtableTextures[name]
-        }
+        fun obtainTexture(name: String) = Texture.hashtableTextures[name]
 
         /**
          * Obtain a texture by its name
@@ -383,10 +368,7 @@ open class Texture internal constructor(name: String, reference: String)
          * @param name Texture name
          * @return The texture or `null` if no texture with the given name
          */
-        fun obtainTextureOrDummy(name: String): Texture
-        {
-            return Texture.hashtableTextures[name] ?: Texture.DUMMY
-        }
+        fun obtainTextureOrDummy(name: String) = Texture.hashtableTextures[name] ?: Texture.DUMMY
 
         /**
          * Force refresh all textures
@@ -419,14 +401,17 @@ open class Texture internal constructor(name: String, reference: String)
         {
             var newName = newName
             newName = newName.trim { it <= ' ' }
+
             if (newName.length < 1)
             {
                 throw IllegalArgumentException("Name can't be empty")
             }
+
             if (texture.textureName == newName)
             {
                 return
             }
+
             Texture.hashtableTextures.remove(texture.textureName)
             texture.textureName = newName
             Texture.hashtableTextures[newName] = texture
@@ -444,6 +429,7 @@ open class Texture internal constructor(name: String, reference: String)
             val i1 = b1.toUnsignedInt()
             val i2 = b2.toUnsignedInt()
             val i = i1 - i2
+
             return if (i <= 0)
             {
                 0.toByte()
@@ -456,15 +442,7 @@ open class Texture internal constructor(name: String, reference: String)
          *
          * @param texture Texture to unregister
          */
-        private fun unregisterTexture(texture: Texture)
-        {
-            if (Texture.hashtableTextures == null)
-            {
-                return
-            }
-
-            Texture.hashtableTextures.remove(texture.textureName)
-        }
+        private fun unregisterTexture(texture: Texture) = Texture.hashtableTextures.remove(texture.textureName)
     }
 
     /**
@@ -518,10 +496,12 @@ open class Texture internal constructor(name: String, reference: String)
     init
     {
         val name = name.trim { it <= ' ' }
+
         if (name.length < 1)
         {
             throw IllegalArgumentException("Name can't be empty")
         }
+
         this.videoMemoryId = -1
         this.textureName = name
         this.textureID = Texture.nextTextureID++
@@ -529,6 +509,11 @@ open class Texture internal constructor(name: String, reference: String)
         Texture.registerTexture(this)
     }
 
+    /**
+     * Create texture from buffered image
+     * @param name Texture unique name
+     * @param bufferedImage Buffered image to copy
+     */
     constructor(name: String, bufferedImage: BufferedImage) : this(name, Texture.REFERENCE_BUFFERED_IMAGE)
     {
         this.needToRefresh = true
@@ -539,6 +524,11 @@ open class Texture internal constructor(name: String, reference: String)
         this.setPixels(width, height, pixels)
     }
 
+    /**
+     * Create texture from icon
+     * @param name Texture unique name
+     * @param icon Icon to copy
+     */
     constructor(name: String, icon: Icon) : this(name, Texture.REFERENCE_ICON)
     {
         this.needToRefresh = true
@@ -552,6 +542,11 @@ open class Texture internal constructor(name: String, reference: String)
         this.setPixels(width, height, pixels)
     }
 
+    /**
+     * Create texture from image
+     * @param name Texture unique name
+     * @param image Image to copy
+     */
     constructor(name: String, image: Image) : this(name, Texture.REFERENCE_IMAGE)
     {
         this.needToRefresh = true
@@ -570,6 +565,17 @@ open class Texture internal constructor(name: String, reference: String)
         this.setPixels(width, height, pixels)
     }
 
+    /**
+     * Create texture from pixels
+     *
+     * The pixels array size must be coherent with given width and height
+     * @param name Texture unique name
+     * @param width Image inside pixels array width
+     * @param height Image inside pixels array height
+     * @param pixels Pixels of image (R G B A byte format)
+     * @throws IllegalArgumentException If pixels array size not coherent with given width and height
+     */
+    @Throws(IllegalArgumentException::class)
     constructor(name: String, width: Int, height: Int, pixels: ByteArray = ByteArray(width * height * 4)) : this(name,
                                                                                                                  Texture.REFERENCE_PIXELS)
     {
@@ -577,19 +583,49 @@ open class Texture internal constructor(name: String, reference: String)
         this.setPixels(width, height, pixels)
     }
 
+    /**
+     * Create texture fill with one color
+     * @param name Texture unique name
+     * @param width Texture width
+     * @param height Texture height
+     * @param color Color to fill texture
+     */
     constructor(name: String, width: Int, height: Int, color: Color) : this(name, width, height)
     {
         this.fillRect(0, 0, width, height, color, false)
     }
 
-    constructor(name: String, width: Int, height: Int, color: Int) : this(name, width, height, Color(color, true))
+    /**
+     * Create texture fill with one color
+     * @param name Texture unique name
+     * @param width Texture width
+     * @param height Texture height
+     * @param color Color to fill texture
+     */
+    constructor(name: String, width: Int, height: Int, color: ColorInt) : this(name, width, height, Color(color, true))
 
-    constructor(name: String, width: Int, height: Int, pixels: IntArray) : this(name, Texture.REFERENCE_PIXELS)
+    /**
+     * Create texture from pixels
+     *
+     * The pixels array size must be coherent with given width and height
+     * @param name Texture unique name
+     * @param width Image inside pixels array width
+     * @param height Image inside pixels array height
+     * @param pixels Pixels of image (AARRGGBB integer format)
+     * @throws IllegalArgumentException If pixels array size not coherent with given width and height
+     */
+    @Throws(IllegalArgumentException::class)
+    constructor(name: String, width: Int, height: Int, pixels: Pixels) : this(name, Texture.REFERENCE_PIXELS)
     {
         this.needToRefresh = true
         this.setPixels(width, height, pixels)
     }
 
+    /**
+     * Create texture from image
+     * @param name Texture unique name
+     * @param image Image to copy
+     */
     constructor(name: String, image: JHelpImage) : this(name, Texture.REFERENCE_JHELP_IMAGE)
     {
         this.needToRefresh = true
@@ -599,6 +635,14 @@ open class Texture internal constructor(name: String, reference: String)
         this.setPixels(width, height, pixels)
     }
 
+    /**
+     * Create texture from stream
+     * @param name Texture unique name
+     * @param reference Texture reference (Source type description)
+     * @param inputStream Stream to parse
+     * @throws IOException If stream not contains a valid image
+     */
+    @Throws(IOException::class)
     constructor(name: String, reference: String, inputStream: InputStream) : this(name, ImageIO.read(inputStream))
     {
         this.textureReference = reference
@@ -706,16 +750,16 @@ open class Texture internal constructor(name: String, reference: String)
                 }
                 PathIterator.SEG_QUADTO  ->
                 {
-                    xx = Texture.PQuadriques(x, coords[0], coords[2], precision)
-                    yy = Texture.PQuadriques(y, coords[1], coords[3], precision)
+                    xx = Texture.quadratics(x, coords[0], coords[2], precision)
+                    yy = Texture.quadratics(y, coords[1], coords[3], precision)
                     this.draws(xx, yy, color, mix)
                     x = xx[precision - 1]
                     y = yy[precision - 1]
                 }
                 PathIterator.SEG_CUBICTO ->
                 {
-                    xx = Texture.PCubiques(x, coords[0], coords[2], coords[4], precision)
-                    yy = Texture.PCubiques(y, coords[1], coords[3], coords[5], precision)
+                    xx = Texture.cubics(x, coords[0], coords[2], coords[4], precision)
+                    yy = Texture.cubics(y, coords[1], coords[3], coords[5], precision)
                     this.draws(xx, yy, color, mix)
                     x = xx[precision - 1]
                     y = yy[precision - 1]

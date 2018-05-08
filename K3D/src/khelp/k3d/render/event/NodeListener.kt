@@ -2,6 +2,9 @@ package khelp.k3d.render.event
 
 import khelp.k3d.render.Node
 
+/**
+ * Listener of mouse event on a node
+ */
 interface NodeListener
 {
     /**

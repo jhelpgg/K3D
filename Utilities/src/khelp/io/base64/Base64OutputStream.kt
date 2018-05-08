@@ -36,13 +36,6 @@ class Base64OutputStream(private val outputStream: OutputStream) : OutputStream(
 
     /**
      * Write one byte
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param b Byte to write
      * @throws IOException On writing issue
      * @see OutputStream.write
@@ -81,13 +74,6 @@ class Base64OutputStream(private val outputStream: OutputStream) : OutputStream(
 
     /**
      * Flush the stream
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @throws IOException On flushing issue
      * @see OutputStream.flush
      */
@@ -96,13 +82,6 @@ class Base64OutputStream(private val outputStream: OutputStream) : OutputStream(
 
     /**
      * Add the need = and Close the stream
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @throws IOException On closing issue
      * @see OutputStream.close
      */

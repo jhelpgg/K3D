@@ -17,21 +17,46 @@ import java.util.Stack
 import java.util.Vector
 import java.util.concurrent.atomic.AtomicInteger
 
+/**
+ * Fire mouse click event to a listener
+ * @param node Clicked node
+ * @param nodeListener Listener to alert
+ * @param leftButton Indicates if mouse left button is pressed
+ * @param rightButton Indicates if mouse right button is pressed
+ */
 internal fun taskFireMouseClick(node: Node, nodeListener: NodeListener, leftButton: Boolean, rightButton: Boolean) =
         {
             nodeListener.mouseClick(node, leftButton, rightButton)
         }
 
+/**
+ * Fire mouse enter event to a listener
+ * @param node Entered node
+ * @param nodeListener Listener to alert
+ */
 internal fun taskFireMouseEnter(node: Node, nodeListener: NodeListener) =
         {
             nodeListener.mouseEnter(node)
         }
 
+/**
+ * Fire mouse exit event to a listener
+ * @param node Exited node
+ * @param nodeListener Listener to alert
+ */
 internal fun taskFireMouseExit(node: Node, nodeListener: NodeListener) =
         {
             nodeListener.mouseExit(node)
         }
 
+/**
+ * Fire position change to a listener
+ * @param node Moved node
+ * @param nodePositionListener Listener to alert
+ * @param x New X
+ * @param y New Y
+ * @param z New Z
+ */
 internal fun taskFireNodePositionChange(node: Node, nodePositionListener: NodePositionListener,
                                         x: Float, y: Float, z: Float) =
         {
@@ -53,71 +78,116 @@ open class Node : Iterable<Node>
     companion object
     {
         /**
-         * Color picking ID
+         * Next color picking ID
          */
         private var ID_PICKING = AtomicInteger(0)
     }
 
+    /**Additional information*/
     var additionalInformation: Any? = null
 
+    /**X position*/
     private var x = 0f
+    /**Y position*/
     private var y = 0f
+    /**Z position*/
     private var z = 0f
+    /**Rotation around X axis*/
     private var angleX = 0f
+    /**Rotation around Y axis*/
     private var angleY = 0f
+    /**Rotation around Z axis*/
     private var angleZ = 0f
+    /**Scale on X*/
     private var scaleX = 1f
+    /**Scale on Y*/
     private var scaleY = 1f
+    /**Scale on Z*/
     private var scaleZ = 1f
 
+    /**Indicates if X is limited*/
     private var xLimited = false
+    /**Minimum X*/
     private var xMin = -Float.MAX_VALUE
+    /**Maximum X*/
     private var xMax = Float.MAX_VALUE
 
+    /**Indicates if Y is limited*/
     private var yLimited = false
+    /**Minimum Y*/
     private var yMin = -Float.MAX_VALUE
+    /**Maximum Y*/
     private var yMax = Float.MAX_VALUE
 
+    /**Indicates if Z is limited*/
     private var zLimited = false
+    /**Minimum Z*/
     private var zMin = -Float.MAX_VALUE
+    /**Maximum Z*/
     private var zMax = Float.MAX_VALUE
 
+    /**Indicates if rotation around X axis is limited*/
     private var angleXLimited = false
+    /**Minimum angle around X axis*/
     private var angleXMin = -360f
+    /**Maximum angle around X axis*/
     private var angleXMax = 360f
 
+    /**Indicates if rotation around Y axis is limited*/
     private var angleYLimited = false
+    /**Minimum angle around Y axis*/
     private var angleYMin = -360f
+    /**Maximum angle around Y axis*/
     private var angleYMax = 360f
 
+    /**Indicates if rotation around Z axis is limited*/
     private var angleZLimited = false
+    /**Minimum angle around Z axis*/
     private var angleZMin = -360f
+    /**Maximum angle around Z axis*/
     private var angleZMax = 360f
 
+    /**Wire frame color*/
     var wireColor = DEFAULT_WIRE_FRAME_COLOR
 
+    /**Listeners of node mouse events*/
     private val nodeListeners = ArrayList<NodeListener>(4)
+    /**Listeners of node position events*/
     private val nodePositionListeners = ArrayList<NodePositionListener>()
+    /**Node children*/
     private val children = Vector<Node>(8)
 
+    /**Red part of picking color*/
     private val redPicking: Float
+    /**Green part of picking color*/
     private val greenPicking: Float
+    /**Blue part of picking color*/
     private val bluePicking: Float
+    /**Color picking ID*/
     val colorPickingId: Int
+    /**Indicates if node can be pick/detect by the mouse*/
     var canBePick = false
 
+    /**Indicates if mouse over the node*/
     private var over = false
+    /**Select or not the node*/
     var selected = false
+    /**Show/hide wire frames*/
     var showWire = false
+    /**Node visibility*/
     var visible = true
 
+    /**Node name*/
     var name = ""
+    /**Listener of picking UV. If set, and node can be pick be UV, the next click will be convert to a pick UV event and call the listener*/
     var pickUVlistener: PickUVlistener? = null
-    var zOrder = 0f
+    /**Node Z order*/
+    internal var zOrder = 0f
+    /**Hot spot texture*/
     var textureHotspot: Texture? = null
 
+    /**Parent node*/
     private var parent: Node? = null
-    private val arrayListListeners = ArrayList<NodeListener>()
 
     init
     {
@@ -207,6 +277,9 @@ open class Node : Iterable<Node>
         }
     }
 
+    /**
+     * Fire node position changed
+     */
     private fun fireNodePositionChanged()
     {
         synchronized(this.nodePositionListeners)
@@ -215,6 +288,9 @@ open class Node : Iterable<Node>
         }
     }
 
+    /**
+     * Fire mouse enter the node
+     */
     private fun fireMouseEnter()
     {
         synchronized(this.nodeListeners)
@@ -223,6 +299,9 @@ open class Node : Iterable<Node>
         }
     }
 
+    /**
+     * Fire mouse exit the node
+     */
     private fun fireMouseExit()
     {
         synchronized(this.nodeListeners)
@@ -231,6 +310,11 @@ open class Node : Iterable<Node>
         }
     }
 
+    /**
+     * Fire mouse click on the node
+     * @param leftButton Indicates if left button pressed
+     * @param rightButton Indicates if right button pressed
+     */
     private fun fireMouseClick(leftButton: Boolean, rightButton: Boolean)
     {
         synchronized(this.nodeListeners)
@@ -455,69 +539,140 @@ open class Node : Iterable<Node>
         return allNodes
     }
 
+    /**
+     * X position
+     */
     fun x() = this.x;
+
+    /**
+     * Y position
+     */
     fun y() = this.y;
+
+    /**
+     * Z position
+     */
     fun z() = this.z;
+
+    /**
+     * Rotation angle around X axis in degree
+     */
     fun angleX() = this.angleX;
+
+    /**
+     * Rotation angle around Y axis in degree
+     */
     fun angleY() = this.angleY;
+
+    /**
+     * Rotation angle around Z axis in degree
+     */
     fun angleZ() = this.angleZ;
+
+    /**
+     * Scale along X axis
+     */
     fun scaleX() = this.scaleX;
+
+    /**
+     * Scale along Y axis
+     */
     fun scaleY() = this.scaleY;
+
+    /**
+     * Scale along Z axis
+     */
     fun scaleZ() = this.scaleZ;
+
+    /**
+     * Change X position
+     */
     fun x(x: Float)
     {
         this.x = x
         this.checkValues()
     }
 
+    /**
+     * Change Y position
+     */
     fun y(y: Float)
     {
         this.y = y
         this.checkValues()
     }
 
+    /**
+     * Change Z position
+     */
     fun z(z: Float)
     {
         this.z = z
         this.checkValues()
     }
 
+    /**
+     * Change angle (in degree) around X axis
+     */
     fun angleX(angleX: Float)
     {
         this.angleX = angleX
         this.checkValues()
     }
 
+    /**
+     * Change angle (in degree) around Y axis
+     */
     fun angleY(angleY: Float)
     {
         this.angleY = angleY
         this.checkValues()
     }
 
+    /**
+     * Change angle (in degree) around Z axis
+     */
     fun angleZ(angleZ: Float)
     {
         this.angleZ = angleZ
         this.checkValues()
     }
 
+    /**
+     * Change scale along X axis
+     */
     fun scaleX(scaleX: Float)
     {
         this.scaleX = scaleX
         this.checkValues()
     }
 
+    /**
+     * Change scale along Y axis
+     */
     fun scaleY(scaleY: Float)
     {
         this.scaleY = scaleY
         this.checkValues()
     }
 
+    /**
+     * Change scale along Z axis
+     */
     fun scaleZ(scaleZ: Float)
     {
         this.scaleZ = scaleZ
         this.checkValues()
     }
 
+    /**
+     * Limit X position to given interval.
+     *
+     * If value set is outside the limits, the real value set is put on minimum (for values lower the minimum)
+     * or maximum (For values upper the maximum)
+     * @param min Minimum value
+     * @param max Maximum value
+     */
     fun limitX(min: Float, max: Float)
     {
         this.xLimited = true;
@@ -526,13 +681,27 @@ open class Node : Iterable<Node>
         this.checkValues()
     }
 
+    /**
+     * Indicates if X values are limited
+     */
     fun xLimited() = this.xLimited
 
+    /**
+     * Remove any limit constraints for X position
+     */
     fun freeX()
     {
         this.xLimited = false
     }
 
+    /**
+     * Limit Y position to given interval.
+     *
+     * If value set is outside the limits, the real value set is put on minimum (for values lower the minimum)
+     * or maximum (For values upper the maximum)
+     * @param min Minimum value
+     * @param max Maximum value
+     */
     fun limitY(min: Float, max: Float)
     {
         this.yLimited = true;
@@ -541,13 +710,27 @@ open class Node : Iterable<Node>
         this.checkValues()
     }
 
+    /**
+     * Indicates if Y values are limited
+     */
     fun yLimited() = this.yLimited
 
+    /**
+     * Remove any limit constraints for Y position
+     */
     fun freeY()
     {
         this.yLimited = false
     }
 
+    /**
+     * Limit Z position to given interval.
+     *
+     * If value set is outside the limits, the real value set is put on minimum (for values lower the minimum)
+     * or maximum (For values upper the maximum)
+     * @param min Minimum value
+     * @param max Maximum value
+     */
     fun limitZ(min: Float, max: Float)
     {
         this.zLimited = true;
@@ -556,13 +739,27 @@ open class Node : Iterable<Node>
         this.checkValues()
     }
 
+    /**
+     * Indicates if Z values are limited
+     */
     fun zLimited() = this.zLimited
 
+    /**
+     * Remove any limit constraints for Z position
+     */
     fun freeZ()
     {
         this.zLimited = false
     }
 
+    /**
+     * Limit angle around X axis to given interval.
+     *
+     * If value set is outside the limits, the real value set is put on minimum (for values lower the minimum)
+     * or maximum (For values upper the maximum)
+     * @param min Minimum value
+     * @param max Maximum value
+     */
     fun limitAngleX(min: Float, max: Float)
     {
         this.angleXLimited = true;
@@ -571,13 +768,27 @@ open class Node : Iterable<Node>
         this.checkValues()
     }
 
+    /**
+     * Indicates if angle around X axis is limited
+     */
     fun angleXLimited() = this.angleXLimited
 
+    /**
+     * Remove any limit constraints for angle around X axis
+     */
     fun freeAngleX()
     {
         this.angleXLimited = false
     }
 
+    /**
+     * Limit angle around Y axis to given interval.
+     *
+     * If value set is outside the limits, the real value set is put on minimum (for values lower the minimum)
+     * or maximum (For values upper the maximum)
+     * @param min Minimum value
+     * @param max Maximum value
+     */
     fun limitAngleY(min: Float, max: Float)
     {
         this.angleYLimited = true;
@@ -586,13 +797,27 @@ open class Node : Iterable<Node>
         this.checkValues()
     }
 
+    /**
+     * Indicates if angle around Y axis is limited
+     */
     fun angleYLimited() = this.angleYLimited
 
+    /**
+     * Remove any limit constraints for angle around Y axis
+     */
     fun freeAngleY()
     {
         this.angleYLimited = false
     }
 
+    /**
+     * Limit angle around Z axis to given interval.
+     *
+     * If value set is outside the limits, the real value set is put on minimum (for values lower the minimum)
+     * or maximum (For values upper the maximum)
+     * @param min Minimum value
+     * @param max Maximum value
+     */
     fun limitAngleZ(min: Float, max: Float)
     {
         this.angleZLimited = true;
@@ -601,8 +826,14 @@ open class Node : Iterable<Node>
         this.checkValues()
     }
 
+    /**
+     * Indicates if angle around Z axis is limited
+     */
     fun angleZLimited() = this.angleZLimited
 
+    /**
+     * Remove any limit constraints for angle around Z axis
+     */
     fun freeAngleZ()
     {
         this.angleZLimited = false
@@ -641,6 +872,9 @@ open class Node : Iterable<Node>
         }
     }
 
+    /**
+     * Node center point
+     */
     open fun center() = Point3D(this.x, this.y, this.z)
 
     /**
@@ -653,9 +887,23 @@ open class Node : Iterable<Node>
         this.translateGravityPoint(-center.x, -center.y, -center.z)
     }
 
+    /**
+     * Obtain a child node
+     * @param index Child index
+     * @return The child
+     */
     operator fun get(index: Int) = this.children[index]
+
+    /**
+     * Number of children
+     */
     fun numberOfChildren() = this.children.size
+
+    /**
+     * Iterator over children
+     */
     fun children() = this.children.iterator()
+
     /**
      * Compute the complete box that contains the node and all its hierarchy and projected it in world space
      *
@@ -717,7 +965,7 @@ open class Node : Iterable<Node>
 
         if (this is NodeWithBox)
         {
-            virtualBox.add((this as NodeWithBox).getBox(), this.x, this.y, this.z)
+            virtualBox.add(this.getBox(), this.x, this.y, this.z)
         }
 
         for (child in this.children)
@@ -743,7 +991,8 @@ open class Node : Iterable<Node>
         while (!stack.isEmpty())
         {
             node = stack.pop()
-            if (node.name == this.name)
+
+            if (node.name == nodeName)
             {
                 return node
             }
@@ -763,14 +1012,9 @@ open class Node : Iterable<Node>
      * @param node Node tested
      * @return `true` if a node is an ancestor of this node
      */
-    fun isAncestor(node: Node): Boolean
-    {
-        return if (this.isParent(node))
-        {
-            true
-        }
-        else this.parent != null && this.parent!!.isAncestor(node)
-    }
+    fun isAncestor(node: Node): Boolean =
+            if (this.isParent(node)) true
+            else this.parent != null && this.parent!!.isAncestor(node)
 
     /**
      * Indicates if a node is a child to this node
@@ -812,16 +1056,11 @@ open class Node : Iterable<Node>
      * @param blue  Blue part of picking color
      * @return `true` if the node is pick or not
      */
-    fun isMePick(red: Float, green: Float, blue: Float): Boolean
-    {
-        return if (!this.canBePick)
-        {
-            false
-        }
-        else equalPick(red, this.redPicking) &&
-                equalPick(green, this.greenPicking) &&
-                equalPick(blue, this.bluePicking)
-    }
+    fun isMePick(red: Float, green: Float, blue: Float) =
+            this.canBePick
+                    && equalPick(red, this.redPicking)
+                    && equalPick(green, this.greenPicking)
+                    && equalPick(blue, this.bluePicking)
 
     /**
      * Indicates if a node is the parent to this node
@@ -831,6 +1070,9 @@ open class Node : Iterable<Node>
      */
     fun isParent(node: Node) = this.parent != null && this.parent == node
 
+    /**
+     * Node parent
+     */
     fun parent() = this.parent
 
     /**
@@ -945,6 +1187,10 @@ open class Node : Iterable<Node>
         return Point3D(vect)
     }
 
+    /**
+     * Register listener to alert on position changed
+     * @param nodePositionListener Listener to register
+     */
     fun registerNodePositionListener(nodePositionListener: NodePositionListener)
     {
         synchronized(this.nodePositionListeners)
@@ -987,9 +1233,9 @@ open class Node : Iterable<Node>
      */
     fun removeNodeListener(nodeListener: NodeListener)
     {
-        synchronized(this.arrayListListeners)
+        synchronized(this.nodeListeners)
         {
-            this.arrayListListeners.remove(nodeListener)
+            this.nodeListeners.remove(nodeListener)
         }
     }
 
@@ -1174,6 +1420,10 @@ open class Node : Iterable<Node>
         }
     }
 
+    /**
+     * Unregister listener to alert on position changed
+     * @param nodePositionListener Listener to unregister
+     */
     fun unregisterNodePositionListener(nodePositionListener: NodePositionListener)
     {
         synchronized(this.nodePositionListeners) {

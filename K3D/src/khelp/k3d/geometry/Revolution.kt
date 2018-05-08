@@ -1,6 +1,5 @@
 package khelp.k3d.geometry
 
-import khelp.k3d.k2d.Line2D
 import khelp.k3d.k2d.Path
 import khelp.k3d.render.Mesh
 import khelp.k3d.render.Object3D
@@ -8,15 +7,44 @@ import khelp.k3d.render.Point2D
 import khelp.k3d.render.Vertex
 import khelp.math.limit
 
+/**
+ * A revolution is a path draw in (X, Y) plane and rotate around Y axis.
+ *
+ * By example for a bottle:
+ *
+ *     Y
+ *     |
+ *     |..
+ *     | .
+ *     |  .
+ *     |  .
+ *     |  .
+ *     |  .
+ *     |...
+ *     |
+ *
+ * Where the dot are the path, and vertical bar is Y axis.
+ *
+ * If rotate around Y axis, the result is the bottle
+ * @documentation geometry/Revolution.md
+ * @param angle Angle to do the revolution around Y axis.
+ * @param pathPrecision Precision used by the path. Less precision faster but less smooth border
+ * @param rotationPrecision Precision used by rotation. Less precision, less round but faster
+ * @param multiplierU Multiplier of U to be repeat texture around the object
+ */
 class Revolution(angle: Float = 360f, pathPrecision: Int = 5, rotationPrecision: Int = 12,
                  var multiplierU: Float = 1f) : Object3D()
 {
+    /**Angle to do the revolution around Y axis.*/
     var angle = limit(angle, 0f, 360f)
         private set
+    /**Precision used by the path. Less precision faster but less smooth border*/
     var pathPrecision = Math.max(2, pathPrecision)
         private set
+    /**Precision used by rotation. Less precision, less round but faster*/
     var rotationPrecision = Math.max(3, rotationPrecision)
         private set
+    /**Path to rotate*/
     val path = Path()
 
     /**
@@ -83,15 +111,15 @@ class Revolution(angle: Float = 360f, pathPrecision: Int = 5, rotationPrecision:
 
         var an: Int
 
-        val list: List<Line2D>
-        if (homogeneous)
-        {
-            list = this.path.pathHomogeneous(this.pathPrecision, start, end)
-        }
-        else
-        {
-            list = this.path.path(this.pathPrecision)
-        }
+        val list =
+                if (homogeneous)
+                {
+                    this.path.pathHomogeneous(this.pathPrecision, start, end)
+                }
+                else
+                {
+                    this.path.path(this.pathPrecision)
+                }
 
         // For each line of the path
         for (line2D in list)
@@ -185,16 +213,31 @@ class Revolution(angle: Float = 360f, pathPrecision: Int = 5, rotationPrecision:
         this.mesh = mesh
     }
 
+    /**
+     * Change rotation angle.
+     *
+     * To see result call [refreshRevolution]
+     */
     fun angle(angle: Float)
     {
         this.angle = limit(angle, 0f, 360f)
     }
 
+    /**
+     * Change path precision
+     *
+     * To see result call [refreshRevolution]
+     */
     fun pathPrecision(pathPrecision: Int)
     {
         this.pathPrecision = Math.max(2, pathPrecision)
     }
 
+    /**
+     * Change rotation precision
+     *
+     * To see result call [refreshRevolution]
+     */
     fun rotationPrecision(rotationPrecision: Int)
     {
         this.rotationPrecision = Math.max(3, rotationPrecision)
@@ -276,6 +319,7 @@ class Revolution(angle: Float = 360f, pathPrecision: Int = 5, rotationPrecision:
     /**
      * Refresh the revolution's mesh homogeneously
      *
+     * Call it when you made modification and want see the result.*
      * @param start Interpolation value at path start
      * @param end   Interpolation value at path
      */

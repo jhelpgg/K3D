@@ -279,8 +279,15 @@ fun squareRoot(f: Float) = Math.sqrt(f.toDouble()).toFloat()
  * @param center Center of symmetry
  * @return Symmetric point
  */
-fun symetric(point: Point3D, center: Point3D) =
+fun symmetric(point: Point3D, center: Point3D) =
         Point3D(2f * center.x - point.x, 2f * center.y - point.y, 2f * center.z - point.z)
 
+/**
+ * Convert degree angle to radian angle
+ */
 fun Float.toRadians() = Math.toRadians(this.toDouble()).toFloat()
+
+/**
+ * Convert radian angle to degree angle
+ */
 fun Float.toDegrees() = Math.toDegrees(this.toDouble()).toFloat()

@@ -1,42 +1,73 @@
 package khelp.k3d.render
 
+import khelp.util.ColorInt
 import java.awt.Color
 import java.awt.Font
 import java.awt.Polygon
 
-class TextureGirdUV(name: String, width: Int, height: Int) : Texture(name, width, height, 0xFFFFFFFF.toInt())
+/**
+ * Texture with a gird computed with [Mesh]/[Object3D] UV polygons ([createGird]).
+ *
+ * This texture can be used to see how UV are applied to an object.
+ * @param name Texture unique name
+ * @param width Texture width
+ * @param height Texture height
+ */
+class TextureGirdUV(name: String, width: Int, height: Int) : Texture(name, width, height, khelp.util.WHITE)
 {
     /**
      * Shape description
-     *
-     *
-     * Constructs Shape
+     * @param polygon Shape polygon
      */
     internal class Shape(internal val polygon: Polygon)
     {
         /**
-         * Color to fill
+         * Color to fill the shape
          */
-        var color: Int = 0
+        var color: ColorInt = 0
     }
 
+    /**Grid shapes*/
     private val shapes = ArrayList<Shape>()
+    /**Background color*/
     var backgroundColor = Color.WHITE
-        set(value)
-        {
-            this.backgroundColor = value
-            this.refreshShapes()
-        }
-    var borderColor = Color.BLACK
-        set(value)
-        {
-            this.borderColor = value
-            this.refreshShapes()
-        }
+        private set
 
+    /**
+     * Change background color
+     */
+    fun backgroundColor(color: Color)
+    {
+        this.backgroundColor = color
+        this.refreshShapes()
+    }
+
+    /**Border color*/
+    var borderColor = Color.BLACK
+        private set
+
+    /**
+     * Change border color
+     */
+    fun borderColor(color: Color)
+    {
+        this.borderColor = color
+        this.refreshShapes()
+    }
+
+    /**
+     * Obtain a shape's color
+     * @param shape Shape index
+     * @return Shape color
+     */
     fun colorOnShape(shape: Int) = this.shapes[shape].color
 
-    fun colorOnShape(shape: Int, color: Int)
+    /**
+     * Change color on a shape
+     * @param shape Shape index
+     * @param color New color
+     */
+    fun colorOnShape(shape: Int, color: ColorInt)
     {
         this.shapes[shape].color = color
         this.refreshShapes()
@@ -54,8 +85,14 @@ class TextureGirdUV(name: String, width: Int, height: Int) : Texture(name, width
         this.refreshShapes()
     }
 
+    /**
+     * Create grid from 3D object
+     */
     fun createGird(object3D: Object3D) = this.createGird(object3D.mesh)
 
+    /**
+     * Number of shape in the grid
+     */
     fun numberOfShape() = this.shapes.size
 
     /**

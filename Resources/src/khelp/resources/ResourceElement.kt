@@ -1,5 +1,8 @@
 package khelp.resources
 
+/**
+ * Element of resource tree
+ */
 interface ResourceElement
 {
     /**

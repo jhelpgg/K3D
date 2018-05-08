@@ -13,7 +13,7 @@ package khelp.k3d.util
 annotation class ThreadAnimation
 
 /**
- * Indicates if method called inside OpenGL thread.
+ * Indicates that the method called inside OpenGL thread.
  *
  * It can be dangerous (crash or unexpected result) to call it manually in an other thread
  *

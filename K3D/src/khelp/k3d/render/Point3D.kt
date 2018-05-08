@@ -6,6 +6,12 @@ import khelp.k3d.util.nul
 import khelp.util.HashCode
 import org.lwjgl.opengl.GL11
 
+/**
+ * Position in 3D
+ * @param x X abscissa
+ * @param y Y ordinate
+ * @param z Z depth
+ */
 class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
 {
     companion object
@@ -136,12 +142,38 @@ class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
         }
     }
 
+    /**
+     * Create position copy to an other one
+     * @param point Point to copy
+     */
     constructor(point: Point3D) : this(point.x, point.y, point.z)
+
+    /**
+     * Create position based on 2D point and Z
+     * @param point Point to specify X and Y
+     * @param z Z value
+     */
     constructor(point: Point2D, z: Float) : this(point.x, point.y, z)
+
+    /**
+     * Create point from [Vec3f]
+     * @param point Vector to copy
+     */
     constructor(point: Vec3f) : this(point.x, point.y, point.z)
+
+    /**
+     * Create point from [Vec4f].
+     *
+     * The [Vec4f.w] part is used as division factor, so must not be 0
+     * @param point Point for compute the 3D point
+     */
     constructor(point: Vec4f) : this(point.x / point.w, point.y / point.w, point.z / point.w)
 
+    /**
+     * Point copy
+     */
     fun copy() = Point3D(this)
+
     /**
      * Indicates if an object is equal to this point
      *
@@ -168,6 +200,9 @@ class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
         else this.equals(obj)
     }
 
+    /**
+     * Hash code
+     */
     override fun hashCode() = HashCode.computeHashCode(this.x, this.y, this.z)
 
     /**
@@ -234,6 +269,10 @@ class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
         this.z += point.z
     }
 
+    /**
+     * Add an other point
+     * @param point Point to add
+     */
     operator fun plusAssign(point: Point3D) = this.translate(point)
 
     /**
@@ -254,7 +293,13 @@ class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
      */
     fun add(vector: Point3D) = Point3D(this.x + vector.x, this.y + vector.y, this.z + vector.z)
 
+    /**
+     * Add this point with given one and return the result.
+     * @param vector Point to add
+     * @return Addition result
+     */
     operator fun plus(vector: Point3D) = this.add(vector)
+
     /**
      * Translate in opposite way
      *
@@ -267,6 +312,10 @@ class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
         this.z -= point.z
     }
 
+    /**
+     * Subtract an other point
+     * @param point Point to subtract
+     */
     operator fun minusAssign(point: Point3D) = this.antiTranslate(point)
 
     /**
@@ -277,8 +326,6 @@ class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
      */
     fun dotProduct(vector: Point3D) = this.x * vector.x + this.y * vector.y + this.z * vector.z
 
-    operator fun rem(vector: Point3D) = this.dotProduct(vector)
-
     /**
      * Multiply the vector by a factor
      *
@@ -287,7 +334,14 @@ class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
      */
     fun factor(factor: Float) = Point3D(this.x * factor, this.y * factor, this.z * factor)
 
+    /**
+     * Multiply the point by a factor
+     */
     operator fun times(factor: Float) = this.factor(factor)
+
+    /**
+     * Multiply the point by a factor
+     */
     operator fun timesAssign(factor: Float)
     {
         this.x *= factor
@@ -295,8 +349,19 @@ class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
         this.z *= factor
     }
 
+    /**
+     * Opposite point
+     */
     fun opposite() = Point3D(-this.x, -this.y, -this.z)
+
+    /**
+     * Opposite point
+     */
     operator fun unaryMinus() = this.opposite()
+
+    /**
+     * Point length
+     */
     val length
         get() = Math.sqrt(this.dotProduct(this).toDouble()).toFloat()
 
@@ -326,7 +391,11 @@ class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
                     this.x * vector.z - this.z * vector.x,
                     this.x * vector.y - this.y * vector.x)
 
+    /**
+     * Dot product
+     */
     operator fun times(vector: Point3D) = this.product(vector)
+
     /**
      * Modify the point
      *
@@ -403,4 +472,7 @@ class Point3D(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f)
     fun toVect4f() = Vec4f(this.x, this.y, this.z, 1f)
 }
 
+/**
+ *  Multiply factor to a point
+ */
 operator fun Number.times(point: Point3D) = point * this.toFloat()

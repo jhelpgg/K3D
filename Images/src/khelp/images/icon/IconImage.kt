@@ -12,6 +12,7 @@ import java.io.InputStream
  * May contains several image size of the icon
  * @param inputStream Stream to read
  * @param rasterImageType Raster image type if already known
+ * @throws IOException If stream not a valid icon
  */
 class IconImage(inputStream: InputStream, rasterImageType: RasterImageType? = null)
 {

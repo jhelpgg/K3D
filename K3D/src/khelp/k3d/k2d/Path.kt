@@ -9,12 +9,22 @@ import khelp.math.sign
 import khelp.math.square
 import java.awt.geom.Rectangle2D
 
+/**
+ * Segment between 2 points
+ * @param pointStart Start point
+ * @param start Value associated to start point
+ * @param pointEnd End point
+ * @param end Value associated to end point
+ */
 class Line2D(var pointStart: Point2D, var start: Float = 0f, var pointEnd: Point2D, var end: Float = 1f)
 {
+    /**Additional value*/
     var additional = 0f
+    /**Associated path element*/
     internal var pathElement = PathElement(PathType.LINE, arrayOf())
 }
 
+/**Path element type*/
 internal enum class PathType
 {
     /**
@@ -31,13 +41,34 @@ internal enum class PathType
     QUADRATIC
 }
 
+/**
+ * Path element
+ * @param pathType Path element type
+ * @param points Associated 3D points
+ */
 internal class PathElement(val pathType: PathType, val points: Array<Point3D>)
 
+/**
+ * Describe a path
+ */
 class Path
 {
+    /**Path elements*/
     private val path = ArrayList<PathElement>()
+    /**Path size*/
     private var size = 0f
 
+    /**
+     * Append cubic to path
+     * @param startPoint Start point
+     * @param start Value associated to start point
+     * @param controlPoint1 First control point
+     * @param control1 Value associated to first control point
+     * @param controlPoint2 Second control point
+     * @param control2 Value associated to second control point
+     * @param endPoint End point
+     * @param end Value associated to end point
+     */
     fun appendCubic(startPoint: Point2D, start: Float = 0f,
                     controlPoint1: Point2D, control1: Float = 1f / 3f,
                     controlPoint2: Point2D, control2: Float = 2f / 3f,
@@ -51,6 +82,13 @@ class Path
         this.size = -1f
     }
 
+    /**
+     * Append line to path
+     * @param startPoint Start point
+     * @param start Value associated to start point
+     * @param endPoint End point
+     * @param end Value associated to end point
+     */
     fun appendLine(startPoint: Point2D, start: Float = 0f,
                    endPoint: Point2D, end: Float = 1f)
     {
@@ -60,6 +98,15 @@ class Path
         this.size = -1f
     }
 
+    /**
+     * Append quadratic to path
+     * @param startPoint Start point
+     * @param start Value associated to start point
+     * @param controlPoint Control point
+     * @param control Value associated to control point
+     * @param endPoint End point
+     * @param end Value associated to end point
+     */
     fun appendQuadratic(startPoint: Point2D, start: Float = 0f,
                         controlPoint: Point2D, control: Float = 0.5f,
                         endPoint: Point2D, end: Float = 1f)
@@ -71,6 +118,10 @@ class Path
         this.size = -1f
     }
 
+    /**
+     * Compute current bounding box
+     * @return Current bounding box
+     */
     fun border(): Rectangle2D
     {
         var minX = java.lang.Float.MAX_VALUE
@@ -92,6 +143,13 @@ class Path
         return Rectangle2D.Float(minX, minY, maxX - minX, maxY - minY)
     }
 
+    /**
+     * Approximate path by small lines.
+     *
+     * Size and number of lines depends on precision
+     * @param precision Precision for cubic and quadratic path elements
+     * @return Computed lines
+     */
     fun path(precision: Int = 12): List<Line2D>
     {
         val precision = Math.max(2, precision)
@@ -146,9 +204,9 @@ class Path
                     value3 = points[2].z
 
                     // Interpolate values
-                    xs = Texture.PQuadriques(x1.toDouble(), x2.toDouble(), x3.toDouble(), precision)
-                    ys = Texture.PQuadriques(y1.toDouble(), y2.toDouble(), y3.toDouble(), precision)
-                    values = Texture.PQuadriques(value1.toDouble(), value2.toDouble(), value3.toDouble(), precision)
+                    xs = Texture.quadratics(x1.toDouble(), x2.toDouble(), x3.toDouble(), precision)
+                    ys = Texture.quadratics(y1.toDouble(), y2.toDouble(), y3.toDouble(), precision)
+                    values = Texture.quadratics(value1.toDouble(), value2.toDouble(), value3.toDouble(), precision)
                     // Add interpolated lines
                     index = 1
 
@@ -180,10 +238,10 @@ class Path
                     value4 = points[3].z
 
                     // Interpolate values
-                    xs = Texture.PCubiques(x1.toDouble(), x2.toDouble(), x3.toDouble(), x4.toDouble(), precision)
-                    ys = Texture.PCubiques(y1.toDouble(), y2.toDouble(), y3.toDouble(), y4.toDouble(), precision)
-                    values = Texture.PCubiques(value1.toDouble(), value2.toDouble(), value3.toDouble(),
-                                               value4.toDouble(), precision)
+                    xs = Texture.cubics(x1.toDouble(), x2.toDouble(), x3.toDouble(), x4.toDouble(), precision)
+                    ys = Texture.cubics(y1.toDouble(), y2.toDouble(), y3.toDouble(), y4.toDouble(), precision)
+                    values = Texture.cubics(value1.toDouble(), value2.toDouble(), value3.toDouble(),
+                                            value4.toDouble(), precision)
 
                     index = 1
                     while (index < precision)
@@ -204,6 +262,15 @@ class Path
         return lines
     }
 
+    /**
+     * Approximate path by small lines and compute each point values homogeneously from start value to end value
+     *
+     * Size and number of lines depends on precision
+     * @param precision Precision for cubic and quadratic path elements
+     * @param start Start value
+     * @param end End value
+     * @return Computed lines
+     */
     fun pathHomogeneous(precision: Int, start: Float, end: Float): List<Line2D>
     {
         val line2ds = this.path(precision)
@@ -221,7 +288,7 @@ class Path
         }
 
         var value = start
-        var diff = end - start
+        val diff = end - start
 
         for (line2d in line2ds)
         {
@@ -233,6 +300,10 @@ class Path
         return line2ds
     }
 
+    /**
+     * Evaluate path size
+     * @return Estimated size
+     */
     fun size(): Float
     {
         if (sign(this.size) >= 0)
@@ -268,6 +339,11 @@ class Path
         return this.size
     }
 
+    /**
+     * Compute values for each point proportionally their distances between start to end
+     * @param start Start point value
+     * @param end End point value
+     */
     fun linearize(start: Float, end: Float)
     {
         this.size = this.size()
@@ -275,6 +351,7 @@ class Path
         var actualPoint: Point3D
         var oldPoint: Point3D? = null
         var dist: Float
+        val diff = end - start
 
         for (pathElement in this.path)
         {
@@ -289,7 +366,7 @@ class Path
                 {
                     dist = Math.sqrt(square(actualPoint.x - oldPoint.x).toDouble() +
                                              square(actualPoint.y - oldPoint.y).toDouble()).toFloat()
-                    value += (end - start) * dist / this.size
+                    value += (diff * dist) / this.size
                 }
 
                 actualPoint.set(actualPoint.x, actualPoint.y, value)

@@ -7,12 +7,14 @@ import khelp.images.bmp.readBitmapHeader
 import khelp.images.raster.BinaryImage
 import khelp.images.raster.RasterImage
 import khelp.images.raster.RasterImageType
+import java.io.IOException
 import java.io.InputStream
 
 /**
  * Icon element image description
  * @param inputStream Stream to read
  * @param rasterImageType Raster image type
+ * @throws IOException If stream not a valid icon
  */
 class IconElementImage(inputStream: InputStream, rasterImageType: RasterImageType? = null)
 {

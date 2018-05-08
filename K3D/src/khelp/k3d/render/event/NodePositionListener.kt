@@ -2,6 +2,9 @@ package khelp.k3d.render.event
 
 import khelp.k3d.render.Node
 
+/**
+ * Listener of node position change
+ */
 interface NodePositionListener
 {
     /**

@@ -14,7 +14,7 @@ val COMPLEMENT = '='.toInt() and 0xFF
 /**
  * Transform a base 64 representation to a byte array.
  *
- * [.toBase64] to revert the operation
+ * [toBase64] to revert the operation
  *
  * @param base64 Base 64 representation
  * @return Byte array
@@ -124,7 +124,7 @@ fun getSymbol(index: Int): Int
 /**
  * Convert a byte array to its base64 representation.
  *
- * [.fromBase64] to revert the operation
+ * [fromBase64] to revert the operation
  *
  * @param array Array to convert
  * @return Base 64 representation

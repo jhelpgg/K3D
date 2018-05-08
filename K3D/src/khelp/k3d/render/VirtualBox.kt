@@ -2,6 +2,9 @@ package khelp.k3d.render
 
 import khelp.text.concatenateText
 
+/**
+ * Virtual box can be used as bounding box and/or collision detection
+ */
 class VirtualBox
 {
     /**
@@ -40,6 +43,9 @@ class VirtualBox
     var maxZ = 0f
         private set
 
+    /**
+     * Clear the box
+     */
     fun clear()
     {
         this.empty = true
@@ -51,6 +57,10 @@ class VirtualBox
         this.maxZ = 0f
     }
 
+    /**
+     * Copy an other box
+     * @param virtualBox Box to copy
+     */
     fun copy(virtualBox: VirtualBox)
     {
         this.empty = virtualBox.empty
@@ -74,11 +84,11 @@ class VirtualBox
         if (this.empty)
         {
             this.maxX = x
-            this.minX = this.maxX
+            this.minX = x
             this.maxY = y
-            this.minY = this.maxY
+            this.minY = y
             this.maxZ = z
-            this.minZ = this.maxZ
+            this.minZ = z
             this.empty = false
             return
         }

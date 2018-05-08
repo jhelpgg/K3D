@@ -89,6 +89,15 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
 {
     companion object
     {
+        /**
+         * Make a default color.
+         *
+         * The color will be immutable
+         * @param red Red part in `[0, 1]`
+         * @param green Green part in `[0, 1]`
+         * @param blue Blue part in `[0, 1]`
+         * @param alpha Alpha part in `[0, 1]`
+         */
         internal fun makeDefaultColor(red: Float = 0f, green: Float = red, blue: Float = green,
                                       alpha: Float = 1f): Color4f
         {
@@ -98,14 +107,28 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
         }
     }
 
+    /**Indicates if it is a default color*/
     private var defaultColor = false
 
+    /**
+     * Create color from a color describes in AARRGGBB
+     * @param color Color describes in AARRGGBB
+     */
     constructor(color: ColorInt) : this(color.red().toFloat() / 255f,
                                         color.green().toFloat() / 255f,
                                         color.blue().toFloat() / 255f,
                                         color.alpha().toFloat() / 255f)
 
+    /**
+     * Create color copy to an other one
+     * @param color Color to copy
+     */
     constructor(color: Color4f) : this(color.red, color.green, color.blue, color.alpha)
+
+    /**
+     * Create color from java.awt.Color
+     * @param color Color to copy
+     */
     constructor(color: Color) : this(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
 
     /**
@@ -117,7 +140,17 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
         GL11.glColor4f(this.red, this.green, this.blue, this.alpha)
     }
 
+    /**
+     * Alpha part
+     */
     fun alpha() = this.alpha
+
+    /**
+     * Modify alpha part
+     * @param alpha New alpha value in `[0, 1]`
+     * @throws IllegalStateException If color is a default one
+     */
+    @Throws(IllegalStateException::class)
     fun alpha(alpha: Float)
     {
         if (this.defaultColor)
@@ -128,7 +161,17 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
         this.alpha = alpha
     }
 
-    fun red() = this.alpha
+    /**
+     * Red part
+     */
+    fun red() = this.red
+
+    /**
+     * Modify red part
+     * @param red New red value in `[0, 1]`
+     * @throws IllegalStateException If color is a default one
+     */
+    @Throws(IllegalStateException::class)
     fun red(red: Float)
     {
         if (this.defaultColor)
@@ -139,7 +182,17 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
         this.red = red
     }
 
-    fun green() = this.alpha
+    /**
+     * Green part
+     */
+    fun green() = this.green
+
+    /**
+     * Modify green part
+     * @param green New green value in `[0, 1]`
+     * @throws IllegalStateException If color is a default one
+     */
+    @Throws(IllegalStateException::class)
     fun green(green: Float)
     {
         if (this.defaultColor)
@@ -150,7 +203,17 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
         this.green = green
     }
 
+    /**
+     * Blue part
+     */
     fun blue() = this.blue
+
+    /**
+     * Modify blue part
+     * @param blue New blue value in `[0, 1]`
+     * @throws IllegalStateException If color is a default one
+     */
+    @Throws(IllegalStateException::class)
     fun blue(blue: Float)
     {
         if (this.defaultColor)
@@ -161,6 +224,9 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
         this.blue = blue
     }
 
+    /**
+     * Indicates if it is a default color
+     */
     fun defaultColor() = this.defaultColor
 
     /**
@@ -173,6 +239,9 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
             (((this.green * 255).toInt() and 0xFF) shl 8) or
             ((this.blue * 255).toInt() and 0xFF)
 
+    /**
+     * Create a mutable copy
+     */
     fun copy() = Color4f(this)
 
     /**
@@ -205,6 +274,9 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
                 equal(this.green, other.green)
     }
 
+    /**
+     * Hash code
+     */
     override fun hashCode() = HashCode.computeHashCode(this.alpha, this.red, this.green, this.blue)
 
     /**
@@ -213,6 +285,7 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
      * @param color Color to extract information
      * @throws IllegalStateException If this color is a default one
      */
+    @Throws(IllegalStateException::class)
     fun fromColor(color: Color)
     {
         if (this.defaultColor)
@@ -270,6 +343,7 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
      * @param alpha New alpha
      * @throws IllegalStateException If this color is a default one
      */
+    @Throws(IllegalStateException::class)
     fun set(red: Float = 0f, green: Float = red, blue: Float = green, alpha: Float = 1f)
     {
         if (this.defaultColor)
@@ -289,6 +363,7 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
      * @param color Base color
      * @throws IllegalStateException If this color is a default one
      */
+    @Throws(IllegalStateException::class)
     fun set(color: Color)
     {
         if (this.defaultColor)
@@ -308,6 +383,7 @@ class Color4f(private var red: Float = 0f, private var green: Float = red, priva
      * @param color Color to copy
      * @throws IllegalStateException If this color is a default one
      */
+    @Throws(IllegalStateException::class)
     fun set(color: Color4f)
     {
         if (this.defaultColor)

@@ -74,7 +74,7 @@ internal fun readBlock(inputStream: InputStream, colorResolution: Int): Block
             when (type)
             {
                 BLOCK_IMAGE_DESCRIPTOR -> ImageDescriptorBlock(colorResolution)
-                BLOCK_EXTENSION        -> readBlockExtention(inputStream)
+                BLOCK_EXTENSION        -> readBlockExtension(inputStream)
                 BLOCK_END_GIF          -> EndBlock
                 0                      -> IgnoreBlock
                 else                   -> throw IOException("Unknown block type : $type")

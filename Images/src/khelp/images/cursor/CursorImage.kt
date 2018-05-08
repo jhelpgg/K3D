@@ -8,8 +8,9 @@ import java.io.InputStream
 /**
  * Create cursor image.
  *
- * Some cursor have several resolution images, each resolution image is stored in a cursor element image
+ * Some cursor have several resolution images, each resolution image is stored in a [CursorElementImage]
  * @param inputStream Stream to parse
+ * @throws IOException If stream not a valid cursor
  */
 class CursorImage(inputStream: InputStream)
 {

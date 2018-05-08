@@ -143,15 +143,8 @@ class Path : Iterable<Segment>
 
     /**
      * Iterator on segments
-     *
-     *
-     *
-     * <b>Parent documentation:</b>
-     *
-     * {@inheritDoc}
-     *
      * @return Iterator on segments
-     * @see Iterable#iterator()
+     * @see Iterable.iterator
      */
     override fun iterator() = this.segments.iterator();
 

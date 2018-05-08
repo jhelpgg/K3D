@@ -128,13 +128,13 @@ fun main(args: Array<String>)
     scene.refresh()
 
     var animationTakeSword = RobotAnimation(robot)
-    animationTakeSword.addFrame(100, RobotPosition(rightShoulderAngleX = 0f, rightAfterArmAngleX = -150f))
+    animationTakeSword.addFrame(100, RobotPosition(rightShoulderAngleX = 0f, rightElbowAngleX = -150f))
     animationList.addAnimation(animationTakeSword)
     animationList.addAnimation(AnimationProduce<Unit>({
                                                           sword.positionForHand()
                                                           robot.putOnRightHand(sword)
                                                       }))
     animationTakeSword = RobotAnimation(robot)
-    animationTakeSword.addFrame(50, RobotPosition(rightShoulderAngleX = 45f, rightAfterArmAngleX = 0f))
+    animationTakeSword.addFrame(50, RobotPosition(rightShoulderAngleX = 45f, rightElbowAngleX = 0f))
     animationList.addAnimation(animationTakeSword)
 }

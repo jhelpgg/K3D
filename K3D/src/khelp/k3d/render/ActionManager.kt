@@ -15,10 +15,23 @@ import org.lwjgl.glfw.GLFW
 import java.util.HashSet
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal data class ActionDescription(val actionCode: ActionCode, var consumable: Boolean = false,
-                                      var joystickCode: JoystickCode = actionCode.defaultJoystickCode,
-                                      var keyCode: Int = actionCode.defaultKeyCode)
+/**
+ * Describe an action event
+ * @param actionCode Action code
+ * @param consumable Indicates if event is consumable
+ * @param joystickCode Associated joystick code
+ * @param keyCode Associated key code
+ */
+internal class ActionDescription(val actionCode: ActionCode, var consumable: Boolean = false,
+                                 var joystickCode: JoystickCode = actionCode.defaultJoystickCode,
+                                 var keyCode: Int = actionCode.defaultKeyCode)
 
+/**
+ * Create the action manager
+ *
+ * To have a correct instance use [Window3D.actionManager]
+ * @param preferences Preferences where store key mapping
+ */
 class ActionManager internal constructor(private val preferences: Preferences)
 {
     companion object
@@ -33,15 +46,25 @@ class ActionManager internal constructor(private val preferences: Preferences)
         private val PREFERENCE_KEY_SUFFIX = "_key"
     }
 
+    /**Current action events*/
     private val actionDescriptions = ArrayList<ActionDescription>()
+    /**Listeners of action events*/
     private val actionListeners = ArrayList<ActionListener>()
+    /**Current active key codes*/
     private val activeKeys = HashSet<Int>()
+    /**Indicates if capture next joystick code is allowed*/
     private val canCaptureJoystick = AtomicBoolean(false)
+    /**Current active actions*/
     private val currentActiveActions = ArrayList<ActionCode>()
+    /**Current active joystick codes and their status*/
     private val currentJoystickCodes = HashMap<JoystickCode, JoystickStatus>()
+    /**Copy of last current active joystick codes and their status*/
     private val currentJoystickCodesCopy = HashMap<JoystickCode, JoystickStatus>()
+    /**Critical section for capture key/joystick*/
     private val mutexCapture = Mutex()
+    /**Promise for set the next capture joystick code*/
     private var nextJoystickCode: Promise<JoystickCode>? = null
+    /**Promise for set the next capture key code*/
     private var nextKeyCode: Promise<Int>? = null
 
     init
@@ -69,7 +92,7 @@ class ActionManager internal constructor(private val preferences: Preferences)
     /**
      * Fire to listeners (in separate threads) current active actions
      *
-     * @param actionCodes Curreent actives actions
+     * @param actionCodes Current actives actions
      */
     @ThreadOpenGL
     private fun fireActionEvent(vararg actionCodes: ActionCode) =
@@ -237,7 +260,7 @@ class ActionManager internal constructor(private val preferences: Preferences)
 
             if (this.activeKeys.contains(actionDescription.keyCode) ||
                     joystickStatus === JoystickStatus.PRESSED ||
-                    joystickStatus === JoystickStatus.REPEATED && !actionDescription.consumable)
+                    (joystickStatus === JoystickStatus.REPEATED && !actionDescription.consumable))
             {
                 if (!this.currentActiveActions.contains(actionDescription.actionCode))
                 {

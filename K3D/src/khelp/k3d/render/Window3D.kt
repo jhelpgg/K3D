@@ -52,15 +52,27 @@ import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Window for show 3D.
+ * @param width Window width
+ * @param height Window height
+ * @param title Window title
+ * @param decorated Indicates if window is decorated
+ * @param maximized Indicates if window should take all screen
+ * @throws Window3DCantBeCreatedException If system can't create the window
  */
 class Window3D private constructor(width: Int, height: Int, title: String, decorated: Boolean, maximized: Boolean)
 {
+    /**
+     * Node/object 2D mouse event information
+     */
     private data class DetectionInfo(var object2DDetect: Object2D?, var nodeDetect: Node?, var scene: Scene?,
                                      var gui2d: GUI2D?,
                                      var detectX: Int, var detectY: Int,
                                      var mouseButtonLeft: Boolean, var mouseButtonRight: Boolean,
                                      var mouseDrag: Boolean)
     {
+        /**
+         * Copy an information
+         */
         fun copy(detectionInfo: DetectionInfo)
         {
             this.object2DDetect = detectionInfo.object2DDetect
@@ -95,9 +107,9 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
          *
          * @param title Window title
          * @return Created window
-         * @throws NullPointerException           If the title is `null`
          * @throws Window3DCantBeCreatedException If system can't create the window
          */
+        @Throws(Window3DCantBeCreatedException::class)
         fun createFullWidow(title: String): Window3D
         {
             return Window3D(800, 600, title, false, true)
@@ -113,12 +125,11 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
          * @param title     Window title
          * @param decorated Indicated if have to show window decoration
          * @return Created window
-         * @throws NullPointerException           If the title is `null`
          * @throws IllegalArgumentException       If window size too small
          * @throws Window3DCantBeCreatedException If system can't create the window
          */
-        fun createSizedWindow(
-                width: Int, height: Int, title: String, decorated: Boolean): Window3D
+        @Throws(IllegalArgumentException::class, Window3DCantBeCreatedException::class)
+        fun createSizedWindow(width: Int, height: Int, title: String, decorated: Boolean): Window3D
         {
             if (width < 16 || height < 16)
             {
@@ -138,8 +149,15 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
         private fun dataFile(fileName: String) = obtainExternalFile(concatenateText(DATA_DIRECTORY_NAME, "/", fileName))
     }
 
+    /**
+     * Task when exit a 2D object
+     */
     private object OutObject2D : Consumer<DetectionInfo>
     {
+        /**
+         * Do the task
+         * @param parameter Detection information
+         */
         override fun consume(parameter: Optional<DetectionInfo>)
         {
             if (!parameter.isPresent)
@@ -156,11 +174,19 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
         }
     }
 
+    /**
+     * Task that update mouse detection information
+     */
     private inner class UpdateMouseDetection : Consumer<DetectionInfo>
     {
+        /**Last detection information*/
         private var lastDetection = DetectionInfo(null, null, null, null,
                                                   -1, -1, false, false, false)
 
+        /**
+         * Do the task
+         * @param parameter Detection information
+         */
         override fun consume(parameter: Optional<DetectionInfo>)
         {
             if (!parameter.isPresent)
@@ -170,7 +196,7 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
 
             val detectionInfo = parameter.get()
 
-            if (this.lastDetection == parameter.get())
+            if (this.lastDetection == detectionInfo)
             {
                 return
             }
@@ -201,6 +227,7 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
         }
     }
 
+    /**Task that update mouse detection information*/
     private val updateMouseDetection = UpdateMouseDetection()
 
     /**
@@ -260,11 +287,12 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
      * Lights access
      */
     private lateinit var lights: Lights
+
     /**
      * Material use for 2D objects
      */
     private val material2D: Material by lazy {
-        val material2D = Material(Material.MATERIAL_FOR_2D_NAME)
+        val material2D = Material.obtainMaterialOrCreate(Material.MATERIAL_FOR_2D_NAME)
         material2D.colorEmissive().set(1f)
         material2D.specularLevel = 1f
         material2D.shininess(128)
@@ -482,6 +510,10 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
         MainPool.run(({ this.render3D() }), 128)
     }
 
+    /**
+     * Stop texture frame render
+     * @param texture Texture to stop frame automatic update
+     */
     private fun stopTextureFrame(texture: Texture?)
     {
         if (texture != null && (texture is TextureFrame<*>))
@@ -490,6 +522,9 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
         }
     }
 
+    /**
+     * Stop texture frame render on material
+     */
     private fun stopTextureFrame(material: Material)
     {
         this.stopTextureFrame(material.textureDiffuse)
@@ -763,11 +798,14 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     /**
      * Will be called when a key is pressed, repeated or released.
      *
+     * Key actions are:
+     * * [PRESS][GLFW.GLFW_PRESS]
+     * * [RELEASE][GLFW.GLFW_RELEASE]
+     * * [REPEAT][GLFW.GLFW_REPEAT]
      * @param window    the window that received the event
      * @param key       the keyboard key that was pressed or released
      * @param scanCode  the system-specific scanCode of the key
-     * @param action    the key action. One of:
-     *<table><tr><td>[PRESS][GLFW.GLFW_PRESS]</td><td>[RELEASE][GLFW.GLFW_RELEASE]</td><td>[REPEAT][GLFW.GLFW_REPEAT]</td></tr></table>
+     * @param action    the key action.
      * @param modifiers bit field describing which modifiers keys were held down
      */
     @ThreadOpenGL
@@ -862,10 +900,13 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     /**
      * Will be called when a mouse button is pressed or released.
      *
+     * Mouse actions are:
+     * * [PRESS][GLFW.GLFW_PRESS]
+     * * [RELEASE][GLFW.GLFW_RELEASE]
+     * * [REPEAT][GLFW.GLFW_REPEAT]
      * @param window    the window that received the event
      * @param button    the mouse button that was pressed or released
-     * @param action    the button action. One of:
-     *<table><tr><td>[PRESS][GLFW.GLFW_PRESS]</td><td>[RELEASE][GLFW.GLFW_RELEASE]</td><td>[REPEAT][GLFW.GLFW_REPEAT]</td></tr></table>
+     * @param action    the button action.
      * @param modifiers bit field describing which modifiers keys were held down
      */
     @ThreadOpenGL
@@ -918,8 +959,6 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
 
     /**
      * Will be called when the cursor is moved.
-     *
-     *
      *
      * The callback function receives the cursor position, measured in screen coordinates but relative to the top-left corner of the window client area. On
      * platforms that provide it, the full sub-pixel cursor position is passed on.

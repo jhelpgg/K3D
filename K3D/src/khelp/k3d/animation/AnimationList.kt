@@ -2,13 +2,30 @@ package khelp.k3d.animation
 
 import khelp.k3d.util.ThreadAnimation
 
+/**
+ * List of animations play one after other.
+ *
+ * It is possible to repeat the list several times.
+ * @param numberOfLoop Number of list repetition
+ */
 class AnimationList(numberOfLoop: Int = 1) : Animation
 {
+    /**Number of list repetition*/
     private val numberOfLoop = Math.max(1, numberOfLoop)
+    /**Animations list*/
     private val animations = ArrayList<Animation>()
+    /**Number of loop left*/
     private var loopLeft = 0
+    /**Current animation index in list*/
     private var index = 0
 
+    /**
+     * Create list that play once or repeat *"infinite"* times
+     * @param loop
+     *  If **`true`** the list will be repeat an *"infinite"* times.
+     *
+     *  If **`false`** list played only once
+     */
     constructor(loop: Boolean) : this(if (loop) Int.MAX_VALUE else 1)
 
     /**

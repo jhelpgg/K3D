@@ -4,6 +4,13 @@ import khelp.k3d.util.ThreadOpenGL
 import khelp.k3d.util.transferFloat
 import org.lwjgl.opengl.GL11
 
+/**
+ * Represents a light.
+ *
+ * To create a light, have to use methods from the lights manager [Lights] get by [Window3D.lights]
+ * @param name Light name
+ * @param id Light ID
+ */
 class Light internal constructor(public val name: String, id: Int)
 {
     companion object
@@ -14,30 +21,47 @@ class Light internal constructor(public val name: String, id: Int)
         val LIGHT_O = "LIGHT_0"
     }
 
+    /**Light OpenGL ID*/
     private val id = GL11.GL_LIGHT0 + id
 
+    /**Diffuse color*/
     private val diffuse = WHITE.copy()
+    /**Ambient color*/
     private val ambient = BLACK.copy()
+    /**Specular color*/
     private val specular = GRAY.copy()
 
+    /**Indicates if light as changed*/
     private var asChanged = false
+    /**Indicates if light is enable*/
     private var enable = false
+    /**Indicates if light need to be refresh*/
     private var needRefresh = false
 
+    /**Attenuation constant part*/
     private var constantAttenuation = 0f
+    /**Attenuation linear part*/
     private var linearAttenuation = 0f
-    private var quadricAttenuation = 0f
+    /**Attenuation quadratic part*/
+    private var quadraticAttenuation = 0f
 
+    /**Spot cut off*/
     private var spotCutOff = 0
+    /**Spot exponent*/
     private var spotExponent = 0
+    /**Spot direction*/
     private val spotDirection = Point3D(0f, 0f, 1f)
 
+    /**X position*/
     var x = 0f
         private set
+    /**Y position*/
     var y = 0f
         private set
+    /**Z position*/
     var z = 0f
         private set
+    /**W position*/
     var w = 0f
         private set
 
@@ -93,7 +117,7 @@ class Light internal constructor(public val name: String, id: Int)
 
                 GL11.glLightf(this.id, GL11.GL_CONSTANT_ATTENUATION, this.constantAttenuation)
                 GL11.glLightf(this.id, GL11.GL_LINEAR_ATTENUATION, this.linearAttenuation)
-                GL11.glLightf(this.id, GL11.GL_QUADRATIC_ATTENUATION, this.quadricAttenuation)
+                GL11.glLightf(this.id, GL11.GL_QUADRATIC_ATTENUATION, this.quadraticAttenuation)
             }
 
             if (this.enable)
@@ -107,7 +131,14 @@ class Light internal constructor(public val name: String, id: Int)
         }
     }
 
+    /**
+     * Ambient color
+     */
     fun ambient() = this.ambient.copy()
+
+    /**
+     * Change ambient color
+     */
     fun ambient(ambient: Color4f)
     {
         this.ambient.set(ambient)
@@ -115,7 +146,14 @@ class Light internal constructor(public val name: String, id: Int)
         this.needRefresh = true
     }
 
+    /**
+     * Diffuse color
+     */
     fun diffuse() = this.diffuse.copy()
+
+    /**
+     * change diffuse color
+     */
     fun diffuse(diffuse: Color4f)
     {
         this.diffuse.set(diffuse)
@@ -123,7 +161,14 @@ class Light internal constructor(public val name: String, id: Int)
         this.needRefresh = true
     }
 
+    /**
+     * Specular color
+     */
     fun specular() = this.specular.copy()
+
+    /**
+     * Change specular color
+     */
     fun specular(specular: Color4f)
     {
         this.specular.set(specular)
@@ -131,7 +176,17 @@ class Light internal constructor(public val name: String, id: Int)
         this.needRefresh = true
     }
 
+    /**
+     * Constant attenuation part
+     */
     fun constantAttenuation() = this.constantAttenuation
+
+    /**
+     * Change attenuation constant part
+     * @param constantAttenuation Attenuation constant part must be positive or nul
+     * @throws IllegalArgumentException If attenuation constant part is negative
+     */
+    @Throws(IllegalArgumentException::class)
     fun constantAttenuation(constantAttenuation: Float)
     {
         if (constantAttenuation < 0)
@@ -144,7 +199,16 @@ class Light internal constructor(public val name: String, id: Int)
         this.asChanged = true
     }
 
+    /**
+     * Linear attenuation part
+     */
     fun linearAttenuation() = this.linearAttenuation
+
+    /**
+     * Change attenuation linear part
+     * @param linearAttenuation Attenuation linear part must be positive or nul
+     * @throws IllegalArgumentException If attenuation linear part is negative
+     */
     fun linearAttenuation(linearAttenuation: Float)
     {
         if (linearAttenuation < 0)
@@ -157,20 +221,36 @@ class Light internal constructor(public val name: String, id: Int)
         this.asChanged = true
     }
 
-    fun quadricAttenuation() = this.quadricAttenuation
-    fun quadricAttenuation(quadricAttenuation: Float)
+    /**
+     * Quadratic attenuation part
+     */
+    fun quadraticAttenuation() = this.quadraticAttenuation
+
+    /**
+     * Change attenuation quadratic part
+     * @param quadraticAttenuation Attenuation quadratic part must be positive or nul
+     * @throws IllegalArgumentException If attenuation quadratic part is negative
+     */
+    fun quadraticAttenuation(quadraticAttenuation: Float)
     {
-        if (quadricAttenuation < 0)
+        if (quadraticAttenuation < 0)
         {
             throw IllegalArgumentException("No negative value")
         }
 
-        this.quadricAttenuation = quadricAttenuation
+        this.quadraticAttenuation = quadraticAttenuation
         this.needRefresh = true
         this.asChanged = true
     }
 
+    /**
+     * Indicates if light is enable (on)
+     */
     fun enable() = this.enable
+
+    /**
+     * Enable/disable the light. Switch it on or off
+     */
     fun enable(enable: Boolean)
     {
         if (this.enable != enable)
@@ -199,7 +279,17 @@ class Light internal constructor(public val name: String, id: Int)
         this.asChanged = true
     }
 
+    /**
+     * Spot cut off angle
+     */
     fun spotCutOff() = this.spotCutOff
+
+    /**
+     * Change spot cut off angle
+     * @param spotCutOff Spot cut off angle. Must be in `[0, 90]` or `180`
+     * @throws IllegalArgumentException if the angle not in `[0, 90]' and not `180`
+     */
+    @Throws(IllegalArgumentException::class)
     fun spotCutOff(spotCutOff: Int)
     {
         if ((spotCutOff < 0 || spotCutOff > 90) && spotCutOff != 180)
@@ -216,7 +306,14 @@ class Light internal constructor(public val name: String, id: Int)
         }
     }
 
+    /**
+     * Spot direction
+     */
     fun spotDirection() = Point3D(this.spotDirection)
+
+    /**
+     * Change spot direction
+     */
     fun spotDirection(spotDirection: Point3D)
     {
         this.spotDirection.set(spotDirection)
@@ -224,7 +321,17 @@ class Light internal constructor(public val name: String, id: Int)
         this.asChanged = true
     }
 
+    /**
+     * Spot exponent
+     */
     fun spotExponent() = this.spotExponent
+
+    /**
+     * Change spot exponent
+     * @param spotExponent New spot exponent. Must be in `[0, 128]`
+     * @throws IllegalArgumentException If exponent not in `[0, 128]`
+     */
+    @Throws(IllegalArgumentException::class)
     fun spotExponent(spotExponent: Int)
     {
         if (spotExponent < 0 || spotExponent > 128)
@@ -259,23 +366,25 @@ class Light internal constructor(public val name: String, id: Int)
 
         this.constantAttenuation = 1f
         this.linearAttenuation = 0f
-        this.quadricAttenuation = 0f
+        this.quadraticAttenuation = 0f
 
         this.needRefresh = true
         this.asChanged = true
     }
 
     /**
-     * Set the light to be a ponctual light
+     * Set the light to be a punctual light
      *
-     * @param position            Position
-     * @param exponent            Exponent attenuation
-     * @param constantAttenuation Constant attenuation
-     * @param linearAttenuation   Linear attenuation
-     * @param quadricAttenuation  Quadric attenuation
+     * @param position Position
+     * @param exponent Exponent attenuation. Must be in `[0, 128]`
+     * @param constantAttenuation Constant attenuation. Must be >=0
+     * @param linearAttenuation Linear attenuation. Must be >=0
+     * @param quadraticAttenuation Quadratic attenuation. Must be >=0
+     * @throws IllegalArgumentException If one of constraints not full fill
      */
-    fun makePonctualLight(position: Point3D, exponent: Int,
-                          constantAttenuation: Float, linearAttenuation: Float, quadricAttenuation: Float)
+    @Throws(IllegalArgumentException::class)
+    fun makePunctualLight(position: Point3D, exponent: Int,
+                          constantAttenuation: Float, linearAttenuation: Float, quadraticAttenuation: Float)
     {
         if (exponent < 0 || exponent > 128)
         {
@@ -292,7 +401,7 @@ class Light internal constructor(public val name: String, id: Int)
             throw IllegalArgumentException("No negative value")
         }
 
-        if (quadricAttenuation < 0)
+        if (quadraticAttenuation < 0)
         {
             throw IllegalArgumentException("No negative value")
         }
@@ -309,7 +418,7 @@ class Light internal constructor(public val name: String, id: Int)
 
         this.constantAttenuation = constantAttenuation
         this.linearAttenuation = linearAttenuation
-        this.quadricAttenuation = quadricAttenuation
+        this.quadraticAttenuation = quadraticAttenuation
 
         this.needRefresh = true
         this.asChanged = true
@@ -318,16 +427,18 @@ class Light internal constructor(public val name: String, id: Int)
     /**
      * Set the light to be a spot
      *
-     * @param position            Position
-     * @param direction           Light direction
-     * @param exponent            Exponent attenuation
-     * @param cutOff              Cut off
-     * @param constantAttenuation Constant attenuation
-     * @param linearAttenuation   Linear attenuation
-     * @param quadricAttenuation  Quadric attenuation
+     * @param position Position
+     * @param direction Light direction
+     * @param exponent Exponent attenuation. Must be in `[0, 128]`
+     * @param cutOff Cut off. Must be in `[0, 90]` or `128`
+     * @param constantAttenuation Constant attenuation. Must be >=0
+     * @param linearAttenuation Linear attenuation. Must be >=0
+     * @param quadraticAttenuation Quadratic attenuation. Must be >=0
+     * @throws IllegalArgumentException If one of constraints not full fill
      */
+    @Throws(IllegalArgumentException::class)
     fun makeSpot(position: Point3D, direction: Point3D, exponent: Int, cutOff: Int,
-                 constantAttenuation: Float, linearAttenuation: Float, quadricAttenuation: Float)
+                 constantAttenuation: Float, linearAttenuation: Float, quadraticAttenuation: Float)
     {
         if (exponent < 0 || exponent > 128)
         {
@@ -344,7 +455,7 @@ class Light internal constructor(public val name: String, id: Int)
             throw IllegalArgumentException("No negative value")
         }
 
-        if (quadricAttenuation < 0)
+        if (quadraticAttenuation < 0)
         {
             throw IllegalArgumentException("No negative value")
         }
@@ -366,7 +477,7 @@ class Light internal constructor(public val name: String, id: Int)
 
         this.constantAttenuation = constantAttenuation
         this.linearAttenuation = linearAttenuation
-        this.quadricAttenuation = quadricAttenuation
+        this.quadraticAttenuation = quadraticAttenuation
 
         this.needRefresh = true
         this.asChanged = true
@@ -391,7 +502,7 @@ class Light internal constructor(public val name: String, id: Int)
 
         this.constantAttenuation = 1f
         this.linearAttenuation = 0f
-        this.quadricAttenuation = 0f
+        this.quadraticAttenuation = 0f
 
         if (this.id == GL11.GL_LIGHT0)
         {

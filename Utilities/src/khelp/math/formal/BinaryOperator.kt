@@ -148,13 +148,6 @@ abstract class BinaryOperator(val operator: String, val parameter1: Function, va
 
     /**
      * Internal comparison
-     *
-     *
-     *
-     * <b>Parent documentation:</b>
-     *
-     * {@inheritDoc}
-     *
      * @param function Function sure be the instance of the function
      * @return Comparison
      * @see Function#compareToInternal(Function)

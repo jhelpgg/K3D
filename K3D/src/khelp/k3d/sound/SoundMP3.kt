@@ -9,6 +9,8 @@ import java.io.InputStream
 /**
  * Sound in MP3 format
  * @param inputStream Stream where read MP3
+ * @throws IllegalArgumentException If sound not mono, neither stereo.
+ * @throws Exception If decode MP3 failed
  */
 class SoundMP3(inputStream: InputStream) : Sound()
 {

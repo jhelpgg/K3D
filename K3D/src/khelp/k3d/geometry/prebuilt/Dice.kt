@@ -17,16 +17,30 @@ import khelp.util.forEachAsync
 import khelp.util.suspended
 import java.util.concurrent.atomic.AtomicInteger
 
+/**
+ * Listener of dice value changes
+ */
 interface DiceChangeListener
 {
+    /**
+     * Called when a dice value changed
+     * @param dice Dice just changed
+     */
     fun diceChanged(dice: Dice)
 }
 
+/**
+ * Create a dice
+ * @param value Initial value: 1, 2, 3, 4, 5 or 6
+ * @throws IllegalArgumentException If value not 1, 2, 3, 4, 5 or 6
+ */
 class Dice(value: Int = random(1, 6)) : Node()
 {
     companion object
     {
+        /**Next dice ID*/
         internal val NEXT_ID = AtomicInteger(0)
+        /**Faces position*/
         internal val positions = arrayOf(PositionNode(), // 1: Face
                                          PositionNode(angleY = -90f), // 2: Right
                                          PositionNode(angleX = -90f), // 3: Bottom
@@ -35,13 +49,20 @@ class Dice(value: Int = random(1, 6)) : Node()
                                          PositionNode(angleY = 180f)) // 6: Back
     }
 
+    /**Dice ID*/
     val id = Dice.NEXT_ID.getAndIncrement()
+    /**Current value*/
     var value = value
         private set
+    /**Box draw the dice*/
     private val dice = Box(CrossUV())
-    private val material = Material("Dice_${this.id}")
+    /**Dice material*/
+    private val material = Material.obtainMaterialOrCreate("Dice_${this.id}")
+    /**Task that change the value*/
     private val taskChangeValue = { value: Int -> this.changeValue(value) }
+    /**Listeners of dice value change*/
     private val diceChangeListeners = ArrayList<DiceChangeListener>()
+    /**Task that signal to listeners that value changed*/
     private val taskFireDiceChanged =
             { diceChangeListener: DiceChangeListener ->
                 diceChangeListener.diceChanged(this)
@@ -63,6 +84,9 @@ class Dice(value: Int = random(1, 6)) : Node()
         this.addChild(this.dice)
     }
 
+    /**
+     * Change dice value
+     */
     private fun changeValue(value: Int)
     {
         assert(value >= 1 && value <= 6)
@@ -74,6 +98,10 @@ class Dice(value: Int = random(1, 6)) : Node()
         }
     }
 
+    /**
+     * Register dice change listener
+     * @param diceChangeListener Listener to register
+     */
     fun registerDiceChangeListener(diceChangeListener: DiceChangeListener)
     {
         synchronized(this.diceChangeListeners)
@@ -85,6 +113,10 @@ class Dice(value: Int = random(1, 6)) : Node()
         }
     }
 
+    /**
+     * Unregister dice change listener
+     * @param diceChangeListener Listener to unregister
+     */
     fun unregisterDiceChangeListener(diceChangeListener: DiceChangeListener)
     {
         synchronized(this.diceChangeListeners)
@@ -93,6 +125,14 @@ class Dice(value: Int = random(1, 6)) : Node()
         }
     }
 
+    /**
+     * Create animation tha change the dice value
+     * @param value New dice value: 1, 2, 3, 4, 5 or 6
+     * @param numberFrame Animation duration in frames
+     * @return Created animation
+     * @throws IllegalArgumentException If value not 1, 2, 3, 4, 5 or 6
+     */
+    @Throws(IllegalArgumentException::class)
     fun value(value: Int, numberFrame: Int = 1): Animation
     {
         if (value < 1 || value > 6)
@@ -108,6 +148,10 @@ class Dice(value: Int = random(1, 6)) : Node()
         return animation
     }
 
+    /**
+     * Create animation tha roll the dice
+     * @return Created animation
+     */
     fun roll(): Animation
     {
         val animationNode = AnimationPositionNode(this.dice)
@@ -134,5 +178,9 @@ class Dice(value: Int = random(1, 6)) : Node()
         return animation
     }
 
+    /**
+     * Change dice color
+     * @param color New dice color
+     */
     fun color(color: Color4f = GRAY) = this.material.colorDiffuse(color)
 }

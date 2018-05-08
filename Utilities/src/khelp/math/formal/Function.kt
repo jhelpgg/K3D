@@ -798,7 +798,7 @@ abstract class Function : Comparable<Function>
 
     /**
      * Simplify the function at maximum and print steps in given stream
-     * @param printStream Stream where print streps
+     * @param printStream Stream where print steps
      * @return Simplified function
      */
     operator fun invoke(printStream: PrintStream) = this.simplifyMaximum(printStream)

@@ -1,5 +1,8 @@
 package khelp.k3d.render.event
 
+/**
+ * Joystick event type
+ */
 enum class JoystickInputType
 {
     /**

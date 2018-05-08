@@ -56,13 +56,6 @@ internal class PlainTextBlock : BlockExtension()
 
     /**
      * Read the plain text extension block
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param inputStream Stream to read
      * @throws IOException If data aren't a valid plain text extension block
      * @see Block.read

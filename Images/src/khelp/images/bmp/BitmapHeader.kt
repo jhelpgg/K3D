@@ -257,8 +257,8 @@ class BitmapHeader internal constructor(inputStream: InputStream, jumpHeader: Bo
             red = inputStream.read()
             green = inputStream.read()
             blue = inputStream.read()
-            // Just throw away this one
 
+            // Just throw away this one (It doesn't mean alpha)
             inputStream.read()
 
             this.colorTable[i] = BLACK_ALPHA_MASK or (red shl 16) or (green shl 8) or blue
@@ -291,6 +291,24 @@ class BitmapHeader internal constructor(inputStream: InputStream, jumpHeader: Bo
         }
     }
 
+    /**
+     * Read raster image from stream.
+     *
+     * Be aware that size and type have to be correct.
+     * Usually it is the image size and type. That's why the default value are set as the image.
+     *
+     * But, by example, the cursor and icon format have a half size has the image.
+     * The icon image may have a different type.
+     *
+     * Those two cases are specific are rare.
+     * @param inputStream Stream to read
+     * @param width Raster image real width. (Usually same as this image)
+     * @param height Raster image real height. (Usually same as this image)
+     * @param rasterImageType Raster image real type. (Usually same as this image)
+     * @return The raster image read
+     * @throws IOException If stream not describes the desired raster image
+     */
+    @Throws(IOException::class)
     fun readRasterImage(inputStream: InputStream, width: Int = this.width, height: Int = this.height,
                         rasterImageType: RasterImageType = this.rasterImageType) =
             when (rasterImageType)

@@ -8,14 +8,34 @@ import khelp.thread.Consumer
 import khelp.thread.MainPool
 import java.util.Optional
 
+/**
+ * 2D object.
+ *
+ * It have a position for it up-left corner and dimensions (width and height)
+ */
 class Object2D
 {
+    /**
+     * Describes mouse event
+     * @param object2d Object concerned by the event
+     * @param object2DListener Listener to fire the event
+     * @param nature Event nature
+     * @param x Mouse X position relative to object
+     * @param y Mouse Y position relative to object
+     * @param left Indicate if left button is pressed
+     * @param right Indicate if left button is pressed
+     */
     internal data class MouseInformation(val object2d: Object2D, val object2DListener: Object2DListener,
                                          val nature: Int, val x: Int, val y: Int,
                                          val left: Boolean = false, val right: Boolean = false)
 
+    /**Task that fire a mouse event*/
     internal object TaskFireMouse : Consumer<MouseInformation>
     {
+        /**
+         * Do the task
+         * @param optional Optional with mouse event description
+         */
         override fun consume(optional: Optional<MouseInformation>)
         {
             if (optional.isPresent)
@@ -116,6 +136,13 @@ class Object2D
      */
     protected var texture: Texture? = null
 
+    /**
+     * Create empty object (Without texture, so not draw until one is given by [texture])
+     * @param x up-left corner X coordinate
+     * @param y up-left corner Y coordinate
+     * @param width Object width
+     * @param height Object height
+     */
     public constructor(x: Int, y: Int, width: Int, height: Int)
     {
         this.x = x
@@ -131,6 +158,9 @@ class Object2D
         this.over = false
     }
 
+    /**
+     * Stop automatic render if the texture is a [TextureFrame]
+     */
     fun stopTextureFrame()
     {
         if (this.texture != null && this.texture is TextureFrame<*>)

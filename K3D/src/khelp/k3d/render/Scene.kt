@@ -1,12 +1,15 @@
 package khelp.k3d.render
 
 import khelp.k3d.util.ThreadOpenGL
-import khelp.k3d.util.equal
+import khelp.math.sign
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Arrays
 import java.util.Stack
 
+/**
+ * Compare nodes with their Z-order
+ */
 internal object NodeComparatorZorder : Comparator<Node>
 {
     /**
@@ -17,27 +20,39 @@ internal object NodeComparatorZorder : Comparator<Node>
      * @return Result
      * @see Comparator.compare
      */
-    override fun compare(node1: Node, node2: Node): Int
-    {
-        if (equal(node1.zOrder, node2.zOrder))
-        {
-            return 0
-        }
-
-        return if (node1.zOrder < node2.zOrder)
-        {
-            -1
-        }
-        else 1
-    }
+    override fun compare(node1: Node, node2: Node) = sign(node1.zOrder - node2.zOrder)
 }
 
+/**
+ * Scene with 3D graph.
+ *
+ * In scene organization, each node have a parent.
+ * When we add a Node in scene directly, the node become the child of a special Node: The scene root node.
+ * When a node is placed, the coordinates, rotations or scales are relative to its parent.
+ * With this it is possible to transform the node parent and it affects its children, grand children, ...
+ *
+ * Changing the root node position or rotation will affect the all scene (Since it is the main parent of every nodes)
+ * With this trick, its possible to do like if camera position change.
+ *
+ * It is possible to change scene background color.
+ *
+ * For performance reason, node list is not compute at each OpenGL loop. The list is recomputed only when adding a node or removing one.
+ * Direct add (With [Scene.add]) or remove (With [Scene.remove]) will automatically refresh the scene.
+ * But when add or remove node to an other node, the scene can't be aware of that.
+ * So to see the result have to call [Scene.refresh].
+
+ */
 class Scene
 {
+    /**Red part of background color*/
     var redBackground = 1f
+    /**Blue part of background color*/
     var blueBackground = 1f
+    /**Green part of background color*/
     var greenBackground = 1f
+    /**Main scene root node*/
     val root = Node()
+    /**Node list*/
     private var nodeList: Array<Node>? = null
 
     init
@@ -45,11 +60,18 @@ class Scene
         this.root.name = "ROOT"
     }
 
+    /**
+     * Force to refresh the node list in next OpenGL loop
+     */
+    @Synchronized
     fun refresh()
     {
         this.nodeList = null
     }
 
+    /**
+     * Draw the background
+     */
     @ThreadOpenGL
     internal fun drawBackground() = GL11.glClearColor(this.redBackground, this.greenBackground, this.blueBackground, 1f)
 

@@ -1,5 +1,7 @@
 package khelp.k3d.render
 
+import khelp.k3d.render.Material.Companion.createNewMaterial
+import khelp.k3d.render.Material.Companion.obtainMaterialOrCreate
 import khelp.k3d.util.ThreadOpenGL
 import khelp.k3d.util.equal
 import khelp.list.EnumerationIterator
@@ -9,7 +11,13 @@ import org.lwjgl.opengl.GL11
 import java.util.Hashtable
 import java.util.concurrent.atomic.AtomicInteger
 
-class Material(private var name: String)
+/**
+ * Represents a material
+ *
+ * To be sure not have name conflict it is preferred to use [obtainMaterialOrCreate] or [createNewMaterial]
+ * @param name Material unique name
+ */
+class Material private constructor(private var name: String)
 {
     companion object
     {
@@ -77,7 +85,7 @@ class Material(private var name: String)
          *
          * Note if the name is alred given to an other material, the name is little changed to be unique
          *
-         * @param name Base name. If `null` or empty, a name is automatic given
+         * @param name Base name. If empty, a name is automatic given
          * @return Created material
          */
         fun createNewMaterial(name: String): Material
@@ -97,7 +105,7 @@ class Material(private var name: String)
          * Obtain material with its name
          *
          * @param name Material name
-         * @return The material or [.DEFAULT_MATERIAL] if the material not exists
+         * @return The material or [DEFAULT_MATERIAL] if the material not exists
          */
         fun obtainMaterial(name: String) = this.hashtableMaterials[name] ?: DEFAULT_MATERIAL
 
@@ -158,18 +166,31 @@ class Material(private var name: String)
         }
     }
 
+    /**Ambient color*/
     private var colorAmbient = BLACK.copy()
+    /**Diffuse color*/
     private var colorDiffuse = GRAY.copy()
+    /**Emissive color*/
     private var colorEmissive = DARK_GRAY.copy()
+    /**Specular color*/
     private var colorSpecular = LIGHT_GRAY.copy()
+    /**Influence of specular color*/
     var specularLevel = 0.1f
+    /**Shininess*/
     private var shininess = 12
+    /**Transparency (0 full transparent, 1 opaque)*/
     var transparency = 1f
+    /**Indicates if have to render the two parts*/
     var twoSided = false
+    /**Spherical texture influence*/
     var sphericRate = 1f
+    /**Cube map influence*/
     var cubeMapRate = 1f
+    /**Cube map*/
     var cubeMap: CubeMap? = null
+    /**Diffuse texture*/
     var textureDiffuse: Texture? = null
+    /**Spherical texture*/
     var textureSpheric: Texture? = null
 
     init
@@ -177,6 +198,9 @@ class Material(private var name: String)
         Material.registerMaterial(this)
     }
 
+    /**
+     * Material name
+     */
     fun name() = this.name
 
     /**
@@ -257,7 +281,14 @@ class Material(private var name: String)
         }
     }
 
+    /**
+     * Ambient color
+     */
     fun colorAmbient() = this.colorAmbient
+
+    /**
+     * Change ambient color
+     */
     fun colorAmbient(colorAmbient: Color4f)
     {
         if (colorAmbient.defaultColor())
@@ -270,7 +301,14 @@ class Material(private var name: String)
         }
     }
 
+    /**
+     * Diffuse color
+     */
     fun colorDiffuse() = this.colorDiffuse
+
+    /**
+     * Change diffuse color
+     */
     fun colorDiffuse(colorDiffuse: Color4f)
     {
         if (colorDiffuse.defaultColor())
@@ -283,7 +321,14 @@ class Material(private var name: String)
         }
     }
 
+    /**
+     * Emissive color
+     */
     fun colorEmissive() = this.colorEmissive
+
+    /**
+     * Change emissive color
+     */
     fun colorEmissive(colorEmissive: Color4f)
     {
         if (colorEmissive.defaultColor())
@@ -296,7 +341,14 @@ class Material(private var name: String)
         }
     }
 
+    /**
+     * Specular color
+     */
     fun colorSpecular() = this.colorSpecular
+
+    /**
+     * Change specular color
+     */
     fun colorSpecular(colorSpecular: Color4f)
     {
         if (colorSpecular.defaultColor())
@@ -463,7 +515,11 @@ class Material(private var name: String)
         this.twoSided = true
     }
 
+    /**
+     * Shininess
+     */
     fun shininess() = this.shininess
+
     /**
      * Change shininess (0 <-> 128)
      *

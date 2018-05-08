@@ -240,8 +240,14 @@ class Rotf(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z: Float
         return rotationResult;
     }
 
+    /**
+     * Rotation angle
+     */
     fun angle() = 2f * Math.acos(this.w.toDouble()).toFloat()
 
+    /**
+     * Rotation axis
+     */
     fun vector(): Vec3f
     {
         val vector = Vec3f(this.x, this.y, this.z)
@@ -249,6 +255,9 @@ class Rotf(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z: Float
         return vector
     }
 
+    /**
+     * Rotate around X axis
+     */
     fun rotateX(angle: Float)
     {
         val w = this.w
@@ -264,6 +273,9 @@ class Rotf(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z: Float
         this.z = z * rw - y * rx
     }
 
+    /**
+     * Rotate around Y axis
+     */
     fun rotateY(angle: Float)
     {
         val w = this.w
@@ -279,6 +291,9 @@ class Rotf(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z: Float
         this.z = z * rw + x * ry
     }
 
+    /**
+     * Rotate around Z axis
+     */
     fun rotateZ(angle: Float)
     {
         val w = this.w

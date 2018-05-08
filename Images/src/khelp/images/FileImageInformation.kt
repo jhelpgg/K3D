@@ -18,23 +18,11 @@ import javax.imageio.stream.FileImageInputStream
  */
 class FileImageInformation(val file: File)
 {
-    /**
-     * File format name or `null` if it's not an image
-     *
-     * @return File format name or `null` if it's not an image
-     */
+    /** File format name or `null` if it's not an image */
     val formatName: String?
-    /**
-     * Image width
-     *
-     * @return Image width
-     */
+    /** Image width */
     val width: Int
-    /**
-     * Image height
-     *
-     * @return Image height
-     */
+    /** Image height */
     val height: Int
 
     init

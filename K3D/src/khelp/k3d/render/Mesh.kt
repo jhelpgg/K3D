@@ -10,14 +10,20 @@ import org.lwjgl.opengl.GL11
 import java.awt.Polygon
 import java.util.Collections
 
+/**
+ * Mesh composed of polygons that each point are vertex (position + normal vector + texture UV)
+ */
 class Mesh
 {
     companion object
     {
+        /**Indicates if print the rendering errors (For debug purpose only)*/
         val PRINT_RENDERING_ERROR = false
+        /**Indicates if print verbose information (For debug purpose only)*/
         val PRINT_VERBOSE_INFORMATION = false
+
         /**
-         * Fill an object with a format OBJ informations
+         * Fill an object with a format OBJ information
          *
          * @param object3D    Object to fill
          * @param points      Points of object
@@ -159,22 +165,31 @@ class Mesh
         }
     }
 
+    /**Current face normals indices*/
     private var actualFaceNormals = ArrayInt()
+    /**Current face positions indices*/
     private var actualFacePoints = ArrayInt()
+    /**Current face UV indices*/
     private var actualFaceUV = ArrayInt()
     /**
      * Bounding box
      */
     private val box = VirtualBox()
+    /**Normals indices for each face*/
     private var facesNormals = ArrayList<ArrayInt>()
+    /**Positions indices for each face*/
     private var facesPoints = ArrayList<ArrayInt>()
+    /**UV indices for each face*/
     private var facesUV = ArrayList<ArrayInt>()
     /**
-     * Indicates if the mesh could be unvalid
+     * Indicates if the mesh could be not valid
      */
     private var mayBeUnvalid: Boolean = false
+    /**Normals references*/
     private var normals = ArrayList<Point3D>()
+    /**Positions references*/
     private var points = ArrayList<Point3D>()
+    /**UV references*/
     private var uv = ArrayList<Point2D>()
 
     init

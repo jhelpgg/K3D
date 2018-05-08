@@ -1,5 +1,8 @@
 package khelp.k3d.render
 
+/**
+ * Node with a bounding box
+ */
 abstract class NodeWithBox : Node()
 {
     /**

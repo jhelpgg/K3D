@@ -4,10 +4,17 @@ import khelp.images.JHelpImage
 import khelp.k3d.render.Texture
 import khelp.resources.Resources
 
+/**Dummy class for have resource reference*/
 private class ResourcesK3D
 
+/**Access to embedded resources*/
 val resourcesK3D = Resources(ResourcesK3D::class.java)
 
+/**
+ * Possible eyes images.
+ *
+ * Can be used by [khelp.k3d.geometry.prebuilt.Head]
+ */
 enum class Eyes private constructor(val path: String)
 {
     EyeBlue("eyes/eyeBlue.png"),
@@ -29,9 +36,15 @@ enum class Eyes private constructor(val path: String)
     EyeToneRed("eyes/eyeToneRed.png")
     ;
 
+    /**Eye image*/
     val image: JHelpImage by lazy { resourcesK3D.obtainResizedJHelpImage(this.path, 64, 64) }
 }
 
+/**
+ * Possible mouth expressions
+ *
+ * Can be used by [khelp.k3d.geometry.prebuilt.Head]
+ */
 enum class Mouth private constructor(val path: String)
 {
     Annoy1("mouth/annoy1.png"),
@@ -63,9 +76,14 @@ enum class Mouth private constructor(val path: String)
     Whisper3("mouth/whisper3.png")
     ;
 
+    /**Mouth image*/
     val image: JHelpImage by lazy { resourcesK3D.obtainJHelpImage(this.path) }
 }
 
+/**
+ * Obtain texture from resources
+ * @param path Texture relative path
+ */
 fun obtainResourceTexture(path: String): Texture
 {
     var texture = Texture.obtainTexture(path)

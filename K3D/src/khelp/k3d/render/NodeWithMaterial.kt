@@ -1,10 +1,7 @@
 package khelp.k3d.render
 
 /**
- * Tow side "philosophy"
- *
- *
- * @author JHelp
+ * Two side "philosophy"
  */
 enum class TwoSidedState
 {
@@ -22,9 +19,14 @@ enum class TwoSidedState
     FORCE_TWO_SIDE
 }
 
+/**
+ * Node with a material and optional selection state
+ */
 abstract class NodeWithMaterial : NodeWithBox()
 {
+    /**Two state rule*/
     var twoSidedState = TwoSidedState.AS_MATERIAL
+
     /**
      * Object material
      *

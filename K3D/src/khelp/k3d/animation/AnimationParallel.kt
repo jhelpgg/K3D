@@ -1,13 +1,25 @@
 package khelp.k3d.animation
 
+import khelp.k3d.util.ThreadAnimation
 import java.util.concurrent.atomic.AtomicBoolean
 
-private data class AnimationInfo(val animation: Animation, var playing: Boolean)
+/**
+ * Animation status information
+ * @param animation Described animation
+ * @param playing Indicates if animation still playing
+ */
+private class AnimationInfo(val animation: Animation, var playing: Boolean)
 
+/**
+ * Set of animations played in same time
+ */
 class AnimationParallel : Animation
 {
+    /**Animations set*/
     private val animations = ArrayList<AnimationInfo>()
+    /**Indicates if the global animation is playing*/
     private val playing = AtomicBoolean(false)
+
     /**
      * Add an animation
      *
@@ -15,6 +27,7 @@ class AnimationParallel : Animation
      * @return `true` if animation added
      * @throws IllegalStateException If animation is playing
      */
+    @Throws(IllegalStateException::class)
     fun addAnimation(animation: Animation): Boolean
     {
         synchronized(this.playing)
@@ -28,6 +41,10 @@ class AnimationParallel : Animation
         return this.animations.add(AnimationInfo(animation, true))
     }
 
+    /**
+     * Indicates if animation is playing
+     * @return **`true`** if animation is playing
+     */
     fun playing() =
             synchronized(this.playing)
             {
@@ -41,6 +58,7 @@ class AnimationParallel : Animation
      * @return `true` if remove succeed
      * @throws IllegalStateException If animation is playing
      */
+    @Throws(IllegalStateException::class)
     fun removeAnimation(animation: Animation): Boolean
     {
         synchronized(this.playing)
@@ -68,6 +86,13 @@ class AnimationParallel : Animation
         return false
     }
 
+    /**
+     * Call by the renderer each time the animation is refresh on playing
+     *
+     * @param absoluteFrame Actual absolute frame
+     * @return `true` if the animation need to be refresh one more time. `false` if the animation is end
+     */
+    @ThreadAnimation
     override fun animate(absoluteFrame: Float): Boolean
     {
         var moreAnimation = false
@@ -98,6 +123,12 @@ class AnimationParallel : Animation
         return moreAnimation
     }
 
+    /**
+     * Call by the renderer to indicates the start absolute frame
+     *
+     * @param startAbsoluteFrame Start absolute frame
+     */
+    @ThreadAnimation
     override fun startAbsoluteFrame(startAbsoluteFrame: Float)
     {
         synchronized(this.playing)

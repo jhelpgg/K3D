@@ -13,18 +13,17 @@ import javax.xml.parsers.SAXParserFactory
 /**
  * Parser of XML that describes a text resources for a language.
  *
- * The XML look like :<code lang="xml"><!--
- * <Texts>
- * <Text key="textKey">
- * The text itself
- * </Text>
- * </Texts>
- * --></code> The markup <b><font color="#008800">"Text"</font></b> defines an association to a
- * <font color="#008800">"key"</font> with some text. The parameter <font color="#008800">"key"</font> specify the text
- * key. The
- * text between opening and closing markup <b><font color="#008800">"Text"</font></b> is the corresponding text in the
- * specific
- * language.
+ * The XML look like :
+ *
+ *     <Texts>
+ *        <Text key="textKey">
+ *           The text itself
+ *        </Text>
+ *     </Texts>
+ *
+ * * The markup **Text** defines an association to a *"key"* with some text.
+ * * The parameter **key** specify the text key.
+ * * The text between opening and closing markup *"Text"* is the corresponding text in the specific language.
  */
 internal class ParserXMLText(private val texts: Hashtable<String, String>, url: URL,
                              reference: String) : DefaultHandler()
@@ -41,7 +40,9 @@ internal class ParserXMLText(private val texts: Hashtable<String, String>, url: 
         private val PARAMETER_KEY = "key"
     }
 
+    /**Current text key*/
     private var key: String? = null
+    /**Current text content*/
     private var value: StringBuilder? = null
 
     init
@@ -65,13 +66,6 @@ internal class ParserXMLText(private val texts: Hashtable<String, String>, url: 
 
     /**
      * Called each time a markup start
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param uri        URI source
      * @param localName  Local name
      * @param qName      Q-name
@@ -102,13 +96,6 @@ internal class ParserXMLText(private val texts: Hashtable<String, String>, url: 
 
     /**
      * Called each time a end of markup arrive
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param uri       URI source
      * @param localName Local name
      * @param qName     Q-name
@@ -135,13 +122,6 @@ internal class ParserXMLText(private val texts: Hashtable<String, String>, url: 
 
     /**
      * Called each time a part of a text is read
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param ch     Array of read characters
      * @param start  Starting offset where find the start of reading text
      * @param length Number of character read

@@ -424,13 +424,6 @@ class JHelpFont(val font: Font, val underline: Boolean = false)
 
     /**
      * Indicates if an object is equals to this font
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param other Compared object
      * @return `true` if equals
      * @see Object.equals
@@ -612,10 +605,15 @@ fun obtainFont(type: JHelpFont.Type, stream: InputStream, size: Int,
 {
     try
     {
-        val fontFormat = if (type == JHelpFont.Type.TYPE1)
-            Font.TYPE1_FONT
-        else
-            Font.TRUETYPE_FONT
+        val fontFormat =
+                if (type == JHelpFont.Type.TYPE1)
+                {
+                    Font.TYPE1_FONT
+                }
+                else
+                {
+                    Font.TRUETYPE_FONT
+                }
 
         var font = Font.createFont(fontFormat, stream)
         val fontSize = font.size
@@ -625,18 +623,14 @@ fun obtainFont(type: JHelpFont.Type, stream: InputStream, size: Int,
 
         when (bold)
         {
-            JHelpFont.Value.FALSE ->
-            {
-            }
+            JHelpFont.Value.FALSE -> Unit
             JHelpFont.Value.FREE  -> style = style or (fontStyle and Font.BOLD)
             JHelpFont.Value.TRUE  -> style = style or Font.BOLD
         }
 
         when (italic)
         {
-            JHelpFont.Value.FALSE ->
-            {
-            }
+            JHelpFont.Value.FALSE -> Unit
             JHelpFont.Value.FREE  -> style = style or (fontStyle and Font.ITALIC)
             JHelpFont.Value.TRUE  -> style = style or Font.ITALIC
         }

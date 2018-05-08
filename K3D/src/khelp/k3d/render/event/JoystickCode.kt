@@ -1,5 +1,10 @@
 package khelp.k3d.render.event
 
+/**
+ * Associate joystick code to joystick axis/button status
+ * @param index Axes or button joystick index
+ * @param joystickInputType Nature of joystick event : from an axis or a button ?
+ */
 enum class JoystickCode private constructor(public val index: Int,
                                             public val joystickInputType: JoystickInputType)
 {
@@ -120,27 +125,18 @@ enum class JoystickCode private constructor(public val index: Int,
          *
          * @param index             Joystick element index
          * @param joystickInputType Joystick input type (Axis positive, axis negative or button)
-         * @return Associated Joystick code OR [.NONE] if none corresponds
+         * @return Associated Joystick code **OR** [NONE] if none corresponds
          */
-        private fun obtain(index: Int, joystickInputType: JoystickInputType): JoystickCode
-        {
-            for (joystickCode in JoystickCode.values())
-            {
-                if (joystickCode.index == index && joystickCode.joystickInputType == joystickInputType)
-                {
-                    return joystickCode
-                }
-            }
-
-            return JoystickCode.NONE
-        }
+        private fun obtain(index: Int, joystickInputType: JoystickInputType) =
+                JoystickCode.values().firstOrNull { it.index == index && it.joystickInputType == joystickInputType }
+                        ?: JoystickCode.NONE
 
         /**
          * Obtain Joystick code associate to an axis
          *
          * @param index    Axis index
          * @param positive Positive or negative press ?
-         * @return Associated Joystick code OR [.NONE] if none corresponds
+         * @return Associated Joystick code **OR** [NONE] if none corresponds
          */
         fun obtainAxis(index: Int, positive: Boolean) =
                 if (positive) JoystickCode.obtain(index, JoystickInputType.AXIS_POSITIVE)
@@ -150,7 +146,7 @@ enum class JoystickCode private constructor(public val index: Int,
          * Obtain Joystick code associate to a button
          *
          * @param index Button index
-         * @return Associated Joystick code OR [.NONE] if none corresponds
+         * @return Associated Joystick code **OR** [NONE] if none corresponds
          */
         fun obtainButton(index: Int) = JoystickCode.obtain(index, JoystickInputType.BUTTON)
     }

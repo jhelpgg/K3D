@@ -1,5 +1,8 @@
 package khelp.k3d.render.event
 
+/**
+ * Listener of actions states change
+ */
 interface ActionListener
 {
     /**

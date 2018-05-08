@@ -1,21 +1,34 @@
 package khelp.k3d.geometry
 
-import khelp.debug.debug
 import khelp.k3d.render.Object3D
 import khelp.k3d.render.Point2D
 import khelp.k3d.render.Point3D
+import khelp.k3d.render.TwoSidedState
 import khelp.k3d.render.Vertex
 
+/**
+ * Create a plane with the two faces visible by default.
+ *
+ * It is a grid to be able morph it.
+ * @param horizontal Number of cell in horizontal (columns)
+ * @param vertical Number of cell in vertical (rows)
+ * @param invertU Indicates if have to invert U
+ * @param invertV Indicates if have to invert V
+ * @see Object3D.movePoint
+ */
 class Plane(horizontal: Int = 1, vertical: Int = 1,
             val invertU: Boolean = false, val invertV: Boolean = false) : Object3D()
 {
+    /**Number of cell in horizontal (columns)*/
     val horizontal = Math.max(1, horizontal)
+    /**Number of cell in vertical (rows)*/
     val vertical = Math.max(1, vertical)
 
     init
     {
-        val v = vertical.toFloat()
-        val h = horizontal.toFloat()
+        this.twoSidedState = TwoSidedState.FORCE_TWO_SIDE
+        val v = this.vertical.toFloat()
+        val h = this.horizontal.toFloat()
         val vertex = Vertex(normal = Point3D(0f, 0f, -1f))
 
         // For each vertical part

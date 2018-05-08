@@ -3,9 +3,17 @@ package khelp.k3d.render
 import khelp.k3d.animation.Animation
 import khelp.thread.MainPool
 
+/**
+ * Animation manager.
+ *
+ * To have instance use [Window3D.animationsManager]
+ * @param window3D Window parent
+ */
 class AnimationsManager internal constructor(private val window3D: Window3D)
 {
+    /**Indicates if animations are alive*/
     private var alive = true
+    /**Playing animations*/
     private val animations = ArrayList<Animation>()
 
     /**

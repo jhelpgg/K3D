@@ -8,10 +8,13 @@ import khelp.k3d.util.ThreadOpenGL
  * The aim is to economize video memory if we use same mesh several times.
  *
  * But if the original object change its mesh, then this change also
+ * @param reference Object to use its mesh
  */
 class ObjectClone(private val reference: Object3D) : NodeWithMaterial()
 {
+    /**Main material*/
     private var material = Material.DEFAULT_MATERIAL
+    /**Selection material*/
     private var materialForSelection: Material? = null
 
     init
@@ -96,17 +99,34 @@ class ObjectClone(private val reference: Object3D) : NodeWithMaterial()
      */
     override fun center() = this.reference.center()
 
+    /**
+     * Main material
+     */
     override fun material() = this.material
+
+    /**
+     * Change ain material
+     */
     override fun material(material: Material)
     {
         this.material = material
     }
 
+    /**
+     * Selection material
+     */
     override fun materialForSelection() = this.materialForSelection
+
+    /**
+     * Change selection material
+     */
     override fun materialForSelection(material: Material?)
     {
         this.materialForSelection = material
     }
 
+    /**
+     * Bounding box
+     */
     override fun getBox() = this.reference.getBox()
 }

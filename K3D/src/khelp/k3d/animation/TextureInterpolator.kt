@@ -38,16 +38,37 @@ enum class TextureInterpolationType
     UNDEFINED
 }
 
+/**
+ * Interpolator between two textures.
+ *
+ * Textures must have same dimensions.
+ *
+ * @param textureStart Start texture
+ * @param textureEnd End texture
+ * @param name Interpolated texture name
+ * @param factor Initial factor. Must be in `[0, 1]`
+ * @param interpolationType Interpolation type.
+ * **Note:** [TextureInterpolationType.UNDEFINED] choose randomly an interpolation each time factor is **0** or **1**
+ * @throws IllegalArgumentException If texture haven't same dimensions or factor not in `[0, 1]`
+ */
 class TextureInterpolator(private val textureStart: Texture, private val textureEnd: Texture, name: String,
                           factor: Double = 0.0, private val interpolationType: TextureInterpolationType = UNDEFINED)
 {
+    /**Texture width*/
     private val width = this.textureStart.width
+    /**Texture height*/
     private val height = this.textureStart.height
+    /**Current interpolation used*/
     private var actualInterpolationType = this.interpolationType
+    /**Number of pixels*/
     private val lengthSmall = this.width * this.height
+    /**Number of bytes*/
     private val length = this.width * this.height * 4
+    /**Texture where */
     val textureInterpolated = Texture(name, this.width, this.height)
+    /**Indexes for shuffle*/
     private val indexes = IntArray(this.lengthSmall, { it })
+    /**Current factor*/
     private var factor = 0.0
 
     init
@@ -62,12 +83,13 @@ class TextureInterpolator(private val textureStart: Texture, private val texture
     }
 
     /**
-     * Change invoke factor
+     * Change interpolation factor
      *
      * @param factor New factor in [0, 1]
      * @return Interpolated texture
      * @throws IllegalArgumentException If factor not in [0, 1]
      */
+    @Throws(IllegalArgumentException::class)
     fun factor(factor: Double): Texture
     {
         if (factor < 0 || factor > 1)
@@ -218,13 +240,7 @@ class TextureInterpolator(private val textureStart: Texture, private val texture
                     }
                 }
             }
-            TextureInterpolationType.UNDEFINED   ->
-            {
-                // Already treat above
-            }
-            else                                 ->
-            {
-            }
+            TextureInterpolationType.UNDEFINED   -> Unit // Already treat above
         }
 
         this.textureInterpolated.flush()

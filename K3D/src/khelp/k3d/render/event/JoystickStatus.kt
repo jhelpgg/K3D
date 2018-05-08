@@ -1,5 +1,8 @@
 package khelp.k3d.render.event
 
+/**
+ * Current joystick code status
+ */
 enum class JoystickStatus
 {
     /**
@@ -21,9 +24,9 @@ enum class JoystickStatus
      * @return Computed status
      */
     fun press() =
-        when (this)
-        {
-            PRESSED, REPEATED ->  JoystickStatus.REPEATED
-            RELEASED          ->  JoystickStatus.PRESSED
-        }
+            when (this)
+            {
+                PRESSED, REPEATED -> JoystickStatus.REPEATED
+                RELEASED          -> JoystickStatus.PRESSED
+            }
 }

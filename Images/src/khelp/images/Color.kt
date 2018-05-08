@@ -1,12 +1,13 @@
 package khelp.images
 
 import khelp.util.BLACK_ALPHA_MASK
+import khelp.util.ColorInt
 
 /**
  * A color
  * @param color Color value
  */
-class Color(val color: Int) : Comparable<Color>
+class Color(val color: ColorInt) : Comparable<Color>
 {
     companion object
     {
@@ -31,7 +32,7 @@ class Color(val color: Int) : Comparable<Color>
          * @param factor Bright factor (<1 : more dark, >1 more bright)
          * @return More bright/dark color
          */
-        fun brightness(color: Int, factor: Double): Int
+        fun brightness(color: ColorInt, factor: Double): ColorInt
         {
             val alpha = color and BLACK_ALPHA_MASK
             val red = color.red()

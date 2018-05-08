@@ -2,11 +2,26 @@ package khelp.k3d.k2d
 
 import khelp.thread.Mutex
 
+/**
+ * 2D object manager.
+ *
+ * It have two layers:
+ * * One for objects draws under the 3D (Usually background)
+ * * Other for objects under the 3D (Usually UI)
+ *
+ * To have an instance link to a 3D view use [khelp.k3d.render.Window3D.gui2d].
+ *
+ * Manually created instances aren't link to 3D, so they are useless
+ */
 class GUI2D
 {
+    /**List of over 3D objects*/
     private val arrayListObject2DOver3D = ArrayList<Object2D>()
+    /**List of under 3D objects*/
     private val arrayListObject2DUnder3D = ArrayList<Object2D>()
+    /**Special object that keep focus temporary, can interact only with it if set*/
     private var exclusiveObject: Object2D? = null
+    /**Synchronization critical section*/
     private val mutex = Mutex()
 
     /**
@@ -45,7 +60,7 @@ class GUI2D
     fun clearUnder3D() = this.mutex.playInCriticalSectionVoid { this.arrayListObject2DUnder3D.clear() }
 
     /**
-     * Looking for an object over 3D and under a position
+     * Looking for an object over 3D at given position
      *
      * @param x X
      * @param y Y
@@ -81,7 +96,7 @@ class GUI2D
             }
 
     /**
-     * Looking for an object over 3D and under a position
+     * Looking for an object under 3D at given position
      *
      * @param x X
      * @param y Y
@@ -104,6 +119,13 @@ class GUI2D
                 null
             }
 
+    /**
+     * Looking for an object over or under 3D at given position
+     *
+     * @param x X
+     * @param y Y
+     * @return The found object or `null`
+     */
     fun detectOver3DorUnder3D(x: Int, y: Int) =
             this.detectOver3D(x, y) ?: if (this.exclusiveObject == null) this.detectUnder3D(x, y) else null
 

@@ -41,6 +41,10 @@ class SoundManager
         ALC10.alcMakeContextCurrent(this.context)
 
         val alcCapabilities = ALC.createCapabilities(this.device)
+        // The alCapabilities creation is mandatory
+        // It should look do:
+        //     AL.createCapabilities(alcCapabilities)
+        // Is enough, but without the affectation it seems cause trouble to Kotlin in this specific case
         val alCapabilities = AL.createCapabilities(alcCapabilities)
 
         this.sourceBackground = SoundSource()

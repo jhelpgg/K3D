@@ -2,6 +2,9 @@ package khelp.k3d.k2d.event
 
 import khelp.k3d.k2d.Object2D
 
+/**
+ * Listener on user event in o 2D object
+ */
 interface Object2DListener
 {
     /**

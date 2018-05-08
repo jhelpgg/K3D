@@ -5,15 +5,28 @@ import khelp.k3d.util.ThreadOpenGL
 import khelp.thread.Mutex
 import org.lwjgl.opengl.GL11
 
+/**
+ * Generic 3D object.
+ *
+ * It contains a [Mesh] to describes each object faces
+ */
 open class Object3D : NodeWithMaterial()
 {
+    /**Critical section for bounding box, center and reconstruction action changes*/
     private val mutex = Mutex()
+    /**Last computed bounding box*/
     private val virtualBox = VirtualBox()
+    /**Last computed center*/
     private val center = Point3D()
+    /**Polygons list's OpenGL ID*/
     private var idList = -1
+    /**Object main material*/
     private var material = Material.DEFAULT_MATERIAL
+    /**Object selection material*/
     private var materialForSelection: Material? = null
+    /**Indicates if the polygons list have to be reconstruct in OpenGL memory*/
     private var needReconstructTheList = true
+    /**Object's mesh*/
     internal var mesh = Mesh()
 
     init

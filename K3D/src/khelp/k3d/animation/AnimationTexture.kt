@@ -31,27 +31,50 @@ fun graySwitch(numberOfFrame: Int, texture: Texture,
 
 }
 
+/**
+ * Animation that transform a texture to an other one.
+ *
+ * The animation can be played several times.
+ *
+ * The animation can be played in ping-pong mode, that is to say transform first to second, then second to first.
+ *
+ * The two textures must have same dimensions
+ *
+ * Apply [interpolatedTexture] to a [khelp.k3d.k2d.Object2D] or [khelp.k3d.render.Material] to see the animation
+ * @param numberOfFrame Duration of one loop in frame.
+ *
+ * **Note:** In ping-pong mode this value is double since used for first to second, then for second to first
+ * @param textureStart Texture at animation start
+ * @param textureEnd Texture goal
+ * @param pingPong Indicates if ping-pong mode
+ * @param numberOfLoop Number of loop
+ * @param interpolationType Texture interpolation type.
+ * **Note:** If [TextureInterpolationType.UNDEFINED] the interpolation is choose randomly at each loop
+ * @throws IllegalArgumentException If the texture haven't the same dimensions
+ */
 class AnimationTexture(numberOfFrame: Int, textureStart: Texture, textureEnd: Texture,
                        private val pingPong: Boolean = false, numberOfLoop: Int = Int.MAX_VALUE,
                        interpolationType: TextureInterpolationType = TextureInterpolationType.UNDEFINED) : Animation
 {
+    /**Animation number of frames*/
     private val numberOfFrame = Math.max(1, numberOfFrame).toFloat()
+    /**Number of loop*/
     private val numberOfLoop = Math.max(1, numberOfLoop)
+    /**Interpolator used for compute the intermediate texture*/
     private val textureInterpolator = TextureInterpolator(textureStart, textureEnd,
                                                           "${textureStart.textureName()}_${textureEnd.textureName()}_interpolation",
                                                           interpolationType = interpolationType)
+    /**Number loop left*/
     private var loopLeft = 0
+    /**Started absolute frame*/
     private var startAbsoluteFrame = 0f
+    /**Indicates if we go from start to end or reverse*/
     private var wayUp = false
+    /** Texture where animation is rendered */
+    val interpolatedTexture get() = this.textureInterpolator.textureInterpolated
+
     /**
      * Called each time animation refresh
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param absoluteFrame Absolute frame
      * @return `true` if animation have to continue
      * @see Animation.animate
@@ -99,13 +122,6 @@ class AnimationTexture(numberOfFrame: Int, textureStart: Texture, textureEnd: Te
 
     /**
      * Called when animation initialized
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param startAbsoluteFrame Start ABSOLUTE frame
      * @see Animation.startAbsoluteFrame
      */
@@ -117,6 +133,4 @@ class AnimationTexture(numberOfFrame: Int, textureStart: Texture, textureEnd: Te
         this.loopLeft = this.numberOfLoop
         this.wayUp = true
     }
-
-    fun interpolatedTexture() = this.textureInterpolator.textureInterpolated
 }

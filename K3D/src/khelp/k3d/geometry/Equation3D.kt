@@ -10,20 +10,82 @@ import khelp.math.formal.Function
 import khelp.math.formal.Variable
 import khelp.math.formal.toFunction
 import khelp.math.isNul
+import khelp.math.sign
 import khelp.thread.parallel
 
+/**
+ * Listener of equation is ready (Compute is finished)
+ */
 interface Equation3DListener
 {
+    /**
+     * Called when equation computing is finished
+     * @param equation Finished equation
+     */
     fun equationReady(equation: Equation3D)
 }
 
+/**
+ * Dummy equation listener that does nothing
+ */
 internal object DummyEquation3DListener : Equation3DListener
 {
+    /**
+     * Called when equation computing is finished
+     * @param equation Finished equation
+     */
     override fun equationReady(equation: Equation3D) = Unit
 }
 
+/**
+ * Variable **t** that:
+ *
+ * * `X(t) : functionX`
+ * * `Y(t) : functionY`
+ * * `Z(t) : functionZ`
+ *
+ * must only depends
+ */
 val VARIABLE_T = Variable("t")
 
+/**
+ * Check if given function depends only on [T] variable
+ * @param function Checked function
+ * @throws IllegalArgumentException If given function not depends only on [T]
+ */
+@Throws(IllegalArgumentException::class)
+private fun checkOnlyUseT(function: Function)
+{
+    val variables = function.variableList()
+
+    if (variables.size > 1)
+    {
+        throw IllegalArgumentException("$function not depends only on t")
+    }
+
+    if (variables.size == 1 && variables[0] != VARIABLE_T)
+    {
+        throw IllegalArgumentException("$function not depends on t")
+    }
+}
+
+/**
+ * Create object 3D along a 3D parametric equation.
+ *
+ * It is a path repeat along the equation.
+ *
+ * Each equation must depends only on **t** ([VARIABLE_T])
+ * @param border Path repeat along the equation
+ * @param borderPrecision Precision used for draw the path
+ * @param tStart **t** start value
+ * @param tEnd **t** end value
+ * @param tStep **t** step size for go from [tStart] tho [tEnd]
+ * @param functionX Equation on **t** for coordinates X: X(t)
+ * @param functionY Equation on **t** for coordinates Y: Y(t)
+ * @param functionZ Equation on **t** for coordinates Z: Z(t)
+ * @param equation3DListener Call back to alert when object is complete
+ * @throws IllegalArgumentException If one equation not depends only of **t** or [tStart], [tEnd] and [tStep] aren't coherent
+ */
 class Equation3D(val border: Path, val borderPrecision: Int = 12,
                  val tStart: Float, val tEnd: Float, val tStep: Float,
                  functionX: Function, functionY: Function, functionZ: Function,
@@ -44,6 +106,16 @@ class Equation3D(val border: Path, val borderPrecision: Int = 12,
 
     init
     {
+        checkOnlyUseT(this.functionX)
+        checkOnlyUseT(this.functionY)
+        checkOnlyUseT(this.functionZ)
+
+        if (isNul(this.tStep) || sign(this.tEnd - this.tStart) != sign(this.tStep))
+        {
+            throw IllegalArgumentException(
+                    "tStart=${this.tStart}, tEnd=${this.tEnd} and tStep=${this.tStep} aren't coherent. Those values don't permit to goes from tStart to tEnd")
+        }
+
         this.twoSidedState = TwoSidedState.FORCE_TWO_SIDE
 
         {
@@ -164,5 +236,4 @@ class Equation3D(val border: Path, val borderPrecision: Int = 12,
             this.equation3DListener.equationReady(this)
         }.parallel()
     }
-
 }

@@ -4,8 +4,6 @@ import java.util.Collections
 
 /**
  * Animation mode
- *
- * @author JHelp
  */
 enum class AnimationMode
 {
@@ -14,7 +12,7 @@ enum class AnimationMode
      */
     LOOP,
     /**
-     * Revese mode
+     * Reverse mode
      */
     REVERSE
 }

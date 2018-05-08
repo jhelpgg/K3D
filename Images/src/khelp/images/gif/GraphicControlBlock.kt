@@ -25,13 +25,6 @@ internal class GraphicControlBlock : BlockExtension()
 
     /**
      * Read stream to extract block information
-     *
-     *
-     *
-     * **Parent documentation:**
-     *
-     * {@inheritDoc}
-     *
      * @param inputStream Stream to read
      * @throws IOException If stream not contains valid data for graphic control block extension
      * @see Block.read

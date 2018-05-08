@@ -23,7 +23,7 @@ internal abstract class BlockExtension : Block()
  * @throws IOException If stream not contains available sub-type
  */
 @Throws(IOException::class)
-internal fun readBlockExtention(inputStream: InputStream): BlockExtension
+internal fun readBlockExtension(inputStream: InputStream): BlockExtension
 {
     val subType = inputStream.read()
     val blockExtension =

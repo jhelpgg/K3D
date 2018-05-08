@@ -2,9 +2,18 @@ package khelp.k3d.render
 
 import khelp.k3d.util.equal
 
-class VirtualSphere(public val x: Float, public val y: Float, public val z: Float, public val ray: Float)
+/**
+ * Virtual sphere
+ * @param x Center X
+ * @param y Center Y
+ * @param z Center Z
+ * @param ray Sphere ray
+ */
+class VirtualSphere(val x: Float, val y: Float, val z: Float, val ray: Float)
 {
-    public val center: Point3D by lazy { Point3D(this.x, this.y, this.z) }
+    /**Sphere center*/
+    val center: Point3D get() = Point3D(this.x, this.y, this.z)
+
     /**
      * Indicates if a point is in the sphere
      *
@@ -26,8 +35,10 @@ class VirtualSphere(public val x: Float, public val y: Float, public val z: Floa
      * @return {@code true} if a sphere is equal to this sphere
      */
     fun equals(sphere: VirtualSphere) =
-            equal(this.ray, sphere.ray) && equal(this.x, sphere.x) && equal(this.y, sphere.y) && equal(this.z,
-                                                                                                       sphere.z);
+            equal(this.ray, sphere.ray) &&
+                    equal(this.x, sphere.x) &&
+                    equal(this.y, sphere.y) &&
+                    equal(this.z, sphere.z)
 
     /**
      * Indicates is an other is equivalent to this sphere

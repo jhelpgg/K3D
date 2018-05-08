@@ -27,6 +27,7 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.Arrays
 import java.util.Enumeration
+import java.util.Optional
 import java.util.Stack
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -2143,3 +2144,50 @@ fun zip(source: File, outputStreamZip: OutputStream, onlyContentIfDirectory: Boo
     zipOutputStream.finish()
     zipOutputStream.flush()
 }
+
+/**
+ * Parse from stream an object.
+ *
+ * Simplify stream and exception management
+ * @param producer Create the input stream
+ * @param parser Parser to apply to the stream (Should throw [IOException] on read issue or stream not valid for parsed type)
+ * @param I Input stream type
+ * @param T Parsed object type
+ * @return Parsed object
+ * @throws IOException On reading issue or stream not valid for parsed type
+ */
+@Throws(IOException::class)
+fun <I : InputStream, T> parseFromStream(producer: () -> I, parser: (I) -> T): T
+{
+    var result: Optional<T> = Optional.empty()
+    var exception: Optional<IOException> = Optional.empty()
+    treatInputStream(producer, { result = Optional.of(parser(it)) }, { exception = Optional.of(it) })
+
+    if (exception.isPresent)
+    {
+        throw exception.get()
+    }
+
+    return result.get()
+}
+
+/**
+ * Parse from stream an object.
+ *
+ * Don't have to manage try/catch
+ * @param producer Create the input stream
+ * @param parser Parser to apply to the stream (Should throw [IOException] on read issue or stream not valid for parsed type)
+ * @param defaultValue Default value return on reading issue or if stream not valid
+ * @param I Input stream type
+ * @param T Parsed object type
+ * @return Parsed object or default value on issue
+ */
+fun <I : InputStream, T> parseFromStream(producer: () -> I, parser: (I) -> T, defaultValue: T) =
+        try
+        {
+            parseFromStream(producer, parser)
+        }
+        catch (exception: IOException)
+        {
+            defaultValue
+        }

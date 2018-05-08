@@ -3,21 +3,53 @@ package khelp.k3d.animation
 import khelp.k3d.render.Node
 import khelp.k3d.util.ThreadAnimation
 
+/**
+ * Node generic position.
+ *
+ * Position here is not only the 3D coordinates, but also the angles and scales applied to the node
+ * @param x Node X coordinate
+ * @param y Node Y coordinate
+ * @param z Node Z coordinate
+ * @param angleX Node rotation around X axis
+ * @param angleY Node rotation around Y axis
+ * @param angleZ Node rotation around Z axis
+ * @param scaleX Node scale on X coordinates
+ * @param scaleY Node scale on Y coordinates
+ * @param scaleZ Node scale on Z coordinates
+ */
 data class PositionNode(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f,
                         var angleX: Float = 0f, var angleY: Float = 0f, var angleZ: Float = 0f,
                         var scaleX: Float = 1f, var scaleY: Float = 1f, var scaleZ: Float = 1f)
 {
+    /**
+     * Create position that corresponds to given node current position
+     * @param node Node to extract the position
+     */
     constructor(node: Node) : this(node.x(), node.y(), node.z(),
                                    node.angleX(), node.angleY(), node.angleZ(),
                                    node.scaleX(), node.scaleY(), node.scaleZ())
 
+    /**
+     * Create position copy to an other position
+     * @param positionNode Position to copy
+     */
     constructor(positionNode: PositionNode) : this(positionNode.x, positionNode.y, positionNode.z,
                                                    positionNode.angleX, positionNode.angleY, positionNode.angleZ,
                                                    positionNode.scaleX, positionNode.scaleY, positionNode.scaleZ)
 
+    /**
+     * Create position copy
+     * @return Position copy
+     */
     fun copy() = PositionNode(this)
 }
 
+/**
+ * Animation that change a node position ([PositionNode]) during time.
+ *
+ * It defines specific [PositionNode] for a frame. For intermediate frames, the [PositionNode] is interpolated
+ * @param node Node to animate
+ */
 class AnimationPositionNode(node: Node) : AnimationKeyFrame<Node, PositionNode>(node)
 {
     /**
@@ -60,9 +92,8 @@ class AnimationPositionNode(node: Node) : AnimationKeyFrame<Node, PositionNode>(
      *
      * @param obj Node to change
      * @param value  New value
-     * @see AnimationKeyFrame#setValue(Object, Object)
+     * @see AnimationKeyFrame.setValue
      */
-    @Override
     @ThreadAnimation
     override protected fun setValue(obj: Node, value: PositionNode)
     {

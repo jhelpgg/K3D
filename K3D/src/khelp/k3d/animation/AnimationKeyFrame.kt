@@ -4,6 +4,13 @@ import khelp.images.dynamic.Interpolation
 import khelp.images.dynamic.LinearInterpolation
 import khelp.k3d.util.ThreadAnimation
 
+/**
+ * Key frame description
+ * @param key Frame key where is the frame
+ * @param value Value at given frame
+ * @param interpolation Interpolation used to go to the frame
+ * @param V Value type
+ */
 internal class KeyFrame<V>(val key: Int, var value: V, var interpolation: Interpolation)
 {
     fun set(value: V, interpolation: Interpolation)
@@ -66,6 +73,7 @@ abstract class AnimationKeyFrame<O, V>(private val obj: O) : Animation
      * @param interpolation Interpolation to use for go to the frame
      * @throws IllegalArgumentException If key is negative
      */
+    @Throws(IllegalArgumentException::class)
     fun addFrame(key: Int, value: V, interpolation: Interpolation = LinearInterpolation)
     {
         var index: Int
@@ -105,6 +113,13 @@ abstract class AnimationKeyFrame<O, V>(private val obj: O) : Animation
         this.keyFrames.add(KeyFrame(key, value, interpolation))
     }
 
+    /**
+     * Call by the renderer each time the animation is refresh on playing
+     *
+     * @param absoluteFrame Actual absolute frame
+     * @return `true` if the animation need to be refresh one more time. `false` if the animation is end
+     */
+    @ThreadAnimation
     override final fun animate(absoluteFrame: Float): Boolean
     {
         // If there are no frame, nothing to do
@@ -120,9 +135,8 @@ abstract class AnimationKeyFrame<O, V>(private val obj: O) : Animation
         val lastKeyFrame = this.keyFrames[size - 1]
         val actualFrame = absoluteFrame - this.startAbsoluteFrame
 
-        // If we are before the first frame (It is possible to start at a frame
-        // >0, the effect is an invoke from the actual value, to the first
-        // frame)
+        // If we are before the first frame (It is possible to start at a frame >0,
+        // the effect is an invoke from the actual value, to the first frame)
         if (actualFrame < firstKeyFrame.key)
         {
             // Interpolate actual position to first frame
@@ -142,8 +156,7 @@ abstract class AnimationKeyFrame<O, V>(private val obj: O) : Animation
 
         this.startValue = null
 
-        // If we are after the last frame, just position in the last frame and the
-        // animation is done
+        // If we are after the last frame, just position in the last frame and the animation is done
         if (actualFrame >= lastKeyFrame.key)
         {
             this.setValue(this.obj, this.keyFrames[size - 1].value)
@@ -158,16 +171,14 @@ abstract class AnimationKeyFrame<O, V>(private val obj: O) : Animation
             frame++
         }
 
-        // If it is the first frame, just locate to the first and the animation
-        // continue
+        // If it is the first frame, just locate to the first and the animation continue
         if (frame == 0)
         {
             this.setValue(this.obj, this.keyFrames[0].value)
             return true
         }
 
-        // If it is after the last frame, locate at last and the animation is
-        // finish
+        // If it is after the last frame, locate at last and the animation is finish
         if (frame >= size)
         {
             this.setValue(this.obj, this.keyFrames[size - 1].value)
@@ -183,6 +194,12 @@ abstract class AnimationKeyFrame<O, V>(private val obj: O) : Animation
         return true
     }
 
+    /**
+     * Call by the renderer to indicates the start absolute frame
+     *
+     * @param startAbsoluteFrame Start absolute frame
+     */
+    @ThreadAnimation
     override final fun startAbsoluteFrame(startAbsoluteFrame: Float)
     {
         this.startAbsoluteFrame = startAbsoluteFrame

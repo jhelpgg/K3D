@@ -51,7 +51,9 @@ import javax.imageio.ImageReader
 import javax.imageio.stream.ImageInputStream
 import javax.swing.Icon
 
+/**Convert long to int, short name to be able have 5 colors per lines in PALETTE*/
 private fun Long.int() = this.toInt()
+
 /**
  * Represents an image.
  *
@@ -803,7 +805,7 @@ class JHelpImage(
 
         /**
          * Load an image and resize it to have specific dimension.
-
+         *
          * This method also manage [PCX] image files
          *
          * @param image  Image file

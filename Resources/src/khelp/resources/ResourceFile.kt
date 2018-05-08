@@ -1,7 +1,12 @@
 package khelp.resources
 
+/**
+ * Resource file in resource tree
+ * @param path File path from resources tree root
+ */
 class ResourceFile(path: String) : ResourceElement
 {
+    /**Resource file path*/
     private val path: String
 
     init
@@ -13,6 +18,9 @@ class ResourceFile(path: String) : ResourceElement
             path
     }
 
+    /**
+     * File name
+     */
     override fun name(): String
     {
         val index = this.path.lastIndexOf('/')
@@ -24,6 +32,15 @@ class ResourceFile(path: String) : ResourceElement
         else this.path.substring(index + 1)
     }
 
+    /**
+     * File path
+     */
     override fun path() = this.path
+
+    /**
+     * Indicates if it is a directory.
+     *
+     * Here always return **`false`**
+     */
     override fun directory() = false
 }

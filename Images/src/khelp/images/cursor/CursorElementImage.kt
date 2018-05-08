@@ -6,11 +6,13 @@ import khelp.images.XOR
 import khelp.images.bmp.readBitmapHeader
 import khelp.images.raster.BinaryImage
 import khelp.images.raster.RasterImageType
+import java.io.IOException
 import java.io.InputStream
 
 /**
  * Cursor image element
  * @param inputStream Stream where read the cursor element
+ * @throws IOException If stream not describes a valid cursor
  */
 class CursorElementImage internal constructor(inputStream: InputStream)
 {

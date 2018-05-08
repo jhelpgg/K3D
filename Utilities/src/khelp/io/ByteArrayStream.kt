@@ -23,13 +23,6 @@ class ByteArrayStream
     {
         /**
          * Read newt byte
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @return Read byte or -1 if end of stream
          * @throws IOException On reading issue
          * @see InputStream.read
@@ -41,13 +34,6 @@ class ByteArrayStream
          * Read some bytes and fill an array.
          *
          * Do same as [read(b, 0, b.length)][read]
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @param b Array to fill
          * @return Number of read bytes
          * @throws IOException On reading issue
@@ -58,13 +44,6 @@ class ByteArrayStream
 
         /**
          * Read some bytes and fill an array.
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @param b   Array to fill
          * @param off Offset where start filling the array
          * @param len Number maximum of byte to read
@@ -93,13 +72,6 @@ class ByteArrayStream
 
         /**
          * Number of left byte to read
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @return Number of left byte to read
          * @throws IOException On reading issue
          * @see InputStream.available
@@ -108,13 +80,6 @@ class ByteArrayStream
 
         /**
          * Close the stream
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @throws IOException On closing issue
          * @see InputStream.close
          */
@@ -122,13 +87,6 @@ class ByteArrayStream
 
         /**
          * Mark actual read position
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @param readLimit Maximum limit
          * @see InputStream.mark
          */
@@ -137,13 +95,6 @@ class ByteArrayStream
 
         /**
          * Reset the mark
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @throws IOException On access issue
          * @see InputStream.reset
          */
@@ -152,13 +103,6 @@ class ByteArrayStream
 
         /**
          * Indicates if mark are supported
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @return `true`
          * @see InputStream.markSupported
          */
@@ -189,13 +133,6 @@ class ByteArrayStream
          * Write an array of bytes.
          *
          * Do same as [write(b, 0, b.length)][write]
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @param b Array to write
          * @throws IOException On writing issue
          * @see OutputStream.write
@@ -204,13 +141,6 @@ class ByteArrayStream
 
         /**
          * Write a part off an array of bytes
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @param b   Array to write
          * @param off Offset where start read the array
          * @param len Number of bytes to write
@@ -235,13 +165,6 @@ class ByteArrayStream
 
         /**
          * Close the stream
-         *
-         *
-         *
-         * **Parent documentation:**
-         *
-         * {@inheritDoc}
-         *
          * @throws IOException On closing issue
          * @see OutputStream.close
          */
