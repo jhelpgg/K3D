@@ -9,7 +9,7 @@ It is a scene graph based on LWJGL:
 * The 3D is rendered by OpenGL (via LWJGL binding)
 * Sounds by OpenAL (via LWJGL binding) 
 * MP3 are decoded via JavaZoom
-* The widow it self, key/mouse/joystick management by GLFW (via LWJGL binding)
+* The window it self, key/mouse/joystick managed with GLFW (via LWJGL binding)
 
 **Note:** GLFW is a free, Open Source, multi-platform library for opening a window, creating an OpenGL context and managing input
 

@@ -28,7 +28,7 @@ Then load it in material spherical texture:
                                           TexturedBoxReflexion::class.java.getResourceAsStream("emerald.jpg"))
 ````
 
-Then djust the sperical influence (How much the object reflect):
+Then adjust the sperical influence (How much the object reflect):
 
 ````Kotlin
         // 11) Adjust spherical reflexion rate to see diffuse and spherical in same proportion

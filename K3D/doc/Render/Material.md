@@ -95,7 +95,7 @@ Then we load the diffuse texture:
     }
 ````
 
-Texture must a unique name. In other words, two different textures must not have same name.
+Texture must have unique name. In other words, two different textures must not have same name.
 
 The texture reference describes where the texture come from.
 
@@ -120,7 +120,7 @@ In previous example just add:
     material.colorEmissive(RED)
 ````
 
-With this trick it is possible to reuse the same texture tint with different colors.
+With this trick it is possible to reuse the same texture, tint with different colors.
 
 **"Et voilà" :)**
 

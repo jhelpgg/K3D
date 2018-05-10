@@ -3,7 +3,7 @@ package khelp.k3d.animation
 import khelp.k3d.util.ThreadAnimation
 
 /**
- * Change a function to an animation loop for ever (until it removed)
+ * Change a function to an animation loop until function return **`false`**
  * @param animateLoop Function called at each animation update. The parameter is the number of frame past since animation was launched
  */
 class AnimationLoop(private val animateLoop: (Float) -> Boolean) : Animation

@@ -12,11 +12,11 @@ At the end we will obtain: ![HelloWorld](HelloWorld.png)
 
 The first step is to create and show a window where 3D will be draw.
 
-For this we use the [khelp.k3d.render.Window3D](../../src/khelp/k3d/render/Window3D) object.
+For this we use the [khelp.k3d.render.Window3D](../../src/khelp/k3d/render/Window3D.kt) object.
 
-[Window3D](../../src/khelp/k3d/render/Window3D) represents the window with the 3D inside.
+[Window3D](../../src/khelp/k3d/render/Window3D.kt) represents the window with the 3D inside.
 
-It have two ways to create a [Window3D](../../src/khelp/k3d/render/Window3D):
+It have two ways to create a [Window3D](../../src/khelp/k3d/render/Window3D.kt):
 
 1. The method `createSizedWindow` that create a window with a specific size and can hide it's decoration.
 Window decoration is the window border and the bar with usually the close button.
