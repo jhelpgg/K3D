@@ -34,6 +34,16 @@ val DARK_GRAY = Color4f.makeDefaultColor(0.25f)
 val DARK_RED = Color4f.makeDefaultColor(0.5f, 0f, 0f)
 
 /**
+ * Default green color
+ */
+val DARK_GREEN = Color4f.makeDefaultColor(0f, 0.5f, 0f)
+
+/**
+ * Default blue color
+ */
+val DARK_BLUE = Color4f.makeDefaultColor(0f, 0f, 0.5f)
+
+/**
  * Default wire frame color : black semi-transparent
  */
 val DEFAULT_WIRE_FRAME_COLOR = Color4f.makeDefaultColor(0f, alpha = 0.5f)

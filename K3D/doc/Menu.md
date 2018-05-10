@@ -8,4 +8,6 @@ Basic material tutorial: [Basic material](Render/Material.md)
 
 Reflexion on object: [Spherical reflexion](Render/MaterialReflection.md) 
 
+Light influence on material: [Material and light](Render/MaterialLight.md)
+
 **"Et voilà" :)**
