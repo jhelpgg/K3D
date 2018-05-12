@@ -5,6 +5,7 @@ import khelp.debug.exception
 import khelp.debug.information
 import khelp.debug.todo
 import khelp.images.JHelpImage
+import khelp.io.createDirectory
 import khelp.io.obtainExternalFile
 import khelp.io.outsideDirectory
 import khelp.io.treatOutputStream
@@ -29,6 +30,7 @@ import khelp.thread.Consumer
 import khelp.thread.Future
 import khelp.thread.MainPool
 import khelp.thread.Promise
+import khelp.thread.TaskException
 import khelp.util.forEachAsync
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
@@ -103,7 +105,7 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
         /**
          * Snap shot image name number part format
          */
-        internal val SNAPSHOT_NUMBER_FORMAT = DecimalFormat("00000")
+        internal val SNAPSHOT_NUMBER_FORMAT = DecimalFormat("000000000")
 
         /**
          * Create a widow that take the all screen
@@ -1765,6 +1767,11 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
      */
     fun screenShots(number: Int, directory: File): Future<File>
     {
+        if (!createDirectory(directory))
+        {
+            return Future.error(TaskException("Can't create the directory: ${directory.absolutePath}"))
+        }
+
         synchronized(this.snapShotLeft) {
             if (this.snapShotLeft.get() > 0)
             {

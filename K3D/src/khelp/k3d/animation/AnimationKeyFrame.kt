@@ -27,6 +27,7 @@ internal class KeyFrame<V>(val key: Int, var value: V, var interpolation: Interp
  *
  * This class says at that frame the object state must be that
  *
+ * @param obj Modified object
  * @param O Type of the modified object
  * @param V Type of the value change by the animation
  */
@@ -186,11 +187,10 @@ abstract class AnimationKeyFrame<O, V>(private val obj: O) : Animation
         }
 
         // Interpolate the value and animation continue
-        val before = this.keyFrames[frame - 1].value
-        val after = this.keyFrames[frame].value
-        val percent = this.keyFrames[frame].interpolation((actualFrame - this.keyFrames[frame - 1].key) /
-                                                                  (this.keyFrames[frame].key - this.keyFrames[frame - 1].key))
-        this.interpolateValue(this.obj, before, after, percent)
+        val before = this.keyFrames[frame - 1]
+        val after = this.keyFrames[frame]
+        val percent = after.interpolation((actualFrame - before.key) / (after.key - before.key))
+        this.interpolateValue(this.obj, before.value, after.value, percent)
         return true
     }
 
