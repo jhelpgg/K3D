@@ -1,23 +1,25 @@
-# Add 2D elements
+package khelp.samples.k3d
 
-For background, user interaction, or other purpose, it is possible to add some 2D elements.
+import khelp.alphabet.AlphabetBlue16x16
+import khelp.images.JHelpImage
+import khelp.images.JHelpImage.Companion
+import khelp.io.treatOutputStream
+import khelp.k3d.geometry.Box
+import khelp.k3d.k2d.Object2D
+import khelp.k3d.render.DARK_GREEN
+import khelp.k3d.render.Material
+import khelp.k3d.render.Texture
+import khelp.k3d.render.TextureAlphabetText
+import khelp.k3d.render.Window3D
+import khelp.text.JHelpTextAlign.CENTER
+import khelp.util.BLACK_ALPHA_MASK
+import java.io.File
+import java.io.FileOutputStream
 
-Those 2D elements can be sow under the 3D or over the 3D:
-* Under 3D means that each 3D elements are over them, no importance how far the 3D is.
-  Those objects are often use for background.
-* Over 3D means that 2D elements are over all the 3D, no importance how near the 3D is.
-  Those objects are often use for show information or user interaction.
-  
-### Example:
+private class Basic2D
 
-Here we will obtain: 
-![Basic 2D](Basic2D.png)
-
-Complete code at: [Code](../../samples/khelp/samples/k3d/Basic2D.kt)
-
-First initialize 3D and put a green cube:
-
-````Kotlin
+fun main(args: Array<String>)
+{
     // 1) Create window that will show the 3D
     val window3D = Window3D.createSizedWindow(800, 600, "Basic 2D", true)
 
@@ -41,18 +43,10 @@ First initialize 3D and put a green cube:
     val material = Material.obtainMaterialOrCreate("box")
     material.colorDiffuse(DARK_GREEN)
     node.material(material)
-````
 
-For place 2D objects we need the 2D manager:
-
-````Kotlin
     // 11) Obtain the 2D manager
     val gui2d = window3D.gui2d()
-````
 
-Now create a background object. Here it take all screen:
-
-````Kotlin
     // 12) Create 2D background object:
     val background2D = Object2D(0, 0, window3D.width, window3D.height)
 
@@ -67,45 +61,19 @@ Now create a background object. Here it take all screen:
     {
         khelp.debug.exception(exception, "Failed to load the texture!")
     }
-````
 
-The coordinates are screen coordinates. Screen up-left corner is **`(0, 0)`**. 
-X grow from left to right. Y grow from up to down:
-![Screen coordinates](ScreenCoordinates.png)
-
-Place the backound under the 3D:
-
-````Kotlin
     // 14) Put the object in background
     gui2d.addUnder3D(background2D)
-````
 
-Now create Some information that will show over the 3D:
-
-````Kotlin
     // 15) Create texture information
     val textureInformation = TextureAlphabetText(AlphabetBlue16x16,
                                                  5, 3,
                                                  "Hello", CENTER, BLACK_ALPHA_MASK, 0x89ABCDEF.toInt())
-````
 
-Create the object that will show the information:
-
-````Kotlin
     // 16) Create 2D information object
     val information2D = Object2D(432, 123, textureInformation.width, textureInformation.height)
     information2D.texture(textureInformation)
-````
 
-Add the information over the 3D:
-
-````Kotlin
     // 17 Show information over.
     gui2d.addOver3D(information2D)
-````
-   
-
-**"Et voilà" :)**
-
-[Menu](../Menu.md)
-
+}
