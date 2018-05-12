@@ -1,11 +1,13 @@
 package khelp.k3d.render
 
 import khelp.alphabet.AlphabetBlue16x16
+import khelp.debug.exception
 import khelp.debug.information
 import khelp.debug.todo
 import khelp.images.JHelpImage
 import khelp.io.obtainExternalFile
 import khelp.io.outsideDirectory
+import khelp.io.treatOutputStream
 import khelp.k3d.animation.Animation
 import khelp.k3d.animation.AnimationLoop
 import khelp.k3d.geometry.Plane
@@ -44,6 +46,7 @@ import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.text.DecimalFormat
 import java.util.Optional
 import java.util.Stack
@@ -1735,6 +1738,23 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
             return this.snapShot!!.future()
         }
     }
+
+    /**
+     * Take a screen shot and save it in given file
+     * @param file File where save the screen shot
+     * @param onSucceed Called when screenshot taken and saved with success
+     * @param onError Called if save failed
+     */
+    fun screenShot(file: File,
+                   onSucceed: () -> Unit = { information("Screenshot taken and saved at ${file.absolutePath}") },
+                   onError: (IOException) -> Unit =
+                           { exception(it, "Failed to save the screen shot at ${file.absolutePath}") }) =
+            treatOutputStream({ FileOutputStream(file) },
+                              {
+                                  JHelpImage.saveImage(it, this.screenShot()())
+                                  onSucceed()
+                              },
+                              onError)
 
     /**
      * Take several screen shots and put each on the given directory
