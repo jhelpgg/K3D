@@ -415,19 +415,278 @@ Then create and play the animation:
 
 ### Animations on texture
 
-#### Transform a texture to an other one 
+[AnimationTexture](../../src/khelp/k3d/animation/AnimationTexture.kt) transform texture to an other.
 
-#### Mutate a texture
+The source and target textures must have same dimensions.
+
+The animation can be play in one way, or in ping-pong mode. 
+Ping-pong means go from source to target, then from target to source.
+
+For example, for do:
+![Animation on texture](animationTexture.gif)
+
+[Code source](../../samples/khelp/samples/k3d/TextureAnimation.kt)
+
+Create the 3D scene:
+
+````Kotlin
+    // 1) Create the 3D scene
+    val window3D = Window3D.createSizedWindow(800, 600, "Texture animation", true)
+    val scene = window3D.scene()
+    val node = Box()
+    scene.add(node)
+    node.position(0f, 0f, -5f)
+    node.angleX(12f)
+    node.angleY(25f)
+    val material = Material.obtainMaterialOrCreate("Box")
+    node.material(material)
+````
+
+Load the textures:
+
+````Kotlin
+    // 2) Load the textures (Must have same dimensions)
+    val textureStart =
+            try
+            {
+                Texture("textureStart", Texture.REFERENCE_RESOURCES,
+                        TextureAnimation::class.java.getResourceAsStream("emerald.jpg"))
+            }
+            catch (exception: Exception)
+            {
+                Texture("textureStart", 1024, 1024, RED)
+            }
+
+    val textureEnd =
+            try
+            {
+                Texture("textureEnd", Texture.REFERENCE_RESOURCES,
+                        TextureAnimation::class.java.getResourceAsStream("tile.jpg"))
+            }
+            catch (exception: Exception)
+            {
+                Texture("textureEnd", 1024, 1024, GRAY)
+            }
+````
+
+Create the animation:
+
+````Kotlin
+    // 3) Create the animation
+    val animationTexture = AnimationTexture(100, textureStart, textureEnd, true, Int.MAX_VALUE, UNDEFINED)
+````
+
+Here we choose the ping-pong mode. 
+
+The choose of `TextureInterpolationType.UNDEFINED` is done to choose randomly the animation for next transition.
+
+See in [TextureInterpolationType](../../src/khelp/k3d/animation/TextureInterpolator.kt). 
+The enum `TextureInterpolationType` is the list of actual transitions.
+
+Associate the texture that show the animation to the box:
+
+````Kotlin
+    // 4) Set the interpolated texture where the animation is show
+    material.textureDiffuse = animationTexture.interpolatedTexture
+````
+
+Now all is ready to launch the animation:
+
+````Kotlin
+    // 5) Launch the animation
+    window3D.playAnimation(animationTexture)
+````
+
+**"Et voilà" :)**
+ 
 
 ### Animation combination
 
-#### List
+It is possible to combine animations to make a more complex animation. 
+
+#### Animation list
+
+[AnimationList](../../src/khelp/k3d/animation/AnimationList.kt) is an animation made of list of animations played one after other.
+
+Used for play animation **A**, when A finished play **B**, then **C**, ...
+
+By example for:
+![Animation list](animationList.gif)
+
+[Code source](../../samples/khelp/samples/k3d/ListAnimation.kt)
+
+Create the 3D scene
+
+````Kotlin
+    // 1) Create the 3D scene
+    val window3D = Window3D.createSizedWindow(800, 600, "List of animations", true)
+    val scene = window3D.scene()
+
+    val blueBall = Sphere()
+    blueBall.scale(0.5f)
+    blueBall.position(-3f, 0f, -5f)
+    scene.add(blueBall)
+    var material = Material.obtainMaterialOrCreate("blueBall")
+    material.colorDiffuse(BLUE)
+    blueBall.material(material)
+
+    val redBall = ObjectClone(blueBall)
+    redBall.scale(0.5f)
+    redBall.position(0f, 0f, -5f)
+    scene.add(redBall)
+    material = Material.obtainMaterialOrCreate("redBall")
+    material.colorDiffuse(RED)
+    redBall.material(material)
+````
+
+Prepare an animation for each ball
+
+````Kotlin
+    // 2) Prepare balls animation
+    val blueBallAnimation = AnimationPositionNode(blueBall)
+    blueBallAnimation.addFrame(25, PositionNode(-1f, 0f, -5f, scaleX = 0.5f, scaleY = 0.5f, scaleZ = 0.5f),
+                               AccelerationInterpolation(2f))
+
+    val redBallAnimation = AnimationPositionNode(redBall)
+    redBallAnimation.addFrame(50, PositionNode(2.5f, 0f, -5f, scaleX = 0.5f, scaleY = 0.5f, scaleZ = 0.5f),
+                              DecelerationInterpolation(2f))
+````
+
+Create and launch animation that play blue ball animation first, then read ball animation
+
+````Kotlin
+    // 3) Create the animation list
+    val animationList = AnimationList()
+    animationList.addAnimation(blueBallAnimation)
+    animationList.addAnimation(redBallAnimation)
+
+    // 4) Launch the animation
+    window3D.playAnimation(animationList)
+````
+
+**"Et voilà" :)**
 
 #### Parallel
 
-### Animations played immediately
+[AnimationParallel](../../src/khelp/k3d/animation/AnimationParallel.kt) is an animation that play several aniamtions in same time.
 
-## Interpolations effect show
+Since animations can be launch individually, it may seems not very use full alone.
+
+But combine with [AnimationList](../../src/khelp/k3d/animation/AnimationList.kt) it reveal its power.
+For example to launch several animation after an other one is finished.
+
+By example:
+![Animation parallel](animationParallel.gif)
+
+[Code source](../../samples/khelp/samples/k3d/ParallelAnimation.kt)
+
+Create the 3D scene:
+
+````Kotlin
+    // 1) Create the 3D scene
+    val window3D = Window3D.createSizedWindow(800, 600, "Chock animations", true)
+    val scene = window3D.scene()
+
+    val blueBall = Sphere()
+    blueBall.scale(0.5f)
+    blueBall.position(-3f, 0f, -5f)
+    scene.add(blueBall)
+    var material = Material.obtainMaterialOrCreate("blueBall")
+    material.colorDiffuse(BLUE)
+    blueBall.material(material)
+
+    val redBall = ObjectClone(blueBall)
+    redBall.scale(0.5f)
+    redBall.position(0f, 0.5f, -5f)
+    scene.add(redBall)
+    material = Material.obtainMaterialOrCreate("redBall")
+    material.colorDiffuse(RED)
+    redBall.material(material)
+
+    val greenBall = ObjectClone(blueBall)
+    greenBall.scale(0.5f)
+    greenBall.position(0f, -0.5f, -5f)
+    scene.add(greenBall)
+    material = Material.obtainMaterialOrCreate("greenBall")
+    material.colorDiffuse(GREEN)
+    greenBall.material(material)
+````
+
+Prepare each balls animation:
+
+````Kotlin
+    // 2) Prepare balls animation
+    val blueBallAnimation = AnimationPositionNode(blueBall)
+    blueBallAnimation.addFrame(25, PositionNode(-1f, 0f, -5f, scaleX = 0.5f, scaleY = 0.5f, scaleZ = 0.5f),
+                               AccelerationInterpolation(2f))
+
+    val redBallAnimation = AnimationPositionNode(redBall)
+    redBallAnimation.addFrame(50, PositionNode(2.5f, 2f, -5f, scaleX = 0.5f, scaleY = 0.5f, scaleZ = 0.5f),
+                              DecelerationInterpolation(2f))
+
+    val greenBallAnimation = AnimationPositionNode(greenBall)
+    greenBallAnimation.addFrame(50, PositionNode(2.5f, -2f, -5f, scaleX = 0.5f, scaleY = 0.5f, scaleZ = 0.5f),
+                                DecelerationInterpolation(2f))
+````
+
+Create animation parallel to play red an green balls in same time:
+
+````Kotlin
+    // 3) Prepare parallel animation that play red an green balls in same time
+    val animationParallel = AnimationParallel()
+    animationParallel.addAnimation(redBallAnimation)
+    animationParallel.addAnimation(greenBallAnimation)
+````
+
+Create the complete animation and launch it:
+
+````Kotlin
+    // 3) Create the animation list: blue ball then red and green
+    val animationList = AnimationList()
+    animationList.addAnimation(blueBallAnimation)
+    animationList.addAnimation(animationParallel)
+
+    // 4) Launch the animation
+    window3D.playAnimation(animationList)
+````
+
+**"Et voilà" :)**
+
+### Animations specials
+
+[AnimationPause](../../src/khelp/k3d/animation/AnimationPause.kt) is an animation that does nothing for a number of frames.
+Inside a [AnimationList](../../src/khelp/k3d/animation/AnimationList.kt) it can be used for make a pause between two animations.
+
+[AnimationTask](../../src/khelp/k3d/animation/AnimationTask.kt) launch a task in separate thread when play.
+Inside a [AnimationList](../../src/khelp/k3d/animation/AnimationList.kt) it can be used for launch a task after an animation.
+Inside a [AnimationParallel](../../src/khelp/k3d/animation/AnimationParallel.kt) it can be used to launch a task in same time as an animation.
+
+## Conclusion
+
+Animations can be combined in several ways, since [AnimationList](../../src/khelp/k3d/animation/AnimationList.kt) and [AnimationParallel](../../src/khelp/k3d/animation/AnimationParallel.kt)
+are animations, they can be combined in very complex way. Let's talk your imagination.
+
+The animation tutorial ends here. 
+
+**"Et voilà" :)**
+
+## Bonus
+
+To show the effect of each interpolation, in samples launch: [MainInterpolationsShower](../../samples/khelp/samples/k3d/interpolations/MainInterpolationsShower.kt)
+
+To exit use the escape key.
+
+The application is cut in different files:
+* [MainInterpolationsShower](../../samples/khelp/samples/k3d/interpolations/MainInterpolationsShower.kt): The application main. 
+  It launches the application. It creates other classes, link them together and launch the animation.
+* [ManagerAction](../../samples/khelp/samples/k3d/interpolations/ManagerAction.kt): React to user events. 
+  It exits application when escape key is pressed
+* [SceneManager](../../samples/khelp/samples/k3d/interpolations/SceneManager.kt): Manage the 3D scene.
+  It creates and position the 3D objects. It creates the animation.
+* [UIManager](../../samples/khelp/samples/k3d/interpolations/UIManager.kt): Manage the 2D interface.
+  It creates and postation the information. It upsate the information text.
+  
+See the code for more details.
 
 **"Et voilà" :)**
 

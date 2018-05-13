@@ -109,6 +109,155 @@ class TextureInterpolator(private val textureStart: Texture, private val texture
     }
 
     /**
+     * Melt the textures
+     * @param pixelsStart Start texture pixels
+     * @param pixelsEnd End texture pixels
+     * @param pixelsInterpolated Interpolated pixels where write the result
+     */
+    private fun melt(pixelsStart: ByteArray, pixelsEnd: ByteArray, pixelsInterpolated: ByteArray)
+    {
+        val rotcaf = 1.0 - this.factor
+
+        (0 until this.length).forEach {
+            pixelsInterpolated[it] = ((pixelsStart[it] and 0xFF) * rotcaf + (pixelsEnd[it] and 0xFF) * this.factor).toByte()
+        }
+    }
+
+    /**
+     * Change pixels "randomly"
+     * @param pixelsStart Start texture pixels
+     * @param pixelsEnd End texture pixels
+     * @param pixelsInterpolated Interpolated pixels where write the result
+     */
+    private fun random(pixelsStart: ByteArray, pixelsEnd: ByteArray, pixelsInterpolated: ByteArray)
+    {
+        System.arraycopy(pixelsStart, 0, pixelsInterpolated, 0, this.length)
+        val nb = (this.factor * this.lengthSmall).toInt()
+
+        (0 until nb).forEach {
+            var index = this.indexes[it] * 4
+            pixelsInterpolated[index] = pixelsEnd[index]
+            index++
+            pixelsInterpolated[index] = pixelsEnd[index]
+            index++
+            pixelsInterpolated[index] = pixelsEnd[index]
+            index++
+            pixelsInterpolated[index] = pixelsEnd[index]
+        }
+    }
+
+    /**
+     * Replace linearly texture pixels
+     * @param pixelsStart Start texture pixels
+     * @param pixelsEnd End texture pixels
+     * @param pixelsInterpolated Interpolated pixels where write the result
+     */
+    private fun replace(pixelsStart: ByteArray, pixelsEnd: ByteArray, pixelsInterpolated: ByteArray)
+    {
+        val nb = ((1.0 - this.factor) * this.length).toInt()
+        val bn = this.length - nb
+
+        if (nb > 0)
+        {
+            System.arraycopy(pixelsStart, 0, pixelsInterpolated, 0, nb)
+        }
+
+        if (bn > 0)
+        {
+            System.arraycopy(pixelsEnd, nb, pixelsInterpolated, nb, bn)
+        }
+    }
+
+    /**
+     * Replace by corner
+     * @param pixelsStart Start texture pixels
+     * @param pixelsEnd End texture pixels
+     * @param pixelsInterpolated Interpolated pixels where write the result
+     */
+    private fun corner(pixelsStart: ByteArray, pixelsEnd: ByteArray, pixelsInterpolated: ByteArray)
+    {
+        System.arraycopy(pixelsStart, 0, pixelsInterpolated, 0, this.length)
+        val w = (this.factor * this.width.toDouble() * 0.5).toInt()
+        val h = (this.factor * this.height.toDouble() * 0.5).toInt()
+
+        if (w > 0 && h > 0)
+        {
+            val minX = w
+            val maxX = this.width - w
+            val minY = h
+            val maxY = this.height - h
+            var pix = 0
+
+            (0 until this.height).forEach {
+                if (it <= minY || it >= maxY)
+                {
+                    (0 until this.width).forEach {
+                        if (it <= minX || it >= maxX)
+                        {
+                            var index = pix * 4
+                            pixelsInterpolated[index] = pixelsEnd[index]
+                            index++
+                            pixelsInterpolated[index] = pixelsEnd[index]
+                            index++
+                            pixelsInterpolated[index] = pixelsEnd[index]
+                            index++
+                            pixelsInterpolated[index] = pixelsEnd[index]
+                        }
+
+                        pix++
+                    }
+                }
+                else
+                {
+                    pix += this.width
+                }
+            }
+        }
+    }
+
+    /**
+     * Replace by border
+     * @param pixelsStart Start texture pixels
+     * @param pixelsEnd End texture pixels
+     * @param pixelsInterpolated Interpolated pixels where write the result
+     */
+    private fun border(pixelsStart: ByteArray, pixelsEnd: ByteArray, pixelsInterpolated: ByteArray)
+    {
+        System.arraycopy(pixelsStart, 0, pixelsInterpolated, 0, this.length)
+        val w = (this.factor * this.width.toDouble() * 0.5).toInt()
+        val h = (this.factor * this.height.toDouble() * 0.5).toInt()
+
+        if (w > 0 && h > 0)
+        {
+            val minX = w
+            val maxX = this.width - w
+            val minY = h
+            val maxY = this.height - h
+            var pix = 0
+
+            for (y in 0 until this.height)
+            {
+                for (x in 0 until this.width)
+                {
+                    if (y <= minY || y >= maxY || x <= minX || x >= maxX)
+                    {
+                        var index = pix * 4
+                        pixelsInterpolated[index] = pixelsEnd[index]
+                        index++
+                        pixelsInterpolated[index] = pixelsEnd[index]
+                        index++
+                        pixelsInterpolated[index] = pixelsEnd[index]
+                        index++
+                        pixelsInterpolated[index] = pixelsEnd[index]
+                    }
+
+                    pix++
+                }
+            }
+        }
+    }
+
+    /**
      * Force refresh the interpolated texture
      *
      * @return Interpolated texture
@@ -117,132 +266,26 @@ class TextureInterpolator(private val textureStart: Texture, private val texture
     {
         val pixelsStart = this.textureStart.pixels
         val pixelsEnd = this.textureEnd.pixels
-        val pixelsInterpolated = this.textureInterpolated.pixels
+        val pixelsInterpolated = ByteArray(this.textureInterpolated.pixels.size)
 
         while (this.actualInterpolationType == TextureInterpolationType.UNDEFINED)
         {
             this.actualInterpolationType = random(TextureInterpolationType::class.java)
         }
 
-        val rotcaf = 1.0 - this.factor
-
         when (this.actualInterpolationType)
         {
-            TextureInterpolationType.MELTED      -> for (i in this.length - 1 downTo 0)
-            {
-                pixelsInterpolated[i] = ((pixelsStart[i] and 0xFF) * rotcaf + (pixelsEnd[i] and 0xFF) * this.factor).toByte()
-            }
-            TextureInterpolationType.RANDOM      ->
-            {
-                System.arraycopy(pixelsStart, 0, pixelsInterpolated, 0, this.length)
-                val nb = (this.factor * this.lengthSmall).toInt()
-                for (i in 0 until nb)
-                {
-                    var index = this.indexes[i] * 4
-                    pixelsInterpolated[index] = pixelsEnd[index]
-                    index++
-                    pixelsInterpolated[index] = pixelsEnd[index]
-                    index++
-                    pixelsInterpolated[index] = pixelsEnd[index]
-                    index++
-                    pixelsInterpolated[index] = pixelsEnd[index]
-                }
-            }
-            TextureInterpolationType.REPLACEMENT ->
-            {
-                val nb = (rotcaf * this.length).toInt()
-                val bn = this.length - nb
-
-                if (nb > 0)
-                {
-                    System.arraycopy(pixelsStart, 0, pixelsInterpolated, 0, nb)
-                }
-
-                if (bn > 0)
-                {
-                    System.arraycopy(pixelsEnd, nb, pixelsInterpolated, nb, bn)
-                }
-            }
-            TextureInterpolationType.CORNER      ->
-            {
-                System.arraycopy(pixelsStart, 0, pixelsInterpolated, 0, this.length)
-                val w = (this.factor * this.width.toDouble() * 0.5).toInt()
-                val h = (this.factor * this.height.toDouble() * 0.5).toInt()
-
-                if (w > 0 && h > 0)
-                {
-                    val minX = w
-                    val maxX = this.width - w
-                    val minY = h
-                    val maxY = this.height - h
-                    var pix = 0
-
-                    for (y in 0 until this.height)
-                    {
-                        if (y <= minY || y >= maxY)
-                        {
-                            for (x in 0 until this.width)
-                            {
-                                if (x <= minX || x >= maxX)
-                                {
-                                    var index = pix * 4
-                                    pixelsInterpolated[index] = pixelsEnd[index]
-                                    index++
-                                    pixelsInterpolated[index] = pixelsEnd[index]
-                                    index++
-                                    pixelsInterpolated[index] = pixelsEnd[index]
-                                    index++
-                                    pixelsInterpolated[index] = pixelsEnd[index]
-                                }
-
-                                pix++
-                            }
-                        }
-                        else
-                        {
-                            pix += this.width
-                        }
-                    }
-                }
-            }
-            TextureInterpolationType.BORDER      ->
-            {
-                System.arraycopy(pixelsStart, 0, pixelsInterpolated, 0, this.length)
-                val w = (this.factor * this.width.toDouble() * 0.5).toInt()
-                val h = (this.factor * this.height.toDouble() * 0.5).toInt()
-
-                if (w > 0 && h > 0)
-                {
-                    val minX = w
-                    val maxX = this.width - w
-                    val minY = h
-                    val maxY = this.height - h
-                    var pix = 0
-
-                    for (y in 0 until this.height)
-                    {
-                        for (x in 0 until this.width)
-                        {
-                            if (y <= minY || y >= maxY || x <= minX || x >= maxX)
-                            {
-                                var index = pix * 4
-                                pixelsInterpolated[index] = pixelsEnd[index]
-                                index++
-                                pixelsInterpolated[index] = pixelsEnd[index]
-                                index++
-                                pixelsInterpolated[index] = pixelsEnd[index]
-                                index++
-                                pixelsInterpolated[index] = pixelsEnd[index]
-                            }
-
-                            pix++
-                        }
-                    }
-                }
-            }
+            TextureInterpolationType.MELTED      -> this.melt(pixelsStart, pixelsEnd, pixelsInterpolated)
+            TextureInterpolationType.RANDOM      -> this.random(pixelsStart, pixelsEnd, pixelsInterpolated)
+            TextureInterpolationType.REPLACEMENT -> this.replace(pixelsStart, pixelsEnd, pixelsInterpolated)
+            TextureInterpolationType.CORNER      -> this.corner(pixelsStart, pixelsEnd, pixelsInterpolated)
+            TextureInterpolationType.BORDER      -> this.border(pixelsStart, pixelsEnd, pixelsInterpolated)
             TextureInterpolationType.UNDEFINED   -> Unit // Already treat above
         }
 
+        System.arraycopy(pixelsInterpolated, 0,
+                         this.textureInterpolated.pixels, 0,
+                         this.textureInterpolated.pixels.size)
         this.textureInterpolated.flush()
         return this.textureInterpolated
     }
