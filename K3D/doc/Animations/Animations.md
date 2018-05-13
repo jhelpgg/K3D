@@ -364,7 +364,7 @@ Equation on each coordinate must depneds only on **t** parameter.
 
 By example we make an object follow the clover knot.
 
-Clover not equation:
+Clover knot equation:
 
     X(t) = sin(t) + 2 sin(2t)
     Y(t) = cos(t) - 2 cos(2t)
