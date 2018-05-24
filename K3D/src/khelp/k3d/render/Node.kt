@@ -59,9 +59,7 @@ internal fun taskFireMouseExit(node: Node, nodeListener: NodeListener) =
  */
 internal fun taskFireNodePositionChange(node: Node, nodePositionListener: NodePositionListener,
                                         x: Float, y: Float, z: Float) =
-        {
-            nodePositionListener.nodePositionChanged(node, x, y, z)
-        }
+        nodePositionListener.nodePositionChanged(node, x, y, z)
 
 /**
  * General node of the graph scene.

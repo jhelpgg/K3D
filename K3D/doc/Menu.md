@@ -14,4 +14,6 @@ Place 2D objects under or over the 3D: [Basic 2D](2D/OverAndUnder3D.md)
 
 How create animations: [Animations](Animations/Animations.md)
 
+Play sounds: [Sounds](Sound/Sound.md)
+
 **"Et voilà" :)**

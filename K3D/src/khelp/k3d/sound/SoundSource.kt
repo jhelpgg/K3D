@@ -190,7 +190,7 @@ open class SoundSource internal constructor()
     }
 
     /**
-     * Stop current sound (If their one) and clear the sound queue
+     * Stop current sound (If there one) and clear the sound queue
      */
     fun clearSounds()
     {

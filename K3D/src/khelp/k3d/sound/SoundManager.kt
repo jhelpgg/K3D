@@ -1,6 +1,7 @@
 package khelp.k3d.sound
 
 import khelp.k3d.util.ThreadOpenGL
+import khelp.math.limit
 import org.lwjgl.openal.AL
 import org.lwjgl.openal.ALC
 import org.lwjgl.openal.ALC10
@@ -62,7 +63,8 @@ class SoundManager
             return DummySoundSource
         }
 
-        synchronized(this.sources) {
+        synchronized(this.sources)
+        {
             val soundSource = SoundSource()
             this.sources.add(soundSource)
             return soundSource
@@ -114,6 +116,9 @@ class SoundManager
     /**
      * Enqueue sound in background
      *
+     * If their not sound in waiting queue and no sound is currently playing, the given sound is playing immediately and becomes the current one.
+     *
+     * In other cases, the sound is just put in queue and wait its turn.
      * @param sound Sound to enqueue
      */
     fun enqueueBackground(sound: Sound)
@@ -127,7 +132,7 @@ class SoundManager
     }
 
     /**
-     * Play  in background
+     * Play a sound in background immediately on stopping current one if need
      *
      * @param sound Sound to play
      */
@@ -160,7 +165,7 @@ class SoundManager
      */
     fun backgroundLevel(level: Float)
     {
-        var level = Math.max(0f, Math.min(1f, level))
+        var level = limit(level, 0f, 1f)
         this.sourceBackground.position(0f, 0f, SoundManager.LEVEL_ZERO_FAR * (1f - level))
     }
 

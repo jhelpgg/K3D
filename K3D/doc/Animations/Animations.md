@@ -684,7 +684,7 @@ The application is cut in different files:
 * [SceneManager](../../samples/khelp/samples/k3d/interpolations/SceneManager.kt): Manage the 3D scene.
   It creates and position the 3D objects. It creates the animation.
 * [UIManager](../../samples/khelp/samples/k3d/interpolations/UIManager.kt): Manage the 2D interface.
-  It creates and postation the information. It upsate the information text.
+  It creates and position the information text. It updates the information text.
   
 See the code for more details.
 
