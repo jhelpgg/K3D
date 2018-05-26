@@ -152,13 +152,13 @@ class SoundWav private constructor(private val data: ByteBuffer,
                 }
 
                 val tempBuffer = ByteArray(available)
-                var total = 0
-                var read = audioInputStream.read(tempBuffer, total, tempBuffer.size - total)
+                var read = audioInputStream.read(tempBuffer, 0, tempBuffer.size)
+                var total = read
 
-                while (read != -1 && total < tempBuffer.size)
+                while (read >= 0 && total < tempBuffer.size)
                 {
-                    total += read
                     read = audioInputStream.read(tempBuffer, total, tempBuffer.size - total)
+                    total += read
                 }
 
                 buffer = SoundWav.convertAudioBytes(tempBuffer, audioformat.sampleSizeInBits == 16,

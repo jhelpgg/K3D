@@ -16,4 +16,6 @@ How create animations: [Animations](Animations/Animations.md)
 
 Play sounds: [Sounds](Sound/Sound.md)
 
+Keyboard/Joystick management: [Keyboard/Joystick](UserInteraction/KeyboardJoystickControl.md)
+
 **"Et voilà" :)**

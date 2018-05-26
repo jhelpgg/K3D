@@ -150,4 +150,6 @@ enum class JoystickCode private constructor(public val index: Int,
          */
         fun obtainButton(index: Int) = JoystickCode.obtain(index, JoystickInputType.BUTTON)
     }
+
+    override fun toString() = "${this.name}: Index=${this.index}, Type:${this.joystickInputType}"
 }
