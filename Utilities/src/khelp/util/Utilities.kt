@@ -611,10 +611,10 @@ inline fun <T> List<T>.contains(condition: (T) -> Boolean) = this.indexOfFirst(c
  * Remove all element from map that satisfy a condition
  * @param K Map key type
  * @param V Map value type
- * @param removeCondition Condition for remove element.
- * First parameter is the current element key.
- * Second parameter is the current element value.
- * Return value indicates if have to remove (**`true`**) or not (**`false`**) the current element
+ * @param removeCondition Condition for remove element:
+ * * First parameter is the current element key.
+ * * Second parameter is the current element value.
+ * * Return value indicates if have to remove (**`true`**) or not (**`false`**) the current element
  */
 fun <K, V> MutableMap<K, V>.removeAll(removeCondition: (K, V) -> Boolean)
 {

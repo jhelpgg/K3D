@@ -101,7 +101,7 @@ Some actions need to be done only one time. In other word, there action we want 
 Make an action consumable does exactly this. When an action is consumable, if the corresponding key/joystick button is pressed, the event is published once and not repeat. 
 To do the action again, have to release the key/joystick button and press it again.
 
-For example take previous example and make rotation (**I**, **J**, **K**, **L**) cosumable to fell the difference.
+For example take previous example and make rotation (**I**, **J**, **K**, **L**) consumable to feel the difference.
 
 [Code source](../../samples/khelp/samples/k3d/KeyboardJoystickConsumable.kt)
 

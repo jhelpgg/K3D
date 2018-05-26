@@ -1851,8 +1851,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     /**
      * Convert a time in millisecond to a number of frame.
      *
-     * Warning: The result depends on current [animationsFps][.animationsFps].
-     * If [animationsFps][.animationsFps] change after the call of this method the obtained result becomes obsolete.
+     * Warning: The result depends on current [animationsFps].
+     * If [animationsFps] change after the call of this method the obtained result becomes obsolete.
      *
      * @param timeAnimation Animation time in milliseconds
      * @return Animation frame
