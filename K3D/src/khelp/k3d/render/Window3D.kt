@@ -187,6 +187,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
         /**Last detection information*/
         private var lastDetection = DetectionInfo(null, null, null, null,
                                                   -1, -1, false, false, false)
+        /**Moved node*/
+        internal var nodeMoved: Node? = null
 
         /**
          * Do the task
@@ -200,6 +202,16 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
             }
 
             val detectionInfo = parameter.get()
+            val manipulateNode = this.nodeMoved
+
+            if (manipulateNode != null)
+            {
+                this@Window3D.mouseActions.apply(manipulateNode,
+                                                 detectionInfo.detectX, detectionInfo.detectY,
+                                                 detectionInfo.mouseButtonLeft, detectionInfo.mouseButtonRight)
+                return
+            }
+
 
             if (this.lastDetection == detectionInfo)
             {
@@ -421,6 +433,10 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
      * Reference for GLFW to this window
      */
     private val window: Long
+    /**
+     * Actions on manipulated node
+     */
+    val mouseActions = MouseActions()
 
     init
     {
@@ -1857,4 +1873,43 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
             this.clickInSpaceListeners.remove(clickInSpaceListener)
         }
     }
+
+    /**
+     * Start manipulate a node by mouse.
+     *
+     * To change movement association or movement speed use [mouseActions]
+     * @param node Node to manipulate
+     */
+    fun manipulateNode(node: Node)
+    {
+        this.mouseActions.start(this.detectX, this.detectY)
+        this.updateMouseDetection.nodeMoved = node;
+    }
+
+    /**
+     * Disable all mouse manipulation to return to mouse detection
+     */
+    fun disableManipulation()
+    {
+        this.updateMouseDetection.nodeMoved = null
+    }
+
+    /**
+     * Obtain the current manipulated node
+     *
+     * If **`null`** it means no manipulated node and we are in classical mouse detection
+     * @return Current manipulated node
+     */
+    fun manipulatedNode() = this.updateMouseDetection.nodeMoved
+
+    /**
+     * Manipulate all the scene.
+     *
+     * In other words, the scene root becomes the manipulate node
+     *
+     * Does same as:
+     *
+     *     window3D.manipulateNode(window3D.scene().root)
+     */
+    fun manipulateAllScene() = this.manipulateNode(this.scene().root)
 }
