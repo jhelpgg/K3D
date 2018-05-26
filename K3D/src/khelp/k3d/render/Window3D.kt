@@ -14,7 +14,9 @@ import khelp.k3d.animation.AnimationLoop
 import khelp.k3d.geometry.Plane
 import khelp.k3d.k2d.GUI2D
 import khelp.k3d.k2d.Object2D
+import khelp.k3d.render.event.AlwaysAllowToExit
 import khelp.k3d.render.event.ClickInSpaceListener
+import khelp.k3d.render.event.WindowCloseListener
 import khelp.k3d.sound.SoundManager
 import khelp.k3d.ui.TextureFrame
 import khelp.k3d.util.TEMPORARY_DOUBLE_BUFFER
@@ -437,6 +439,8 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
      * Actions on manipulated node
      */
     val mouseActions = MouseActions()
+    /** Listener of window closing events and may prevent window closing to fast*/
+    var windowCloseListener: WindowCloseListener = AlwaysAllowToExit
 
     init
     {
@@ -559,10 +563,12 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
      */
     private fun closeWindow(window: Long)
     {
-        // TODO Implements the method
-        todo("Implements the method")
-        //Bellow, trick for avoid exit immediately after the method
-        //GLFW.glfwSetWindowShouldClose(this.window, false);
+        if (!this.windowCloseListener.allowToCloseNow(this))
+        {
+            //Avoid the closing
+            GLFW.glfwSetWindowShouldClose(this.window, false)
+            return
+        }
 
         //Closing
         GLFW.glfwSetWindowShouldClose(this.window, true)
@@ -1820,7 +1826,7 @@ class Window3D private constructor(width: Int, height: Int, title: String, decor
     /**
      * Indicates if window currently showing
      *
-     * @return `` true if window currently showing
+     * @return **`true`** if window currently showing
      */
     fun showing(): Boolean
     {
