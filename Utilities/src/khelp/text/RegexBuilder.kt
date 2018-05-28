@@ -246,7 +246,7 @@ internal class RegexCharacters(val charactersInterval: CharactersInterval) : Reg
                 else                          ->
                     String.format(this.pattern, this.charactersInterval.format("", "-", "",
                                                                                "", "",
-                                                                               ""))
+                                                                               "", true))
             }
 }
 

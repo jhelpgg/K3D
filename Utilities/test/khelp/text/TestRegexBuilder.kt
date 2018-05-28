@@ -47,7 +47,7 @@ class TestRegexBuilder
     fun testCharacterInterval()
     {
         var regex = createBasicCharactersInterval('h', 'q').toCharactersInterval().regexIn()
-        Assert.assertEquals("[h-q]", regex.toString())
+        Assert.assertEquals("[\\u0068-\\u0071]", regex.toString())
         val text = "hello, I said goodbye"
         var matches = charArrayOf('h', 'l', 'l', 'o', 'i', 'o', 'o')
         var matcher = regex.matcher(text)
@@ -64,7 +64,7 @@ class TestRegexBuilder
         // ---
 
         regex = (createBasicCharactersInterval('h', 'q') + createBasicCharactersInterval('x', 'z')).regexIn()
-        Assert.assertEquals("[h-qx-z]", regex.toString())
+        Assert.assertEquals("[\\u0068-\\u0071\\u0078-\\u007a]", regex.toString())
         matches = charArrayOf('h', 'l', 'l', 'o', 'i', 'o', 'o', 'y')
         matcher = regex.matcher(text)
         count = 0
@@ -80,7 +80,7 @@ class TestRegexBuilder
         // ---
 
         regex = (createBasicCharactersInterval('h', 'q') + createBasicCharactersInterval('x', 'z') + 'a').regexIn()
-        Assert.assertEquals("[ah-qx-z]", regex.toString())
+        Assert.assertEquals("[\\u0061\\u0068-\\u0071\\u0078-\\u007a]", regex.toString())
         matches = charArrayOf('h', 'l', 'l', 'o', 'a', 'i', 'o', 'o', 'y')
         matcher = regex.matcher(text)
         count = 0
@@ -112,7 +112,7 @@ class TestRegexBuilder
         // --
 
         regex = charArrayOf('l', 'o').regex()
-        Assert.assertEquals("[lo]", regex.toString())
+        Assert.assertEquals("[\\u006c\\u006f]", regex.toString())
         matches = charArrayOf('l', 'l', 'o', 'o', 'o')
         matcher = regex.matcher(text)
         count = 0
@@ -131,7 +131,7 @@ class TestRegexBuilder
     {
         val group = charArrayOf(',', '!').regex().group()
         var regex = "hello".regexText() + group
-        Assert.assertEquals("\\Qhello\\E([!,])", regex.toString())
+        Assert.assertEquals("\\Qhello\\E([\\u0021\\u002c])", regex.toString())
         var groupName = regex.groupName(group)
         Assert.assertEquals("$1", groupName)
         var text = "hello, I said hello!"
@@ -150,7 +150,7 @@ class TestRegexBuilder
 
         val group2 = ANY.group()
         regex = ('o'.regex() + group) OR ('a'.regex() + group2)
-        Assert.assertEquals("(?:(?:[o]([!,]))|(?:[a](.)))", regex.toString())
+        Assert.assertEquals("(?:(?:[\\u006f]([\\u0021\\u002c]))|(?:[\\u0061](.)))", regex.toString())
         groupName = regex.groupName(group)
         var groupName2 = regex.groupName(group2)
         Assert.assertEquals("$1", groupName)
@@ -172,7 +172,7 @@ class TestRegexBuilder
     fun testRepeat()
     {
         var regex = 'a'.regex() + ANY.zeroOrMore()
-        Assert.assertEquals("[a](?:.)*", regex.toString())
+        Assert.assertEquals("[\\u0061](?:.)*", regex.toString())
         Assert.assertTrue(regex.matches("a"))
         Assert.assertTrue(regex.matches("an"))
         Assert.assertTrue(regex.matches("attack"))
@@ -182,7 +182,7 @@ class TestRegexBuilder
         Assert.assertFalse(regex.matches("boat"))
 
         regex = 'a'.regex() + ANY.oneOrMore()
-        Assert.assertEquals("[a](?:.)+", regex.toString())
+        Assert.assertEquals("[\\u0061](?:.)+", regex.toString())
         Assert.assertFalse(regex.matches("a"))
         Assert.assertTrue(regex.matches("an"))
         Assert.assertTrue(regex.matches("attack"))
@@ -192,7 +192,7 @@ class TestRegexBuilder
         Assert.assertFalse(regex.matches("boat"))
 
         regex = 'a'.regex() + ANY.zeroOrOne()
-        Assert.assertEquals("[a](?:.)?", regex.toString())
+        Assert.assertEquals("[\\u0061](?:.)?", regex.toString())
         Assert.assertTrue(regex.matches("a"))
         Assert.assertTrue(regex.matches("an"))
         Assert.assertFalse(regex.matches("attack"))
@@ -202,7 +202,7 @@ class TestRegexBuilder
         Assert.assertFalse(regex.matches("boat"))
 
         regex = 'a'.regex() + ANY.exactly(5)
-        Assert.assertEquals("[a](?:.){5}", regex.toString())
+        Assert.assertEquals("[\\u0061](?:.){5}", regex.toString())
         Assert.assertFalse(regex.matches("a"))
         Assert.assertFalse(regex.matches("an"))
         Assert.assertTrue(regex.matches("attack"))
@@ -212,7 +212,7 @@ class TestRegexBuilder
         Assert.assertFalse(regex.matches("boat"))
 
         regex = 'a'.regex() + ANY.atLeast(5)
-        Assert.assertEquals("[a](?:.){5,}", regex.toString())
+        Assert.assertEquals("[\\u0061](?:.){5,}", regex.toString())
         Assert.assertFalse(regex.matches("a"))
         Assert.assertFalse(regex.matches("an"))
         Assert.assertTrue(regex.matches("attack"))
@@ -222,7 +222,7 @@ class TestRegexBuilder
         Assert.assertFalse(regex.matches("boat"))
 
         regex = 'a'.regex() + ANY.between(1, 5)
-        Assert.assertEquals("[a](?:.){1,5}", regex.toString())
+        Assert.assertEquals("[\\u0061](?:.){1,5}", regex.toString())
         Assert.assertFalse(regex.matches("a"))
         Assert.assertTrue(regex.matches("an"))
         Assert.assertTrue(regex.matches("attack"))
@@ -303,11 +303,11 @@ class TestRegexBuilder
         val groupPhoneHeader = ((('+'.regex() + number + number) OR '0'.regex()) + number).group()
         val groupSeparator = charArrayOf(' ', '-', '.').regex().group()
         val sameSeparator = groupSeparator.same()
-        val twoNumber = number + number
-        val groupNumber1 = twoNumber.group()
-        val groupNumber2 = twoNumber.group()
-        val groupNumber3 = twoNumber.group()
-        val groupNumber4 = twoNumber.group()
+        val twoNumbers = number.exactly(2)
+        val groupNumber1 = twoNumbers.group()
+        val groupNumber2 = twoNumbers.group()
+        val groupNumber3 = twoNumbers.group()
+        val groupNumber4 = twoNumbers.group()
         val phoneRegex = groupPhoneHeader + groupSeparator + groupNumber1 + sameSeparator + groupNumber2 + sameSeparator + groupNumber3 + sameSeparator + groupNumber4
         val groupPhoneHeaderNumber = phoneRegex.groupNumber(groupPhoneHeader)
         val groupSeparatorNumber = phoneRegex.groupNumber(groupSeparator)

@@ -15,6 +15,27 @@ class BasicCharactersInterval internal constructor(val minimum: Char, val maximu
     override fun toString() = format()
 
     /**
+     * Transform character to string
+     * @param character Character to transforù
+     * @param hexadecimalForm Indicates if use the hexadecimal form
+     */
+    private fun form(character: Char, hexadecimalForm: Boolean) =
+            if (hexadecimalForm)
+            {
+                val stringBuilder = StringBuilder(4)
+                stringBuilder.append(java.lang.Integer.toHexString(character.toInt()))
+
+                while (stringBuilder.length < 4)
+                {
+                    stringBuilder.insert(0, '0')
+                }
+
+                stringBuilder.insert(0, "\\u")
+                stringBuilder.toString()
+            }
+            else character.toString()
+
+    /**
      * Compute a string representation on following given format.
      *
      * @param openInterval String used for open interval, when the minimum and maximum are different
@@ -22,14 +43,19 @@ class BasicCharactersInterval internal constructor(val minimum: Char, val maximu
      * @param closeInterval String used for close interval, when the minimum and maximum are different
      * @param openAlone String used for open when interval contains only one character
      * @param closeAlone String used for close when interval contains only one character
+     * @param hexadecimalForm Indicates if characters have the hexadecimal form
      */
     fun format(openInterval: String = "[", intervalSeparator: String = ", ", closeInterval: String = "]",
-               openAlone: String = "{", closeAlone: String = "}") =
+               openAlone: String = "{", closeAlone: String = "}",
+               hexadecimalForm: Boolean = false) =
             when
             {
                 this.minimum > this.maximum  -> "$openInterval$closeInterval"
-                this.minimum == this.maximum -> "$openAlone${this.minimum}$closeAlone"
-                else                         -> "$openInterval${this.minimum}$intervalSeparator${this.maximum}$closeInterval"
+                this.minimum == this.maximum -> "$openAlone${this.form(this.minimum, hexadecimalForm)}$closeAlone"
+                else                         ->
+                    "$openInterval${this.form(this.minimum,
+                                              hexadecimalForm)}$intervalSeparator${this.form(this.maximum,
+                                                                                             hexadecimalForm)}$closeInterval"
             }
 
     /**
@@ -263,10 +289,11 @@ class CharactersInterval
      * @param openAlone String used for open when interval contains only one character
      * @param closeAlone String used for close when interval contains only one character
      * @param unionSymbol String used for the union between intervals
+     * @param hexadecimalForm Indicates if characters have the hexadecimal form
      */
     fun format(openInterval: String = "[", intervalSeparator: String = ", ", closeInterval: String = "]",
                openAlone: String = "{", closeAlone: String = "}",
-               unionSymbol: String = " U "): String
+               unionSymbol: String = " U ", hexadecimalForm: Boolean = false): String
     {
         if (this.intervals.isEmpty())
         {
@@ -275,12 +302,12 @@ class CharactersInterval
 
         val stringBuilder = StringBuilder()
         stringBuilder.append(this.intervals[0].format(openInterval, intervalSeparator, closeInterval,
-                                                      openAlone, closeAlone))
+                                                      openAlone, closeAlone, hexadecimalForm))
 
         (1 until this.intervals.size).forEach {
             stringBuilder.append(unionSymbol)
             stringBuilder.append(this.intervals[it].format(openInterval, intervalSeparator, closeInterval,
-                                                           openAlone, closeAlone))
+                                                           openAlone, closeAlone, hexadecimalForm))
         }
 
         return stringBuilder.toString()
