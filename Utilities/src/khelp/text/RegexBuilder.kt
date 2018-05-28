@@ -122,7 +122,7 @@ internal class RegexText(text: String) : RegexElement(Pattern.quote(text), Regex
  * @param element1 First possibility
  * @param element2 Second possibility
  */
-internal class RegexOr(element1: RegexElement, element2: RegexElement) : RegexElement("(?:%s)|(?:%s)", RegexType.OR,
+internal class RegexOr(element1: RegexElement, element2: RegexElement) : RegexElement("(?:(?:%s)|(?:%s))", RegexType.OR,
                                                                                       element1 = element1,
                                                                                       element2 = element2)
 {
@@ -462,7 +462,9 @@ open class RegexPart internal constructor(internal val regexElement: RegexElemen
      *
      * Usually used on replacement in [replaceAll], [java.util.regex.Matcher.appendReplacement],
      * [java.util.regex.Matcher.replaceAll], [java.util.regex.Matcher.replaceFirst]
+     * @throws IllegalArgumentException If group not inside the regex
      */
+    @Throws(IllegalArgumentException::class)
     fun groupName(group: Group) = "$${this.groupNumber(group)}"
 
     /**

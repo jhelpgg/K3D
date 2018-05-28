@@ -27,7 +27,7 @@ class TestRegexBuilder
     fun testOr()
     {
         val regex = "hello".regexText() OR "goodbye".regexText()
-        Assert.assertEquals("(?:\\Qhello\\E)|(?:\\Qgoodbye\\E)", regex.toString())
+        Assert.assertEquals("(?:(?:\\Qhello\\E)|(?:\\Qgoodbye\\E))", regex.toString())
         val text = "hello, I said goodbye"
 
         val matcher = regex.matcher(text)
@@ -150,7 +150,7 @@ class TestRegexBuilder
 
         val group2 = ANY.group()
         regex = ('o'.regex() + group) OR ('a'.regex() + group2)
-        Assert.assertEquals("(?:[o]([!,]))|(?:[a](.))", regex.toString())
+        Assert.assertEquals("(?:(?:[o]([!,]))|(?:[a](.)))", regex.toString())
         groupName = regex.groupName(group)
         var groupName2 = regex.groupName(group2)
         Assert.assertEquals("$1", groupName)
@@ -294,5 +294,70 @@ class TestRegexBuilder
         Assert.assertEquals("(\\s)(?:.)+\\1", regex.toString())
         val replaced = regex.replaceAll(text, "[$groupName]")
         Assert.assertEquals("[ ][\n] [\t]", replaced)
+    }
+
+    @Test
+    fun testPhoneNumber()
+    {
+        val number = createBasicCharactersInterval('0', '9').regexIn()
+        val groupPhoneHeader = ((('+'.regex() + number + number) OR '0'.regex()) + number).group()
+        val groupSeparator = charArrayOf(' ', '-', '.').regex().group()
+        val sameSeparator = groupSeparator.same()
+        val twoNumber = number + number
+        val groupNumber1 = twoNumber.group()
+        val groupNumber2 = twoNumber.group()
+        val groupNumber3 = twoNumber.group()
+        val groupNumber4 = twoNumber.group()
+        val phoneRegex = groupPhoneHeader + groupSeparator + groupNumber1 + sameSeparator + groupNumber2 + sameSeparator + groupNumber3 + sameSeparator + groupNumber4
+        val groupPhoneHeaderNumber = phoneRegex.groupNumber(groupPhoneHeader)
+        val groupSeparatorNumber = phoneRegex.groupNumber(groupSeparator)
+        val groupNumber1Number = phoneRegex.groupNumber(groupNumber1)
+        val groupNumber2Number = phoneRegex.groupNumber(groupNumber2)
+        val groupNumber3Number = phoneRegex.groupNumber(groupNumber3)
+        val groupNumber4Number = phoneRegex.groupNumber(groupNumber4)
+
+        //
+
+        var matcher = phoneRegex.matcher("06 12 34 56 78")
+        Assert.assertTrue(matcher.matches())
+        Assert.assertEquals("06", matcher.group(groupPhoneHeaderNumber))
+        Assert.assertEquals(" ", matcher.group(groupSeparatorNumber))
+        Assert.assertEquals("12", matcher.group(groupNumber1Number))
+        Assert.assertEquals("34", matcher.group(groupNumber2Number))
+        Assert.assertEquals("56", matcher.group(groupNumber3Number))
+        Assert.assertEquals("78", matcher.group(groupNumber4Number))
+
+        //
+
+        matcher = phoneRegex.matcher("06-12-34-56-78")
+        Assert.assertTrue(matcher.matches())
+        Assert.assertEquals("06", matcher.group(groupPhoneHeaderNumber))
+        Assert.assertEquals("-", matcher.group(groupSeparatorNumber))
+        Assert.assertEquals("12", matcher.group(groupNumber1Number))
+        Assert.assertEquals("34", matcher.group(groupNumber2Number))
+        Assert.assertEquals("56", matcher.group(groupNumber3Number))
+        Assert.assertEquals("78", matcher.group(groupNumber4Number))
+
+        //
+
+        matcher = phoneRegex.matcher("+336.12.34.56.78")
+        Assert.assertTrue(matcher.matches())
+        Assert.assertEquals("+336", matcher.group(groupPhoneHeaderNumber))
+        Assert.assertEquals(".", matcher.group(groupSeparatorNumber))
+        Assert.assertEquals("12", matcher.group(groupNumber1Number))
+        Assert.assertEquals("34", matcher.group(groupNumber2Number))
+        Assert.assertEquals("56", matcher.group(groupNumber3Number))
+        Assert.assertEquals("78", matcher.group(groupNumber4Number))
+
+        //
+
+        matcher = phoneRegex.matcher("06 12-34.56 78")
+        Assert.assertFalse(matcher.matches())
+
+        matcher = phoneRegex.matcher("0612345678")
+        Assert.assertFalse(matcher.matches())
+
+        matcher = phoneRegex.matcher("06 12 34 56 7 8")
+        Assert.assertFalse(matcher.matches())
     }
 }
