@@ -18,4 +18,6 @@ Play sounds: [Sounds](Sound/Sound.md)
 
 Keyboard/Joystick management: [Keyboard/Joystick](UserInteraction/KeyboardJoystickControl.md)
 
+How to make screenshots: [ScreenShots](Misc/ScreenShot.md)
+
 **"Et voilà" :)**
