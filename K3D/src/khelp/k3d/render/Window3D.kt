@@ -1,6 +1,7 @@
 package khelp.k3d.render
 
 import khelp.alphabet.AlphabetBlue16x16
+import khelp.debug.debug
 import khelp.debug.exception
 import khelp.debug.information
 import khelp.debug.todo

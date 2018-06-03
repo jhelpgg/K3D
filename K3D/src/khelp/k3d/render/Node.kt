@@ -25,29 +25,21 @@ import java.util.concurrent.atomic.AtomicInteger
  * @param rightButton Indicates if mouse right button is pressed
  */
 internal fun taskFireMouseClick(node: Node, nodeListener: NodeListener, leftButton: Boolean, rightButton: Boolean) =
-        {
-            nodeListener.mouseClick(node, leftButton, rightButton)
-        }
+        nodeListener.mouseClick(node, leftButton, rightButton)
 
 /**
  * Fire mouse enter event to a listener
  * @param node Entered node
  * @param nodeListener Listener to alert
  */
-internal fun taskFireMouseEnter(node: Node, nodeListener: NodeListener) =
-        {
-            nodeListener.mouseEnter(node)
-        }
+internal fun taskFireMouseEnter(node: Node, nodeListener: NodeListener) = nodeListener.mouseEnter(node)
 
 /**
  * Fire mouse exit event to a listener
  * @param node Exited node
  * @param nodeListener Listener to alert
  */
-internal fun taskFireMouseExit(node: Node, nodeListener: NodeListener) =
-        {
-            nodeListener.mouseExit(node)
-        }
+internal fun taskFireMouseExit(node: Node, nodeListener: NodeListener) = nodeListener.mouseExit(node)
 
 /**
  * Fire position change to a listener

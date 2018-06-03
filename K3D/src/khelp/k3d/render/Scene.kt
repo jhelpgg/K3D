@@ -1,5 +1,6 @@
 package khelp.k3d.render
 
+import khelp.debug.debug
 import khelp.k3d.util.ThreadOpenGL
 import khelp.math.sign
 import org.lwjgl.opengl.GL11
