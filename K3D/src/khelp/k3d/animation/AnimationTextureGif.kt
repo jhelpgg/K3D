@@ -3,9 +3,18 @@ package khelp.k3d.animation
 import khelp.images.gif.GIF
 import khelp.k3d.render.Texture
 
+/**
+ * Create Animation based on GIF.
+ *
+ * It creates a Texture that will be updated with new GIF image.
+ * @param gif GIF to show
+ * @param name Texture name
+ */
 class AnimationTextureGif(private val gif: GIF, name: String) : Animation
 {
+    /**Texture where GIF is draw*/
     val texture = Texture(name, this.gif.width, this.gif.height)
+    /**Last GIF image index*/
     private var lastIndex = 0
 
     init
