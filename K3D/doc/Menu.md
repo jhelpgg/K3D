@@ -20,4 +20,6 @@ Keyboard/Joystick management: [Keyboard/Joystick](UserInteraction/KeyboardJoysti
 
 How to make screenshots: [ScreenShots](Misc/ScreenShot.md)
 
+Mouse management: [Mouse](UserInteraction/MouseInteraction.md)
+
 **"Et voilà" :)**
