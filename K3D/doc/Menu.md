@@ -22,4 +22,6 @@ How to make screenshots: [ScreenShots](Misc/ScreenShot.md)
 
 Mouse management: [Mouse](UserInteraction/MouseInteraction.md)
 
+Window closing event: [Do something before close](Misc/ClosingApplication.md)
+
 **"Et voilà" :)**

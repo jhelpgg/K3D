@@ -1,19 +1,24 @@
-# Reaction window close event
+package khelp.samples.k3d
 
-By default, when close a window 3D by `window3D.close()` or close the application, let the window close properly.
+import khelp.alphabet.AlphabetGraffiti
+import khelp.alphabet.AlphabetOrange16x16
+import khelp.k3d.k2d.Object2D
+import khelp.k3d.k2d.event.Object2DListener
+import khelp.k3d.render.TextureAlphabetText
+import khelp.k3d.render.Window3D
+import khelp.k3d.render.event.ActionCode
+import khelp.k3d.render.event.ActionCode.ACTION_EXIT
+import khelp.k3d.render.event.ActionListener
+import khelp.k3d.render.event.WindowCloseListener
+import khelp.text.JHelpTextAlign.CENTER
+import khelp.util.BLACK_ALPHA_MASK
+import khelp.util.POST_IT
 
-It is possible to catch the close event and avoid the widow exit. 
-The idea is to register a listener called when window will close and the listener say if the close is allow now or not.
+/**Yes answer*/
+const val YES = 0
+/**No answer*/
+const val NO = 1
 
-By example show an option pane to ask user if he wants really exit.
-
-[Code source](../../samples/khelp/samples/k3d/CloseWindow.kt)
-
-Here we do the job inside a dedicated class for manage listeners more properly as usual.
-
-Create the class and its fields:
-
-````Kotlin
 class CloseWindow : Object2DListener, ActionListener, WindowCloseListener
 {
     /**Window 3D*/
@@ -26,15 +31,7 @@ class CloseWindow : Object2DListener, ActionListener, WindowCloseListener
     private val objectNo: Object2D
     /**Indicates if exit is currently allowed*/
     private var allowToExit = false
-````
- 
-* Object2DListener: For react when user click one button
-* ActionListener: For associate **Escape** key to close window
-* WindowCloseListener: For react to window closing
 
-Initialize the scene:
-
-````Kotlin
     init
     {
         // Prepare the option pane do choose if exit or not
@@ -79,14 +76,7 @@ Initialize the scene:
         // Change reaction to exit window
         this.window3D.windowCloseListener = this
     }
-````
 
-The option pane's elements and not visible at start.
-At the end we specified that we want use our custom window close reaction
-
-Add mouse click reaction
-
-````Kotlin
     /**
      * Call when mouse click on a object
      *
@@ -115,14 +105,45 @@ Add mouse click reaction
             }
         }
     }
-````
 
-* **YES** button: allow to exit and call close to exit for real
-* **NO** button: Just hide the option pane's elements
+    /**
+     * Call when mouse drag on a object
+     *
+     * @param object2D    Object under mouse
+     * @param x           Mouse X
+     * @param y           Mouse Y
+     * @param leftButton  Indicates if the left button is down
+     * @param rightButton Indicates if the right button is down
+     */
+    override fun mouseDrag(object2D: Object2D, x: Int, y: Int, leftButton: Boolean, rightButton: Boolean) = Unit
 
-Associate **Escape** key to window close
+    /**
+     * Call when mouse enter on a object
+     *
+     * @param object2D Object enter
+     * @param x        Mouse X
+     * @param y        Mouse Y
+     */
+    override fun mouseEnter(object2D: Object2D, x: Int, y: Int) = Unit
 
-````Kotlin
+    /**
+     * Call when mouse exit on a object
+     *
+     * @param object2D Object exit
+     * @param x        Mouse X
+     * @param y        Mouse Y
+     */
+    override fun mouseExit(object2D: Object2D, x: Int, y: Int) = Unit
+
+    /**
+     * Call when mouse move on a object
+     *
+     * @param object2D Object under mouse
+     * @param x        Mouse X
+     * @param y        Mouse Y
+     */
+    override fun mouseMove(object2D: Object2D, x: Int, y: Int) = Unit
+
     /**
      * Called each time current actions updates.
      *
@@ -141,11 +162,7 @@ Associate **Escape** key to window close
             }
         }
     }
-````
 
-Finally add window close reaction:
-
-````Kotlin
     /**
      * Indicates if it is allow to close the widow now.
      *
@@ -169,12 +186,12 @@ Finally add window close reaction:
 
         return this.allowToExit
     }
-````
+}
 
-If it is not allow to exit now, show the option pane's elements.
-
-Beware to not do long operation inside this listener. And keep in mind that it must exists a state where the listener return **true**.
- 
-**"Et voilà" :)**
-
-[Menu](../Menu.md)
+/**
+ * Launch the sample
+ */
+fun main(args: Array<String>)
+{
+    CloseWindow()
+}

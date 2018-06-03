@@ -94,7 +94,7 @@ class AlphabetText private constructor(private val alphabet: Alphabet,
     init
     {
         val dimension = this.alphabet.getCharacterDimension()
-        this.limitWidth = Math.max(16, numberCharacterPerLine) * dimension.width
+        this.limitWidth = Math.max(4, numberCharacterPerLine) * dimension.width
         this.limitHeight = Math.max(1, numberLine) * dimension.height
         this.x = AlphabetText.BORDER_SIZE_TWICE + 1
         this.y = AlphabetText.BORDER_SIZE_TWICE + 1
