@@ -344,7 +344,7 @@ and [ActionOnNodeWay](../../src/khelp/k3d/render/event/ActionOnNodeWay.kt) (for 
 
 > Note:
 > * Here the Y change is reversed because in 2D coordinates the Y axis positive values goes down and in 3D it goes up.
-> * We changed oly rotation speed in the example. But it is possible to change the translation speed (`mouseActions.translationStep`) 
+> * We changed only rotation speed in the example. But it is possible to change the translation speed (`mouseActions.translationStep`) 
 >   and Z change speed (`mouseActions.zoomStep`)
 
 **"Et voilà" :)**

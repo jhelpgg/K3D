@@ -214,12 +214,12 @@ class GIF(inputStream: InputStream)
     fun image(index: Int) = this.images[index]
 
     /**
-     * Get the image suggest between last time [GIF.startAnimation] was called and time this method is called based on
+     * Get the image index suggest between last time [GIF.startAnimation] was called and time this method is called based on
      * images delays
      *
-     * @return Image since last time [GIF.startAnimation] was called
+     * @return Image index since last time [GIF.startAnimation] was called
      */
-    fun imageFromStartAnimation(): JHelpImage
+    fun imageIndexFromStartAnimation(): Int
     {
         val time = System.currentTimeMillis() - this.startTime
         val max = this.images.size - 1
@@ -249,8 +249,16 @@ class GIF(inputStream: InputStream)
         }
 
         this.previousIndex = index
-        return this.images[index]
+        return index
     }
+
+    /**
+     * Get the image suggest between last time [GIF.startAnimation] was called and time this method is called based on
+     * images delays
+     *
+     * @return Image since last time [GIF.startAnimation] was called
+     */
+    fun imageFromStartAnimation() = this.images[this.imageIndexFromStartAnimation()]
 
     /**
      * Number of images

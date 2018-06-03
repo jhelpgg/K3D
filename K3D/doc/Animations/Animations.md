@@ -499,6 +499,53 @@ Now all is ready to launch the animation:
 
 **"Et voilà" :)**
  
+### Animation based on GIF
+
+It is possible to create an animated texture based on GIF. 
+The GIF will be played on a texture.
+
+Example: [code source](../../samples/khelp/samples/k3d/TextureGifAnimation.kt)
+
+![Gif on cube](textureGIF.gif)
+
+First create an object that will receive the GIF:
+
+````Kotlin
+    // 1) Create 3D scene
+    val window3D = Window3D.createSizedWindow(800, 600, "Animation texture GIF", true)
+    val scene = window3D.scene()
+    val node = Box()
+    scene.add(node)
+    node.position(0f, 0f, -3f)
+    node.angleX(12f)
+    node.angleY(25f)
+    val material = Material.obtainMaterialOrCreate("Box")
+    node.material(material)
+````
+
+Then load the GIF and create animation:
+
+````Kotlin
+        // 2) Load gif and create animation
+        val gif = GIF(TextureGifAnimation::class.java.getResourceAsStream("wink.gif"))
+        val animation = AnimationTextureGif(gif, "wink")
+````
+
+Associate the texture with the GIF to the box:
+
+````Kotlin
+        // 3) Associate animation texture to the box
+        material.textureDiffuse = animation.texture
+````
+
+Finally launch the animation:
+
+````Kotlin
+        // 4) Launch animation
+        window3D.playAnimation(animation)
+````
+ 
+**"Et voilà" :)**
 
 ### Animation combination
 
