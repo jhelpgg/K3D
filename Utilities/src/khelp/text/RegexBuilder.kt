@@ -676,18 +676,6 @@ val ANY = RegexPart(RegexAny)
  */
 operator fun RegexPart.plus(regexPart: RegexPart): RegexPart
 {
-    if (this.regexElement is RegexUnion)
-    {
-        this.regexElement += regexPart.regexElement
-        return this
-    }
-
-    if (regexPart.regexElement is RegexUnion)
-    {
-        regexPart.regexElement += this.regexElement
-        return regexPart
-    }
-
     val regexUnion = RegexUnion()
     regexUnion += this.regexElement
     regexUnion += regexPart.regexElement
