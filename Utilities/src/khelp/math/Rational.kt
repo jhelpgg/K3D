@@ -131,7 +131,7 @@ class Rational private constructor(private val numerator: Long, private val deno
             {
                 try
                 {
-                    return createRational(string.toLong(), 1L)
+                    return createRational(string.trim().toLong(), 1L)
                 }
                 catch (exception: Exception)
                 {
@@ -141,8 +141,8 @@ class Rational private constructor(private val numerator: Long, private val deno
 
             try
             {
-                return createRational(string.substring(0, index).toLong(),
-                                      string.substring(index + 1).toLong())
+                return createRational(string.substring(0, index).trim().toLong(),
+                                      string.substring(index + 1).trim().toLong())
             }
             catch (exception: Exception)
             {

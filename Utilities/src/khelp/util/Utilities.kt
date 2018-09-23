@@ -95,13 +95,14 @@ fun <T, R> Optional<T>.ifElse(present: (T) -> R, absent: () -> R) =
  * @param T Iterable element type
  * @return Filtered [Iterable]
  */
-fun <T> Iterable<T>.smartFilter(filter: (T) -> Boolean): Iterable<T> =
-        object : Iterable<T>
+fun <T> Iterable<T>.smartFilter(filter: (T) -> Boolean) =
+        if (this is FilteredIterable)
         {
-            /**
-             * Returns an iterator over the elements of this object.
-             */
-            override fun iterator(): Iterator<T> = this@smartFilter.iterator().smartFilter(filter)
+            this.filter(filter)
+        }
+        else
+        {
+            FilteredIterable(this, filter)
         }
 
 /**
@@ -112,58 +113,14 @@ fun <T> Iterable<T>.smartFilter(filter: (T) -> Boolean): Iterable<T> =
  * @param T Iterator element type
  * @return Filtered [Iterator]
  */
-fun <T> Iterator<T>.smartFilter(filter: (T) -> Boolean): Iterator<T> =
-        object : Iterator<T>
+fun <T> Iterator<T>.smartFilter(filter: (T) -> Boolean) =
+        if (this is FilteredIterator)
         {
-            var nextSet: Boolean = false
-            var next: T? = null
-            /**
-             * Returns `true` if the iteration has more elements.
-             */
-            override fun hasNext(): Boolean
-            {
-                if (this.nextSet)
-                {
-                    return true
-                }
-
-                while (this@smartFilter.hasNext())
-                {
-                    this.next = this@smartFilter.next()
-
-                    if (filter(this.next!!))
-                    {
-                        this.nextSet = true
-                        return true
-                    }
-                }
-
-                return false
-            }
-
-            /**
-             * Returns the next element in the iteration.
-             */
-            override fun next(): T
-            {
-                if (this.nextSet)
-                {
-                    this.nextSet = false
-                    return this.next!!
-                }
-
-                while (this@smartFilter.hasNext())
-                {
-                    this.next = this@smartFilter.next()
-
-                    if (filter(this.next!!))
-                    {
-                        return this.next!!
-                    }
-                }
-
-                throw NoSuchElementException("No more elements to iterate!")
-            }
+            this.filter(filter)
+        }
+        else
+        {
+            FilteredIterator(this, filter)
         }
 
 /**
@@ -176,12 +133,13 @@ fun <T> Iterator<T>.smartFilter(filter: (T) -> Boolean): Iterator<T> =
  * @return [Iterable] with transformed elements
  */
 fun <T1, T2> Iterable<T1>.transform(transformation: (T1) -> T2): Iterable<T2> =
-        object : Iterable<T2>
+        if (this is TransformedIterable<*, *>)
         {
-            /**
-             * Returns an iterator over the elements of this object.
-             */
-            override fun iterator(): Iterator<T2> = this@transform.iterator().transform(transformation)
+            this.transformation(transformation as (Any?) -> T2)
+        }
+        else
+        {
+            TransformedIterable<T1, T2>(this, transformation)
         }
 
 /**
@@ -193,18 +151,14 @@ fun <T1, T2> Iterable<T1>.transform(transformation: (T1) -> T2): Iterable<T2> =
  * @param T2 Transformed type
  * @return [Iterator] with transformed elements
  */
-fun <T1, T2> Iterator<T1>.transform(transformation: (T1) -> T2): Iterator<T2> =
-        object : Iterator<T2>
+fun <T1, T2> Iterator<T1>.transform(transformation: (T1) -> T2) =
+        if (this is TransformedIterator<*, *>)
         {
-            /**
-             * Returns `true` if the iteration has more elements.
-             */
-            override fun hasNext(): Boolean = this@transform.hasNext()
-
-            /**
-             * Returns the next element in the iteration.
-             */
-            override fun next(): T2 = transformation(this@transform.next())
+            this.transformation(transformation as (Any?) -> T2)
+        }
+        else
+        {
+            TransformedIterator<T1, T2>(this, transformation)
         }
 
 /**
@@ -629,3 +583,50 @@ fun <K, V> MutableMap<K, V>.removeAll(removeCondition: (K, V) -> Boolean)
 
     toRemove.forEach { this.remove(it) }
 }
+
+/**
+ * Do something on first matched element.
+ * Do something else if not found
+ * @receiver Iterable<T>
+ * @param condition (T) -> Boolean Condition to fulfill
+ * @param firstFound (T) -> Unit Action to do if element found. Element in parameter
+ * @param firstNotFound () -> Unit Action to do if  not found
+ */
+fun <T> Iterable<T>.onFirst(condition: (T) -> Boolean, firstFound: (T) -> Unit, firstNotFound: () -> Unit = {})
+{
+    val first = this.firstOrNull(condition)
+
+    if (first == null)
+    {
+        firstNotFound()
+        return
+    }
+
+    firstFound(first)
+}
+
+/**
+ * Do something on first matched element.
+ * Do something else if not found.
+ *
+ * Element are indexed
+ * @receiver Iterable<T>
+ * @param condition (T) -> Boolean Condition to fulfill
+ * @param firstFound (Int, T) -> Unit Action to do if element found. Index as first parameter, element at second
+ * @param firstNotFound () -> Unit Action to do if  not found
+ */
+fun <T> Iterable<T>.onFirstIndexed(condition: (T) -> Boolean,
+                                   firstFound: (Int, T) -> Unit,
+                                   firstNotFound: () -> Unit = {})
+{
+    this.forEachIndexed { index, element ->
+        if (condition(element))
+        {
+            firstFound(index, element)
+            return
+        }
+    }
+
+    firstNotFound()
+}
+

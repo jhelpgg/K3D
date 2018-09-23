@@ -50,8 +50,7 @@ class Matrix(private val width: Int, private val height: Int)
                                 val adjacent: DoubleArray,
                                 val sign: Double,
                                 val index: Int,
-                                val x: Int,
-                                val height: Int)
+                                val x: Int)
 
     /**
      * Compute an adjacent cell
@@ -270,6 +269,11 @@ class Matrix(private val width: Int, private val height: Int)
         var coefficient: Double
         val div = this.matrix[startY + xy]
 
+        if (Matrix.isNul(div))
+        {
+            return
+        }
+
         for (yy in xy + 1 until this.height)
         {
             coefficient = this.matrix[y + xy]
@@ -356,18 +360,6 @@ class Matrix(private val width: Int, private val height: Int)
                         1 -> return this.matrix[1] * this.matrix[8] - this.matrix[2] * this.matrix[7]
                         2 -> return this.matrix[1] * this.matrix[5] - this.matrix[2] * this.matrix[4]
                     }
-                    when (y)
-                    {
-                        0 -> return this.matrix[3] * this.matrix[8] - this.matrix[5] * this.matrix[6]
-                        1 -> return this.matrix[0] * this.matrix[8] - this.matrix[2] * this.matrix[6]
-                        2 -> return this.matrix[0] * this.matrix[5] - this.matrix[2] * this.matrix[3]
-                    }
-                    when (y)
-                    {
-                        0 -> return this.matrix[3] * this.matrix[7] - this.matrix[4] * this.matrix[6]
-                        1 -> return this.matrix[0] * this.matrix[7] - this.matrix[1] * this.matrix[6]
-                        2 -> return this.matrix[0] * this.matrix[4] - this.matrix[1] * this.matrix[3]
-                    }
                 }
                 1 ->
                 {
@@ -376,12 +368,6 @@ class Matrix(private val width: Int, private val height: Int)
                         0 -> return this.matrix[3] * this.matrix[8] - this.matrix[5] * this.matrix[6]
                         1 -> return this.matrix[0] * this.matrix[8] - this.matrix[2] * this.matrix[6]
                         2 -> return this.matrix[0] * this.matrix[5] - this.matrix[2] * this.matrix[3]
-                    }
-                    when (y)
-                    {
-                        0 -> return this.matrix[3] * this.matrix[7] - this.matrix[4] * this.matrix[6]
-                        1 -> return this.matrix[0] * this.matrix[7] - this.matrix[1] * this.matrix[6]
-                        2 -> return this.matrix[0] * this.matrix[4] - this.matrix[1] * this.matrix[3]
                     }
                 }
                 2 -> when (y)
@@ -476,7 +462,7 @@ class Matrix(private val width: Int, private val height: Int)
 
         for (x in 0 until this.width)
         {
-            this.taskAdjacent.parallel(TaskAdjacent(count, adjacent.matrix, signMain, index, x, this.height))
+            this.taskAdjacent.parallel(TaskAdjacent(count, adjacent.matrix, signMain, index, x))
             signMain *= -1.0
             index += this.width
         }

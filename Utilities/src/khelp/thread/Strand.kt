@@ -7,7 +7,7 @@ package khelp.thread
  * Each method call are queued in a thread where their where executed.
  *
  * Call [Strand.stop] when the strand no more need and free the thread used for managed the strand.
- * @param interf Interface type where is defined the method to call. Must represents an interface
+ * @param interf Interface type where is defined the methods to call. Must represents an interface
  * @param instance Interface implementation used to be called in the dedicated thread
  */
 class Strand<I>(interf: Class<I>, instance: I)

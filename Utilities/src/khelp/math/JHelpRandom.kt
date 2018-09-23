@@ -1,7 +1,9 @@
 package khelp.math
 
 import khelp.text.concatenateText
+import khelp.util.onFirstIndexed
 import java.util.Random
+import kotlin.math.min
 
 /**
  * Random instance to use on static methods to avoid any influence of other "random"
@@ -209,7 +211,7 @@ fun random(array: ShortArray) = array[random(array.size)]
  *
  * @param E Element type
  */
-private data class Limit<E>(internal val maximum: Int, internal val element: E)
+private data class Limit<E>(internal var maximum: Int, internal val element: E)
 
 class JHelpRandom<T>
 {
@@ -227,12 +229,52 @@ class JHelpRandom<T>
     {
         if (number <= 0)
         {
-            throw IllegalArgumentException("number MUST be > 0, not $number")
+            return
         }
 
-        this.limits.add(Limit<T>(this.maximum + number - 1, choice))
+        this.limits.onFirstIndexed(
+                { it.element == choice },
+                { index, _ ->
+                    (index..this.limits.size - 1).forEach {
+                        this.limits[it].maximum += number
+                    }
+                },
+                { this.limits.add(Limit<T>(this.maximum + number - 1, choice)) }
+        )
 
         this.maximum += number
+    }
+
+    /**
+     * Remove a number of a choice
+     * @param number Int Number to remove
+     * @param choice T Choice to decrement
+     */
+    fun removeChoice(number: Int, choice: T)
+    {
+        if (number <= 0)
+        {
+            return
+        }
+
+        this.limits.onFirstIndexed(
+                { it.element == choice },
+                { index, found ->
+                    val less = min(found.maximum - (if (index > 0) this.limits[index - 1].maximum else 0), number)
+
+                    (this.limits.size - 1 downTo index).forEach {
+                        val element = this.limits[it]
+                        element.maximum -= less
+                    }
+
+                    val beforeMaximum = if (index > 0) this.limits[index - 1].maximum else 0
+
+                    if (found.maximum <= beforeMaximum)
+                    {
+                        this.limits.removeAt(index)
+                    }
+                }
+        )
     }
 
     /**
@@ -269,5 +311,22 @@ class JHelpRandom<T>
     override fun toString(): String
     {
         return concatenateText("JHelpRandom maximum=", this.maximum, " limits=", this.limits)
+    }
+
+    /**
+     * Number of different choice
+     * @return Int Number of different choice
+     */
+    fun numberChoice() = this.limits.size
+
+    /**
+     * Element a given index
+     * @param index Int Searched index
+     * @return Pair<Int, T> Pair of maximum and element
+     */
+    internal fun elementAt(index: Int): Pair<Int, T>
+    {
+        val limit = this.limits[index]
+        return Pair(limit.maximum, limit.element)
     }
 }

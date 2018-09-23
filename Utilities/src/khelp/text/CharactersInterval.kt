@@ -16,7 +16,7 @@ class BasicCharactersInterval internal constructor(val minimum: Char, val maximu
 
     /**
      * Transform character to string
-     * @param character Character to transforù
+     * @param character Character to transform
      * @param hexadecimalForm Indicates if use the hexadecimal form
      */
     private fun form(character: Char, hexadecimalForm: Boolean) =

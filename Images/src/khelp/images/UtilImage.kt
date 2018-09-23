@@ -1,6 +1,11 @@
 package khelp.images
 
+import khelp.images.JHelpFont.Type
+import khelp.images.JHelpFont.Value
 import khelp.images.dynamic.Interpolation
+import khelp.math.maya.DIGIT_00_MIL
+import khelp.math.maya.MayaNumber
+import khelp.math.maya.TOTEM_NUMBERS
 import khelp.text.JHelpTextAlign
 import khelp.util.ColorInt
 import java.awt.Color
@@ -625,3 +630,66 @@ fun ColorInt.green() = (this shr 8) and 0xFF
 
 /**Color blue part*/
 fun ColorInt.blue() = this and 0xFF
+
+/**
+ * Convert the number in totems.
+ *
+ * @param baseSize   Size given to each totem (width and height)
+ * @param horizontal Indicates if totem are put horizontally ({@code true}) OR vertically ({@code false})
+ * @return Image of totems
+ */
+fun MayaNumber.totemImage(baseSize: Int = 32, horizontal: Boolean = true): JHelpImage
+{
+    var width = baseSize
+    var height = baseSize
+    val digits = this.toString().toCharArray()
+    val length = digits.size
+
+    if (horizontal == true)
+    {
+        width *= length
+    }
+    else
+    {
+        height *= length
+    }
+
+    var image: JHelpImage
+    val totem = JHelpImage(width, height)
+    totem.startDrawMode()
+
+    var x = 0
+    var y = 0
+
+    digits.forEach {
+        try
+        {
+            image = JHelpImage.loadImageThumb(
+                    MayaNumber::class.java.getResourceAsStream(TOTEM_NUMBERS[it - DIGIT_00_MIL]),
+                    baseSize,
+                    baseSize)!!
+            totem.drawImage(x, y, image, doAlphaMix = false)
+        }
+        catch (exception: Exception)
+        {
+            khelp.debug.exception(exception, "Failed to get image for number ", it - DIGIT_00_MIL)
+        }
+
+
+        if (horizontal == true)
+        {
+            x += baseSize
+        }
+        else
+        {
+            y += baseSize
+        }
+    }
+
+    totem.endDrawMode()
+    return totem
+}
+
+val MAYA_JHELP_FONT = createFont(Type.TRUE_TYPE,
+                                 MayaNumber::class.java.getResourceAsStream("Roboto-Regular-Maya.ttf"),
+                                 32, Value.FREE, Value.FREE, false)

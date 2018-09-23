@@ -654,10 +654,12 @@ fun RegexPart.exactly(number: Int) =
 fun RegexPart.between(minimum: Int, maximum: Int) =
         when
         {
-            minimum < 0        -> throw IllegalArgumentException("minimum must be >= 0")
-            minimum > maximum  -> throw IllegalArgumentException("minimum ($minimum) not <= maximum ($maximum)")
-            minimum == maximum -> this.exactly(minimum)
-            else               -> RegexPart(RegexBetween(this.regexElement, minimum, maximum))
+            minimum < 0                  -> throw IllegalArgumentException("minimum must be >= 0")
+            minimum > maximum            ->
+                throw IllegalArgumentException("minimum ($minimum) not <= maximum ($maximum)")
+            minimum == 0 && maximum == 1 -> this.zeroOrOne()
+            minimum == maximum           -> this.exactly(minimum)
+            else                         -> RegexPart(RegexBetween(this.regexElement, minimum, maximum))
         }
 
 /**
