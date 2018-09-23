@@ -24,4 +24,6 @@ Mouse management: [Mouse](UserInteraction/MouseInteraction.md)
 
 Window closing event: [Do something before close](Misc/ClosingApplication.md)
 
+Application preferences: [Application preferences](Misc/Preferences.md) 
+
 **"Et voilà" :)**
