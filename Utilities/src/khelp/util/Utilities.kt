@@ -605,6 +605,7 @@ fun <T> Iterable<T>.onFirst(condition: (T) -> Boolean, firstFound: (T) -> Unit, 
     firstFound(first)
 }
 
+fun <T> Iterable<T>.getFirst(condition: (T) -> Boolean) = Optional.ofNullable(this.firstOrNull(condition))
 /**
  * Do something on first matched element.
  * Do something else if not found.
@@ -629,4 +630,3 @@ fun <T> Iterable<T>.onFirstIndexed(condition: (T) -> Boolean,
 
     firstNotFound()
 }
-
