@@ -12,7 +12,7 @@ import kotlin.coroutines.experimental.CoroutineContext
 class Promise<R>(context: CoroutineContext = MainPoolContext)
 {
     /**Future linked to the promise*/
-    private val future: Future<R> = Future(context)
+    private val future: Future<R> = Future<R>(context)
 
     /**
      * Future linked to the promise

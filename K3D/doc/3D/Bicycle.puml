@@ -1,0 +1,6 @@
+@startuml
+bicycle <|-- handlebars
+handlebars <|-- frontWheel
+bicycle <|-- frame
+bicycle <|-- rearWheel
+@enduml

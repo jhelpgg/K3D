@@ -1,0 +1,28 @@
+@startuml
+
+class khelp.k3d.render.Node
+class khelp.k3d.render.NodeWithBox
+class khelp.k3d.render.NodeWithMaterial
+class khelp.k3d.render.Object3D
+class khelp.k3d.render.ObjectClone {
+   -Object3D reference
+}
+
+class khelp.k3d.geometry.Box
+class khelp.k3d.geometry.Equation3D
+class khelp.k3d.geometry.Plane
+class khelp.k3d.geometry.Revolution
+class khelp.k3d.geometry.Sphere
+
+khelp.k3d.render.Node <|-- khelp.k3d.render.NodeWithBox
+khelp.k3d.render.NodeWithBox <|-- khelp.k3d.render.NodeWithMaterial
+khelp.k3d.render.NodeWithMaterial <|-- khelp.k3d.render.Object3D
+khelp.k3d.render.NodeWithMaterial <|-- khelp.k3d.render.ObjectClone
+
+khelp.k3d.render.Object3D <|-- khelp.k3d.geometry.Box
+khelp.k3d.render.Object3D <|-- khelp.k3d.geometry.Equation3D
+khelp.k3d.render.Object3D <|-- khelp.k3d.geometry.Plane
+khelp.k3d.render.Object3D <|-- khelp.k3d.geometry.Revolution
+khelp.k3d.render.Object3D <|-- khelp.k3d.geometry.Sphere
+
+@enduml

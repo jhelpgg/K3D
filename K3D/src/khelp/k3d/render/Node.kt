@@ -58,9 +58,6 @@ internal fun taskFireNodePositionChange(node: Node, nodePositionListener: NodePo
  *
  * It could be use also as a virtual object
  *
- *
- *
- *
  * @author JHelp
  */
 open class Node : Iterable<Node>

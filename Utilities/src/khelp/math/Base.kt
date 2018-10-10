@@ -25,10 +25,6 @@ class Base
      * Digits to use, first represents '0', second '1', ...
      */
     private val baseDigits: CharArray
-    /**
-     * Buffer used in {@link #convert(long)} (to avoid create new one each time)
-     */
-    private val buffer = CharArray(BUFFER_SIZE)
 
     /**
      *  * Create a new instance of Base with given digits.<br>
@@ -177,13 +173,14 @@ class Base
             number *= -1
         }
 
+        val buffer = CharArray(BUFFER_SIZE)
         var index = BUFFER_SIZE
         var length = 0
 
         do
         {
             index--
-            this.buffer[index] = this.baseDigits[(number % this.base).toInt()]
+            buffer[index] = this.baseDigits[(number % this.base).toInt()]
             length++
             number /= this.base.toLong()
         }
@@ -192,11 +189,11 @@ class Base
         if (negative)
         {
             index--
-            this.buffer[index] = '-'
+            buffer[index] = '-'
             length++
         }
 
-        return String(this.buffer, index, length)
+        return String(buffer, index, length)
     }
 
     fun digit(index: Int) = this.baseDigits[index]
