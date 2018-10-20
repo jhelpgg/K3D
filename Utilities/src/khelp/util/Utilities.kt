@@ -240,6 +240,8 @@ fun <P, R> async2(context: CoroutineContext = MainPoolContext): (suspend (P) -> 
 fun <T> Iterable<T>.forEachAsync(action: suspend (T) -> Unit, context: CoroutineContext = MainPoolContext) =
         this.forEach { launch2<T, Unit>(context)(action)(it) }
 
+fun <T> Array<T>.forEachAsync(action: suspend (T) -> Unit, context: CoroutineContext = MainPoolContext) =
+        this.forEach { launch2<T, Unit>(context)(action)(it) }
 /**
  * Search in given context the first element that match given condition
  * @param condition Condition to full fill

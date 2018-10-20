@@ -188,7 +188,7 @@ fun byteArrayToDouble(array: ByteArray) = java.lang.Double.longBitsToDouble(byte
  * @return Long obtain
  */
 fun byteArrayToLong(array: ByteArray) =
-        ((array[0].toUnsignedInt()).toLong() shl 56
+        (((array[0].toUnsignedInt()).toLong() shl 56)
                 or ((array[1].toUnsignedInt()).toLong() shl 48)
                 or ((array[2].toUnsignedInt()).toLong() shl 40)
                 or ((array[3].toUnsignedInt()).toLong() shl 32)
