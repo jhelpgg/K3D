@@ -77,6 +77,18 @@ class StringExtractor(string: String,
      */
     private val stringLimiters: CharArray
 
+    /**
+     * Indicates if last extracted part is considered as a String (Because inside String delimiters)
+     */
+    var isString = false
+        private set
+
+    /**
+     * Indicates if last extracted part is considered as separator
+     */
+    var isSeparator = false
+        private set
+
     init
     {
         this.string = string.toCharArray()
@@ -144,6 +156,8 @@ class StringExtractor(string: String,
      */
     operator fun next(): String?
     {
+        this.isString = false
+        this.isSeparator = false
         this.currentWordStart = this.index
 
         if (this.index >= this.length)
@@ -220,6 +234,7 @@ class StringExtractor(string: String,
                     }
 
                     insideString = true
+                    this.isString = true
                     currentStringLimiter = character
                 }
                 else if (this.separators.contains(character))
@@ -235,6 +250,7 @@ class StringExtractor(string: String,
                     {
                         end = start + 1
                         this.index++
+                        this.isSeparator = true
 
                         break
                     }
