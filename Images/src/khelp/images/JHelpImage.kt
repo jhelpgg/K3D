@@ -6,6 +6,7 @@ import khelp.images.pcx.PCX
 import khelp.images.pcx.isPCX
 import khelp.images.raster.RasterImage
 import khelp.images.raster.RasterImageType
+import khelp.images.shape.ring
 import khelp.list.Queue
 import khelp.list.SortedArray
 import khelp.math.PI_2
@@ -2762,6 +2763,24 @@ class JHelpImage(
                        doAlphaMix)
     }
 
+    fun drawCircle(x: Int, y: Int, radius: Int, color: ColorInt, doAlphaMix: Boolean = true) =
+            this.drawEllipse(x - radius, y - radius, radius shl 1, radius shl 1, color, doAlphaMix)
+
+    fun drawRing(x: Int, y: Int, inRadius: Int, outRadius: Int, color: ColorInt, doAlphaMix: Boolean = true)
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        this.drawCircle(x, y, inRadius, color, doAlphaMix)
+
+        if (inRadius != outRadius)
+        {
+            this.drawCircle(x, y, outRadius, color, doAlphaMix)
+        }
+    }
+
     /**
      * Draw horizontal line
      *
@@ -4459,6 +4478,26 @@ class JHelpImage(
                        doAlphaMix)
     }
 
+    fun fillCircle(x: Int, y: Int, radius: Int, color: ColorInt, doAlphaMix: Boolean = true) =
+            this.fillEllipse(x - radius, y - radius, radius shl 1, radius shl 1, color, doAlphaMix)
+
+    fun fillRing(x: Int, y: Int, inRadius: Int, outRadius: Int, color: ColorInt, doAlphaMix: Boolean = true)
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        if (inRadius == outRadius)
+        {
+            this.drawCircle(x, y, inRadius, color, doAlphaMix)
+            return
+        }
+
+        this.fillShape(ring(x.toDouble(), y.toDouble(), inRadius.toDouble(), outRadius.toDouble()), color,
+                       doAlphaMix)
+    }
+
     /**
      * Fill ellipse with a texture
      *
@@ -4484,6 +4523,20 @@ class JHelpImage(
                        doAlphaMix)
     }
 
+    fun fillCircle(x: Int, y: Int, radius: Int, texture: JHelpImage, doAlphaMix: Boolean = true) =
+            this.fillEllipse(x - radius, y - radius, radius shl 1, radius shl 1, texture, doAlphaMix)
+
+    fun fillRing(x: Int, y: Int, inRadius: Int, outRadius: Int, texture: JHelpImage, doAlphaMix: Boolean = true)
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        this.fillShape(ring(x.toDouble(), y.toDouble(), inRadius.toDouble(), outRadius.toDouble()), texture,
+                       doAlphaMix)
+    }
+
     /**
      * Fill an ellipse
      *
@@ -4504,6 +4557,20 @@ class JHelpImage(
         }
 
         this.fillShape(Ellipse2D.Double(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble()), paint,
+                       doAlphaMix)
+    }
+
+    fun fillCircle(x: Int, y: Int, radius: Int, paint: JHelpPaint, doAlphaMix: Boolean = true) =
+            this.fillEllipse(x - radius, y - radius, radius shl 1, radius shl 1, paint, doAlphaMix)
+
+    fun fillRing(x: Int, y: Int, inRadius: Int, outRadius: Int, paint: JHelpPaint, doAlphaMix: Boolean = true)
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        this.fillShape(ring(x.toDouble(), y.toDouble(), inRadius.toDouble(), outRadius.toDouble()), paint,
                        doAlphaMix)
     }
 
@@ -5465,6 +5532,34 @@ class JHelpImage(
         }
 
         return Rectangle(x, y, lines.second.width, lines.second.height)
+    }
+
+    fun fillStringCenter(x: Int, y: Int, string: String, font: JHelpFont, color: ColorInt,
+                         textAlign: JHelpTextAlign = JHelpTextAlign.LEFT,
+                         doAlphaMix: Boolean = true): Rectangle
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        val lines = font.computeTextLinesAlpha(string, textAlign,
+                                               this.width - x, this.height - y, true)
+        var mask: JHelpImage
+        val xx = -(lines.second.width shr 1)
+        val yy = -(lines.second.height shr 1)
+
+        for (textLineAlpha in lines.first)
+        {
+            mask = textLineAlpha.mask
+            mask.startDrawMode()
+            mask.fillRespectAlpha(color)
+            mask.endDrawMode()
+            this.drawImage(x = x + textLineAlpha.x + xx, y = y + textLineAlpha.y + yy, image = mask,
+                           doAlphaMix = doAlphaMix)
+        }
+
+        return Rectangle(x + xx, y + yy, lines.second.width, lines.second.height)
     }
 
     /**

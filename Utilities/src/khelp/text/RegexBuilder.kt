@@ -621,7 +621,7 @@ fun RegexPart.oneOrMore() = RegexPart(RegexOneOrMore(this.regexElement))
 
 /**
  * Repeat regex at least the given time
- * @throws IllegalArgumentException If specified repetition is negatve
+ * @throws IllegalArgumentException If specified repetition is negative
  */
 @Throws(IllegalArgumentException::class)
 fun RegexPart.atLeast(number: Int) =

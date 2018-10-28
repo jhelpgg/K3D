@@ -22,7 +22,7 @@ class AtomicTaskManager internal constructor()
             tasks.forEach {
                 if (!it.atomicTask.atomicStep())
                 {
-                    this.tasks.remove(it)
+                    synchronized(this.tasks) { this.tasks.remove(it) }
                 }
             }
 

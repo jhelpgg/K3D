@@ -133,7 +133,7 @@ abstract class BinaryOperator(val operator: String, val parameter1: Function, va
                     }
                     BinaryOperator.INDEX_ADDITION // Addition
                                                -> return Addition(func1, func2)
-                    BinaryOperator.INDEX_SUBTRACTION // Substraction
+                    BinaryOperator.INDEX_SUBTRACTION // Subtraction
                                                -> return Subtraction(func1, func2)
                     BinaryOperator.INDEX_MULTIPLICATION // Multiplication
                                                -> return Multiplication(func1, func2)
