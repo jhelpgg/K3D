@@ -2,6 +2,8 @@ package khelp.graph
 
 import khelp.list.EnumerationIterator
 import khelp.util.HashCode
+import khelp.util.smartFilter
+import java.util.Collections
 import java.util.TreeSet
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -18,6 +20,8 @@ class GraphNode<I> internal constructor(val information: I? = null) : Comparable
     private val roads = ArrayList<GraphRoad<I>>()
     /**Roads' number*/
     val size get() = this.roads.size
+    internal var valid = true
+    internal var wayToGo: Way<I>? = null
 
     /**
      * Add a road
@@ -205,6 +209,39 @@ internal fun <I> lighterWeight(ways: List<Way<I>>, end: GraphNode<I>): Int
     return lighter
 }
 
+class NodeByWayToGoComparator<I> : Comparator<GraphNode<I>>
+{
+    override fun compare(node1: GraphNode<I>, node2: GraphNode<I>): Int
+    {
+        val wayToGo1 = node1.wayToGo
+        val wayToGo2 = node2.wayToGo
+
+        if (wayToGo1 == null)
+        {
+            if (wayToGo2 == null)
+            {
+                return node1.id - node2.id
+            }
+
+            return -1
+        }
+
+        if (wayToGo2 == null)
+        {
+            return 1
+        }
+
+        val comparison = wayToGo1.weight - wayToGo2.weight
+
+        if (comparison != 0)
+        {
+            return comparison
+        }
+
+        return node1.id - node2.id
+    }
+}
+
 /**
  * Graph of nodes
  */
@@ -267,12 +304,15 @@ class Graph<I> : Iterable<GraphNode<I>>
     fun sortNodes() = this.nodes.forEach { it.sortRoads() }
 
     override fun iterator() = EnumerationIterator<GraphNode<I>>(this.nodes.toTypedArray())
+
     /**
      * Compute the lightest way for go from a node to an other
      * @param start Start node
      * @param end End node
-     * @return Computed way
+     * @return Computed way (Empty if **`start`** == **`end`**)
+     * @throws IllegalArgumentException If impossible to find a way from **`start`** to **`end`**
      */
+    @Throws(IllegalArgumentException::class)
     fun findWay(start: GraphNode<I>, end: GraphNode<I>): Way<I>
     {
         if (!this.nodes.contains(start))
@@ -286,55 +326,55 @@ class Graph<I> : Iterable<GraphNode<I>>
             throw IllegalArgumentException("The end node $end not inside the graph. Only use node from 'createNode'")
         }
 
-        val ways = ArrayList<Way<I>>()
-        start.sortRoads()
-
-        start.forEach { graphRoad ->
-            val way = Way<I>()
-            way.addRoad(graphRoad)
-            ways += way
+        if (start == end)
+        {
+            return Way<I>()
         }
 
-        var searching = true
+        //Initialize nodes
+        this.nodes.forEach { node ->
+            node.valid = true
+            node.wayToGo = null
+            node.sortRoads()
+        }
 
-        while (searching)
+        //Start algorithm
+        val comparatorNode = NodeByWayToGoComparator<I>()
+        val toExplore = ArrayList<GraphNode<I>>()
+        toExplore += start
+
+        while (toExplore.isNotEmpty())
         {
-            searching = false
-            ways.sort()
-            val maximumWeight = lighterWeight(ways, end)
-            ways.removeIf { it.weight > maximumWeight }
-            val way = ways.firstOrNull { way ->
-                !way.finishBy(end) && way.lastRoad.end.any { !way.contains(it.end) }
-            }
+            Collections.sort(toExplore, comparatorNode)
+            val node = toExplore.removeAt(0)
 
-            if (way != null)
-            {
-                searching = true
-                way.lastRoad.end.sortRoads()
+            node.valid = false
+            val currentWay = node.wayToGo ?: Way<I>()
 
-                way.lastRoad.end.forEach { graphRoad ->
-                    if (!way.contains(graphRoad.end))
-                    {
-                        val copy = Way<I>(way)
-                        copy.addRoad(graphRoad)
+            node.smartFilter { it.end.valid }.forEach { road ->
+                val roadEnd = road.end
+                val wayToGo = roadEnd.wayToGo
+                val way = Way<I>(currentWay)
+                way.addRoad(road)
 
-                        if (copy.weight < maximumWeight)
-                        {
-                            ways += copy
-                        }
-                    }
+                if (wayToGo == null || way.weight < wayToGo.weight)
+                {
+                    roadEnd.wayToGo = way
                 }
 
-                ways -= way
+                if (roadEnd != end && roadEnd !in toExplore)
+                {
+                    toExplore += roadEnd
+                }
             }
         }
 
-        ways.sort()
-        val result = ways.firstOrNull { it.lastRoad.end == end }
+        val result = end.wayToGo ?: throw IllegalArgumentException("No way for go from $start to $end")
 
-        if (result == null)
-        {
-            throw IllegalArgumentException("Can't find a way from $start to $end")
+        //Valid nodes and clear memory
+        this.nodes.forEach { node ->
+            node.valid = true
+            node.wayToGo = null
         }
 
         return result
