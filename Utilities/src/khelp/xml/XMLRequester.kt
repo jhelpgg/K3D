@@ -68,12 +68,14 @@ class Tag(val name: String)
 }
 
 /**
- * Requester in XML to collect tags that match given filter
+ * Requester in XML to collect tags that match one of given filters
  * @property xmlRequest Request to select tags
  * @property dynamicReadXML XML where search
  */
-class XMLRequester(private val xmlRequest: XMLRequest, private val dynamicReadXML: DynamicReadXML)
+class XMLRequester(private val xmlRequests: Array<XMLRequest>, private val dynamicReadXML: DynamicReadXML)
 {
+    constructor(xmlRequest: XMLRequest, dynamicReadXML: DynamicReadXML) : this(arrayOf(xmlRequest), dynamicReadXML)
+
     /**
      * Read next matching tag
      *
@@ -90,6 +92,7 @@ class XMLRequester(private val xmlRequest: XMLRequest, private val dynamicReadXM
         var eventType = this.dynamicReadXML.next()
         var tag: Tag? = null
         val stackTags = Stack<Tag>()
+        var xmlRequest: XMLRequest? = null
 
         while (eventType != EventType.END_XML)
         {
@@ -104,7 +107,11 @@ class XMLRequester(private val xmlRequest: XMLRequest, private val dynamicReadXM
 
                     if (tag == null)
                     {
-                        if (this.xmlRequest.tagNameRegex.matches(name) && argumentsAreValid(arguments, this.xmlRequest))
+                        xmlRequest = this.xmlRequests.firstOrNull {
+                            it.tagNameRegex.matches(name) && argumentsAreValid(arguments, it)
+                        }
+
+                        if (xmlRequest != null)
                         {
                             tag = Tag(name)
                             tag.arguments.putAll(arguments)
@@ -127,7 +134,7 @@ class XMLRequester(private val xmlRequest: XMLRequest, private val dynamicReadXM
 
                         if (stackTags.empty())
                         {
-                            if (tag.match(this.xmlRequest))
+                            if (tag.match(xmlRequest!!))
                             {
                                 return tag
                             }

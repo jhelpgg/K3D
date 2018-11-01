@@ -117,7 +117,7 @@ class TestXMLRequest
     {
         val dynamicReadXML = DynamicReadXML(xmlForTest)
         val request = XMLRequest("A".regexText() + ANY)
-        val requestOnChild = XMLRequest("B".regexText())
+        val requestOnChild = XMLRequest("B")
         requestOnChild.filterOnArgument("arg".regexText(),
                                         ANY.zeroOrMore() + '2'.regex())
         request.oneChildHaveToMatch(requestOnChild)
@@ -153,7 +153,7 @@ class TestXMLRequest
     {
         val dynamicReadXML = DynamicReadXML(xmlForTest)
         val request = XMLRequest("A".regexText() + ANY)
-        val requestOnChild = XMLRequest("C".regexText())
+        val requestOnChild = XMLRequest("C")
         requestOnChild.textRegex = ANY.zeroOrMore() + '2'.regex() + ANY.zeroOrMore()
         request.oneChildHaveToMatch(requestOnChild)
         val requester = XMLRequester(request, dynamicReadXML)
@@ -188,7 +188,7 @@ class TestXMLRequest
     {
         val dynamicReadXML = DynamicReadXML(xmlForTest)
         val request = XMLRequest("A".regexText() + ANY)
-        val requestOnChild = XMLRequest("B".regexText())
+        val requestOnChild = XMLRequest("B")
         requestOnChild.filterOnArgument("arg".regexText(),
                                         ANY.zeroOrMore() + '2'.regex())
         request.noChildHaveToMatch(requestOnChild)
@@ -224,7 +224,7 @@ class TestXMLRequest
     {
         val dynamicReadXML = DynamicReadXML(xmlForTest)
         val request = XMLRequest("A".regexText() + ANY)
-        val requestOnChild = XMLRequest("C".regexText())
+        val requestOnChild = XMLRequest("C")
         requestOnChild.textRegex = ANY.zeroOrMore() + '2'.regex() + ANY.zeroOrMore()
         request.noChildHaveToMatch(requestOnChild)
         val requester = XMLRequester(request, dynamicReadXML)
@@ -246,6 +246,55 @@ class TestXMLRequest
         Assert.assertEquals(1, child.arguments.size)
         Assert.assertEquals("valC", child.arguments["arg"])
         Assert.assertEquals("Text of C", child.text)
+
+        tag = requester.nextMatch()
+        Assert.assertEquals("", tag.name)
+        Assert.assertEquals(0, tag.arguments.size)
+        Assert.assertEquals(0, tag.children.size)
+        Assert.assertEquals("", tag.text)
+    }
+
+    @Test
+    fun testNoCriteria()
+    {
+        val dynamicReadXML = DynamicReadXML(xmlForTest)
+        val requester = XMLRequester(arrayOf(), dynamicReadXML)
+        val tag = requester.nextMatch()
+        Assert.assertEquals("", tag.name)
+        Assert.assertEquals(0, tag.arguments.size)
+        Assert.assertEquals(0, tag.children.size)
+        Assert.assertEquals("", tag.text)
+    }
+
+    @Test
+    fun testSeveralCriteria()
+    {
+        val dynamicReadXML = DynamicReadXML(xmlForTest)
+        val requester = XMLRequester(arrayOf(XMLRequest("B"), XMLRequest("C")), dynamicReadXML)
+
+        var tag = requester.nextMatch()
+        Assert.assertEquals("B", tag.name)
+        Assert.assertEquals(1, tag.arguments.size)
+        Assert.assertEquals("valB", tag.arguments["arg"])
+        Assert.assertEquals("", tag.text)
+
+        tag = requester.nextMatch()
+        Assert.assertEquals("C", tag.name)
+        Assert.assertEquals(1, tag.arguments.size)
+        Assert.assertEquals("valC", tag.arguments["arg"])
+        Assert.assertEquals("Text of C", tag.text)
+
+        tag = requester.nextMatch()
+        Assert.assertEquals("B", tag.name)
+        Assert.assertEquals(1, tag.arguments.size)
+        Assert.assertEquals("valB2", tag.arguments["arg"])
+        Assert.assertEquals("", tag.text)
+
+        tag = requester.nextMatch()
+        Assert.assertEquals("C", tag.name)
+        Assert.assertEquals(1, tag.arguments.size)
+        Assert.assertEquals("valC2", tag.arguments["arg"])
+        Assert.assertEquals("Text of C2", tag.text)
 
         tag = requester.nextMatch()
         Assert.assertEquals("", tag.name)
