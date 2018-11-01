@@ -32,6 +32,7 @@ val EPSILON = maximum(Double.MIN_VALUE,
 val EPSILON_FLOAT = maximum(Float.MIN_VALUE,
                             Math.abs(Math.E.toFloat() - Math.exp(1.0).toFloat()),
                             Math.abs(Math.PI.toFloat() - Math.acos(-1.0).toFloat()))
+
 /**
  * One grade in degree
  */
@@ -76,6 +77,9 @@ const val PI_2 = Math.PI / 2
  * 2 * PI
  */
 const val TWO_PI = Math.PI * 2
+
+/**see http://en.wikipedia.org/wiki/Earth_radius#Equatorial_radius*/
+const val RADIUS_EARTH_METERS = 6378137.0
 
 /**
  * Compute the Bernoulli value
@@ -1345,3 +1349,21 @@ fun square(integer: Int) = integer * integer
  * Parse this String to rational
  */
 fun String.toRational() = Rational.parse(this.trim())
+
+fun distanceOnPlanet(latitude1: Double, longitude1: Double, latitude2: Double, longitude2: Double,
+                     planetRadius: Double = RADIUS_EARTH_METERS): Double
+{
+    val radianLatitude1 = degreeToRadian(latitude1)
+    val radianLongitude1 = degreeToRadian(longitude1)
+    val radianLatitude2 = degreeToRadian(latitude2)
+    val radianLongitude2 = degreeToRadian(longitude2)
+    return planetRadius * 2.0 *
+            Math.asin(Math.min(1.0,
+                               Math.sqrt(
+                                       Math.pow(Math.sin((radianLatitude2 - radianLatitude1) / 2.0),
+                                                2.0)
+                                               + Math.cos(radianLatitude1) * Math.cos(radianLatitude2)
+                                               * Math.pow(Math.sin((radianLongitude2 - radianLongitude1) / 2.0),
+                                                          2.0)
+                               )))
+}

@@ -255,7 +255,6 @@ class DynamicReadXML(inputStream: InputStream)
         }
 
         val value = StringBuilder()
-        var antiSlash = false
 
         do
         {
@@ -263,36 +262,10 @@ class DynamicReadXML(inputStream: InputStream)
 
             when (character)
             {
-                '\\' ->
-                    if (antiSlash)
-                    {
-                        value.append('\\')
-                        antiSlash = false
-                    }
-                    else
-                    {
-                        antiSlash = true
-                    }
                 '"'  ->
-                    if (antiSlash)
-                    {
-                        value.append('"')
-                        antiSlash = false
-                    }
-                    else
-                    {
-                        return value.toString()
-                    }
+                    return value.toString()
                 else ->
-                {
-                    if (antiSlash)
-                    {
-                        value.append('\\')
-                    }
-
-                    antiSlash = false
                     value.append(character)
-                }
             }
         }
         while (true)
