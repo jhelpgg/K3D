@@ -301,7 +301,8 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
 
         while (column != null)
         {
-            columns += ColumnDescription(column.string(0), DataType.valueOf(column.string(1)))
+            val name = column.string(1)
+            columns += ColumnDescription(column.string(0), DataType.values().first { it.name == name })
             column = result.next()
         }
 
