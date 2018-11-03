@@ -85,6 +85,12 @@ class MapShowFrame : JFrame("Map")
         this::regularRefresh.parallel(2048)
     }
 
+    fun graph(graph: MapGraph)
+    {
+        this.graph = graph
+        this.loadFinished()
+    }
+
     private fun regularRefresh()
     {
         if (!this.graphLoaded.get())
@@ -98,7 +104,21 @@ class MapShowFrame : JFrame("Map")
     {
         this.graphLoaded.set(true)
         this.refreshImage()
+        //this::simplify.parallel(4096)
         this::computeWay.parallel()
+    }
+
+    private fun simplify()
+    {
+        if (graph?.simplifyRoads() ?: false)
+        {
+            this.refreshImage()
+            this::simplify.parallel(4096)
+        }
+        else
+        {
+            this::computeWay.parallel()
+        }
     }
 
     private fun computeWay()

@@ -157,4 +157,62 @@ class MapGraph : Iterable<MapNode>
     }
 
     override fun iterator() = EnumerationIterator(this.nodes.iterator())
+
+    fun simplifyRoads(): Boolean
+    {
+        val iterator = this.nodes.iterator()
+        var simplified = false
+
+        while (iterator.hasNext())
+        {
+            val node = iterator.next()
+
+            if (node.size == 2)
+            {
+                val firstRoad = node[0]
+                val firstNode = firstRoad.end
+                val secondRoad = node[1]
+                val secondNode = secondRoad.end
+
+                var road = firstNode.firstOrNull { it.end == node }
+
+                if (road != null)
+                {
+                    firstNode.removeRoad(road)
+                }
+
+                node.removeRoad(firstRoad)
+
+                road = secondNode.firstOrNull { it.end == node }
+
+                if (road != null)
+                {
+                    secondNode.removeRoad(road)
+                }
+
+                node.removeRoad(secondRoad)
+                val distance = firstRoad.distance + secondRoad.distance
+                firstNode.addRoad(MapRoad(firstNode, secondNode, distance))
+                secondNode.addRoad(MapRoad(secondNode, firstNode, distance))
+                iterator.remove()
+                simplified = true
+            }
+        }
+
+        return simplified
+    }
+
+    fun computeAllRoadsDistance(): Double
+    {
+        var distance = 0.0
+        this.nodes.forEach { it.valid = true }
+
+        this.nodes.forEach { node ->
+            node.valid = false
+            node.smartFilter { it.end.valid }.forEach { distance += it.distance }
+        }
+
+        this.nodes.forEach { it.valid = true }
+        return distance
+    }
 }

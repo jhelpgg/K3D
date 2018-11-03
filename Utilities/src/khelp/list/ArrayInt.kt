@@ -77,7 +77,10 @@ class ArrayInt(initialSize: Int = 128) : Iterable<Int>
      * @param toAdd
      * Array to add its elements
      */
-    fun addAll(toAdd: ArrayInt) = toAdd.forEach(this::add)
+    fun addAll(arrayInt: ArrayInt) = arrayInt.forEach(this::add)
+
+    operator fun plusAssign(integer: Int) = this.add(integer)
+    operator fun plusAssign(arrayInt: ArrayInt) = this.addAll(arrayInt)
 
     /**
      * Enumeration/Iterator over ints

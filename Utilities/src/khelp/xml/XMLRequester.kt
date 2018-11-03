@@ -120,10 +120,9 @@ class XMLRequester(private val xmlRequests: Array<XMLRequest>, private val dynam
                     }
                     else
                     {
-                        val currentTag = stackTags.peek()
                         val child = Tag(name)
                         child.arguments.putAll(arguments)
-                        currentTag.children += child
+                        stackTags.peek().children += child
                         stackTags.push(child)
                     }
                 }

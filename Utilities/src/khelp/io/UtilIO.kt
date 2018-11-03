@@ -1241,7 +1241,8 @@ fun <I : InputStream> readLines(producerInput: () -> I,
                                 onError: (IOException) -> Unit = { exception(it, "Failed to read lines!!") }) =
         treatInputStream(producerInput,
                          { inputStream ->
-                             val bufferedReader = BufferedReader(InputStreamReader(inputStream, "UTF-8"));
+                             val bufferedReader = BufferedReader(InputStreamReader(inputStream, "UTF-8"),
+                                                                 BUFFER_SIZE);
                              var line = bufferedReader.readLine()
 
                              while (line != null)

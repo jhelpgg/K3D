@@ -23,6 +23,9 @@ class MapNode(val id: Long, val latitude: Double, val longitude: Double) : Itera
         }
     }
 
+    internal fun addRoad(road: MapRoad) = this.roads.add(road)
+    internal fun removeRoad(road: MapRoad) = this.roads.remove(road)
+
     override fun equals(other: Any?): Boolean
     {
         if (this === other)

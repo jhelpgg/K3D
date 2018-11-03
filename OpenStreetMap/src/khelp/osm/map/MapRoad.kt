@@ -1,9 +1,6 @@
 package khelp.osm.map
 
-class MapRoad(val start: MapNode, val end: MapNode)
-{
-    val distance = this.start.distance(this.end)
-}
+class MapRoad(val start: MapNode, val end: MapNode, val distance: Double = start.distance(end))
 
 class RoadDistanceToComparator(val destination: MapNode) : Comparator<MapRoad>
 {

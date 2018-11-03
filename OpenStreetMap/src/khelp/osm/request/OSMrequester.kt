@@ -1,6 +1,10 @@
 package khelp.osm.request
 
 import khelp.debug.debug
+import khelp.io.readFloat
+import khelp.io.readInteger
+import khelp.io.writeFloat
+import khelp.io.writeInteger
 import khelp.osm.map.MapGraph
 import khelp.osm.map.MapNode
 import khelp.text.OR
@@ -11,6 +15,7 @@ import khelp.xml.DynamicReadXML
 import khelp.xml.XMLRequest
 import khelp.xml.XMLRequester
 import java.io.InputStream
+import java.io.OutputStream
 
 val NODE_TAG = "node"
 val NODE_ID = "id"

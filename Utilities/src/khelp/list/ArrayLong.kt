@@ -77,7 +77,10 @@ class ArrayLong(initialSize: Int = 128) : Iterable<Long>
      * @param toAdd
      * Array to add its elements
      */
-    fun addAll(toAdd: ArrayLong) = toAdd.forEach(this::add)
+    fun addAll(arrayLong: ArrayLong) = arrayLong.forEach(this::add)
+
+    operator fun plusAssign(integer: Long) = this.add(integer)
+    operator fun plusAssign(arrayLong: ArrayLong) = this.addAll(arrayLong)
 
     /**
      * Enumeration/Iterator over ints

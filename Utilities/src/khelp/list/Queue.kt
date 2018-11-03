@@ -176,7 +176,7 @@ class Queue<T> : Iterable<T>
      * The next element will be given to the function and removed from the queue
      * @param function Function to apply
      * @param R Function result type
-     * @return Function result whene apply next element or empty if queue is empty
+     * @return Function result when apply next element or empty if queue is empty
      */
     fun <R> outQueue(function: (T) -> R): Optional<R> =
             if (this.empty()) Optional.empty()
