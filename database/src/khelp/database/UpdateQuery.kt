@@ -2,8 +2,20 @@ package khelp.database
 
 import khelp.database.condition.Condition
 
+/**
+ * Query for modify column(s) in table
+ * @property table Table name
+ * @property columnsValue New column values
+ * @property where Condition to fulfill for do the change. If not specify or **`null`** all rows will be change
+ * @constructor
+ */
 class UpdateQuery(val table: String, val columnsValue: Array<ColumnValue>, val where: Condition? = null)
 {
+    /**
+     * Convert to SQL query
+     * @param security Security to use
+     * @return Query
+     */
     internal fun toUpdateString(security: Security): String
     {
         val query = StringBuilder()

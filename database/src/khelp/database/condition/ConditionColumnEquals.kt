@@ -1,12 +1,14 @@
 package khelp.database.condition
 
-import khelp.database.DatabaseAccess
 import khelp.database.ElapsedTime
 import khelp.database.ID_COLUMN_NAME
 import khelp.database.Security
 import khelp.database.TimeStamp
 import java.util.Base64
 
+/**
+ * Condition satisfied if given column name have the given value
+ */
 class ConditionColumnEquals : Condition
 {
     private val columnName: String
@@ -92,6 +94,11 @@ class ConditionColumnEquals : Condition
         this.value = Base64.getEncoder().encodeToString(value)
     }
 
+    /**
+     * Compute the condition request part
+     * @param security Security to use
+     * @return Computed request part
+     */
     override fun toConditionString(security: Security): String
     {
         val condition = StringBuilder()
@@ -113,11 +120,26 @@ class ConditionColumnEquals : Condition
     }
 }
 
+/**Condition satisfied if this column name have the given value*/
 infix fun String.EQUALS(value: String) = ConditionColumnEquals(this, value)
+
+/**Condition satisfied if this column name have the given value*/
 infix fun String.EQUALS(value: Int) = ConditionColumnEquals(this, value)
+
+/**Condition satisfied if this column name have the given value*/
 infix fun String.EQUALS(value: Long) = ConditionColumnEquals(this, value)
+
+/**Condition satisfied if this column name have the given value*/
 infix fun String.EQUALS(value: Float) = ConditionColumnEquals(this, value)
+
+/**Condition satisfied if this column name have the given value*/
 infix fun String.EQUALS(value: Double) = ConditionColumnEquals(this, value)
+
+/**Condition satisfied if this column name have the given value*/
 infix fun String.EQUALS(value: Boolean) = ConditionColumnEquals(this, value)
+
+/**Condition satisfied if this column name have the given value*/
 infix fun String.EQUALS(value: TimeStamp) = ConditionColumnEquals(this, value)
+
+/**Condition satisfied if this column name have the given value*/
 infix fun String.EQUALS(value: ByteArray) = ConditionColumnEquals(this, value)

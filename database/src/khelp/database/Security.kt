@@ -12,11 +12,17 @@ import javax.crypto.CipherInputStream
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.DESKeySpec
 
+/**
+ * Encrypt/Decrypt manager
+ */
 class Security(password: String)
 {
+    /**Key to use*/
     private val key: ByteArray
+    /**Indicates if have to do encryption operations*/
     val encrypted: Boolean
 
+    /**Compute key from password*/
     private fun computeKey(string: String): ByteArray
     {
         var hash: Long = 0
@@ -46,6 +52,7 @@ class Security(password: String)
         }
     }
 
+    /**Indicates if given password is compatible with the security key*/
     internal fun same(password: String) =
             if (this.encrypted)
             {
@@ -64,6 +71,12 @@ class Security(password: String)
                 password.isEmpty()
             }
 
+    /**
+     * Encrypt or decrypt data
+     * @param mode Encryption or decryption mode
+     * @param inputStream Stream to encrypt/decrypt
+     * @param outputStream Stream where write the result
+     */
     private fun desOperation(mode: Int, inputStream: InputStream, outputStream: OutputStream)
     {
         val desKeySpec = DESKeySpec(this.key)
@@ -85,9 +98,14 @@ class Security(password: String)
         cipherInputStream.close()
     }
 
+    /**
+     * Encrypt a value
+     * @param string Value to encrypt
+     * @return Encryption result
+     */
     internal fun encrypt(string: String): String
     {
-        if (this.key.size == 0)
+        if (!this.encrypted)
         {
             return string
         }
@@ -98,9 +116,14 @@ class Security(password: String)
         return Base64.getEncoder().encodeToString(outputStream.toByteArray())
     }
 
+    /**
+     * Decrypt a value
+     * @param string Value to encrypt
+     * @return Decryption result
+     */
     internal fun decrypt(string: String): String
     {
-        if (this.key.size == 0)
+        if (!this.encrypted)
         {
             return string
         }

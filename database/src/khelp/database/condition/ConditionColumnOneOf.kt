@@ -1,12 +1,14 @@
 package khelp.database.condition
 
-import khelp.database.DatabaseAccess
 import khelp.database.ElapsedTime
 import khelp.database.ID_COLUMN_NAME
 import khelp.database.Security
 import khelp.database.TimeStamp
 import java.util.Base64
 
+/**
+ * Condition satisfied if column have at least one of given value
+ */
 class ConditionColumnOneOf : Condition
 {
     private val columnName: String
@@ -92,6 +94,11 @@ class ConditionColumnOneOf : Condition
         this.value = Array<String>(value.size, { Base64.getEncoder().encodeToString(value[it]) })
     }
 
+    /**
+     * Compute the condition request part
+     * @param security Security to use
+     * @return Computed request part
+     */
     override fun toConditionString(security: Security): String
     {
         val condition = StringBuilder()
@@ -125,11 +132,26 @@ class ConditionColumnOneOf : Condition
     }
 }
 
+/**Condition satisfied if  this column have at least one of given value*/
 fun String.oneOf(value: Array<String>) = ConditionColumnOneOf(this, value)
+
+/**Condition satisfied if  this column have at least one of given value*/
 fun String.oneOf(value: IntArray) = ConditionColumnOneOf(this, value)
+
+/**Condition satisfied if  this column have at least one of given value*/
 fun String.oneOf(value: LongArray) = ConditionColumnOneOf(this, value)
+
+/**Condition satisfied if  this column have at least one of given value*/
 fun String.oneOf(value: FloatArray) = ConditionColumnOneOf(this, value)
+
+/**Condition satisfied if  this column have at least one of given value*/
 fun String.oneOf(value: DoubleArray) = ConditionColumnOneOf(this, value)
+
+/**Condition satisfied if  this column have at least one of given value*/
 fun String.oneOf(value: BooleanArray) = ConditionColumnOneOf(this, value)
+
+/**Condition satisfied if  this column have at least one of given value*/
 fun String.oneOf(value: Array<TimeStamp>) = ConditionColumnOneOf(this, value)
+
+/**Condition satisfied if  this column have at least one of given value*/
 fun String.oneOf(value: Array<ByteArray>) = ConditionColumnOneOf(this, value)

@@ -4,6 +4,9 @@ import khelp.debug.debug
 import khelp.debug.todo
 import java.util.Base64
 
+/**
+ * Column associated to its value
+ */
 class ColumnValue(val columnName: String, internal val value: String)
 {
     init
@@ -24,8 +27,20 @@ class ColumnValue(val columnName: String, internal val value: String)
     constructor(columnName: String, value: ByteArray) : this(columnName, Base64.getEncoder().encodeToString(value))
 }
 
+/**
+ * Create an insert query on a table
+ * @property table Table name
+ * @property columnsValue Columns with their value
+ * @constructor
+ */
 class InsertQuery(val table: String, val columnsValue: Array<ColumnValue>)
 {
+    /**
+     * Convert to SQL query
+     * @param suggestedID Suggested ID for [ID_COLUMN_NAME] column
+     * @param security Security to use
+     * @return Query
+     */
     internal fun toInsertString(suggestedID: Int, security: Security): String
     {
         val query = StringBuilder()

@@ -4,6 +4,9 @@ import java.lang.reflect.ReflectPermission
 import java.security.Permission
 import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * Manage security against reflection
+ */
 internal object DatabaseSecurityManager : SecurityManager()
 {
     private val securityManager = System.getSecurityManager()
@@ -42,10 +45,22 @@ internal object DatabaseSecurityManager : SecurityManager()
     }
 }
 
+/**
+ * Load the security against reflection
+ */
 fun loadSecurity()
 {
-    if (!DatabaseSecurityManager.ready.getAndSet(true))
+    if (!DatabaseSecurityManager.ready.get())
     {
-        System.setSecurityManager(DatabaseSecurityManager)
+        try
+        {
+            System.getSecurityManager()?.checkPermission(RuntimePermission("setSecurityManager"))
+            System.setSecurityManager(DatabaseSecurityManager)
+        }
+        catch (ignored: Exception)
+        {
+        }
+
+        DatabaseSecurityManager.ready.set(true)
     }
 }
