@@ -3,6 +3,7 @@ package khelp.database.condition
 import khelp.database.DatabaseAccess
 import khelp.database.ElapsedTime
 import khelp.database.ID_COLUMN_NAME
+import khelp.database.Security
 import khelp.database.TimeStamp
 import java.util.Base64
 
@@ -91,7 +92,7 @@ class ConditionColumnEquals : Condition
         this.value = Base64.getEncoder().encodeToString(value)
     }
 
-    override fun toConditionString(): String
+    override fun toConditionString(security: Security): String
     {
         val condition = StringBuilder()
         condition.append(this.columnName)
@@ -104,7 +105,7 @@ class ConditionColumnEquals : Condition
         else
         {
             condition.append('\'')
-            condition.append(this.value)
+            condition.append(security.encrypt(this.value))
             condition.append('\'')
         }
 
@@ -112,11 +113,11 @@ class ConditionColumnEquals : Condition
     }
 }
 
-infix fun String.MATCH(value: String) = ConditionColumnEquals(this, value)
-infix fun String.MATCH(value: Int) = ConditionColumnEquals(this, value)
-infix fun String.MATCH(value: Long) = ConditionColumnEquals(this, value)
-infix fun String.MATCH(value: Float) = ConditionColumnEquals(this, value)
-infix fun String.MATCH(value: Double) = ConditionColumnEquals(this, value)
-infix fun String.MATCH(value: Boolean) = ConditionColumnEquals(this, value)
-infix fun String.MATCH(value: TimeStamp) = ConditionColumnEquals(this, value)
-infix fun String.MATCH(value: ByteArray) = ConditionColumnEquals(this, value)
+infix fun String.EQUALS(value: String) = ConditionColumnEquals(this, value)
+infix fun String.EQUALS(value: Int) = ConditionColumnEquals(this, value)
+infix fun String.EQUALS(value: Long) = ConditionColumnEquals(this, value)
+infix fun String.EQUALS(value: Float) = ConditionColumnEquals(this, value)
+infix fun String.EQUALS(value: Double) = ConditionColumnEquals(this, value)
+infix fun String.EQUALS(value: Boolean) = ConditionColumnEquals(this, value)
+infix fun String.EQUALS(value: TimeStamp) = ConditionColumnEquals(this, value)
+infix fun String.EQUALS(value: ByteArray) = ConditionColumnEquals(this, value)

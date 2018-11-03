@@ -7,7 +7,7 @@ import khelp.database.DeleteQuery
 import khelp.database.ID_COLUMN_NAME
 import khelp.database.InsertQuery
 import khelp.database.SelectQuery
-import khelp.database.condition.MATCH
+import khelp.database.condition.EQUALS
 import khelp.database.condition.OR
 import khelp.debug.debug
 
@@ -22,7 +22,7 @@ fun treatDatabase(database: Database)
     database.insert(InsertQuery("Person", arrayOf(ColumnValue("age", 24), ColumnValue("name", "Joe"))))
     val result = database.select(SelectQuery("Person",
                                              arrayOf(ID_COLUMN_NAME,
-                                                     "name", "age")) WHERE (("age" MATCH 42) OR ("name" MATCH "Joe")))
+                                                     "name", "age")) WHERE (("age" EQUALS 42) OR ("name" EQUALS "Joe")))
     val size = result.numberOfColumns
     var line = StringBuilder()
     line.append('|')

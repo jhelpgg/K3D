@@ -6,7 +6,7 @@ class SelectQuery(val table: String, val columns: Array<String>)
 {
     private var where: Condition? = null
 
-    internal fun toSelectString(columnSort: String? = null, ascending: Boolean = false): String
+    internal fun toSelectString(security: Security, columnSort: String? = null, ascending: Boolean = false): String
     {
         val query = StringBuilder()
         query.append("SELECT ")
@@ -23,7 +23,7 @@ class SelectQuery(val table: String, val columns: Array<String>)
         if (this.where != null)
         {
             query.append(" WHERE ")
-            query.append(this.where!!.toConditionString())
+            query.append(this.where!!.toConditionString(security))
         }
 
         if (columnSort != null)

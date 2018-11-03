@@ -130,7 +130,7 @@ fun parseOptimized(sourceStream: InputStream, destinationDirectory: File,
     delete(nodesDirectory)
 
     val nodes = nodesToKeepDirectory.listFiles()
-    nodes.sortBy { it.name }
+    nodes.sortBy { it.name.toLong() }
     treatOutputStream({ FileOutputStream(roadsFile) },
                       { outputStream ->
                           nodes.forEach { write(it, outputStream) }

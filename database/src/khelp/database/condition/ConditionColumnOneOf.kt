@@ -3,6 +3,7 @@ package khelp.database.condition
 import khelp.database.DatabaseAccess
 import khelp.database.ElapsedTime
 import khelp.database.ID_COLUMN_NAME
+import khelp.database.Security
 import khelp.database.TimeStamp
 import java.util.Base64
 
@@ -91,7 +92,7 @@ class ConditionColumnOneOf : Condition
         this.value = Array<String>(value.size, { Base64.getEncoder().encodeToString(value[it]) })
     }
 
-    override fun toConditionString(): String
+    override fun toConditionString(security: Security): String
     {
         val condition = StringBuilder()
         condition.append(this.columnName)
@@ -109,12 +110,12 @@ class ConditionColumnOneOf : Condition
         else
         {
             condition.append('\'')
-            condition.append(this.value[0])
+            condition.append(security.encrypt(this.value[0]))
             condition.append('\'')
 
             (1 until this.value.size).forEach { index ->
                 condition.append(", '")
-                condition.append(this.value[index])
+                condition.append(security.encrypt(this.value[index]))
                 condition.append('\'')
             }
         }
@@ -124,11 +125,11 @@ class ConditionColumnOneOf : Condition
     }
 }
 
-fun String.matchAny(value: Array<String>) = ConditionColumnOneOf(this, value)
-fun String.matchAny(value: IntArray) = ConditionColumnOneOf(this, value)
-fun String.matchAny(value: LongArray) = ConditionColumnOneOf(this, value)
-fun String.matchAny(value: FloatArray) = ConditionColumnOneOf(this, value)
-fun String.matchAny(value: DoubleArray) = ConditionColumnOneOf(this, value)
-fun String.matchAny(value: BooleanArray) = ConditionColumnOneOf(this, value)
-fun String.matchAny(value: Array<TimeStamp>) = ConditionColumnOneOf(this, value)
-fun String.matchAny(value: Array<ByteArray>) = ConditionColumnOneOf(this, value)
+fun String.oneOf(value: Array<String>) = ConditionColumnOneOf(this, value)
+fun String.oneOf(value: IntArray) = ConditionColumnOneOf(this, value)
+fun String.oneOf(value: LongArray) = ConditionColumnOneOf(this, value)
+fun String.oneOf(value: FloatArray) = ConditionColumnOneOf(this, value)
+fun String.oneOf(value: DoubleArray) = ConditionColumnOneOf(this, value)
+fun String.oneOf(value: BooleanArray) = ConditionColumnOneOf(this, value)
+fun String.oneOf(value: Array<TimeStamp>) = ConditionColumnOneOf(this, value)
+fun String.oneOf(value: Array<ByteArray>) = ConditionColumnOneOf(this, value)

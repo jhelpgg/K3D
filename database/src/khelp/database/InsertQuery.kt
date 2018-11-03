@@ -26,7 +26,7 @@ class ColumnValue(val columnName: String, internal val value: String)
 
 class InsertQuery(val table: String, val columnsValue: Array<ColumnValue>)
 {
-    internal fun toInsertString(suggestedID: Int): String
+    internal fun toInsertString(suggestedID: Int, security: Security): String
     {
         val query = StringBuilder()
         query.append("INSERT INTO ")
@@ -44,7 +44,7 @@ class InsertQuery(val table: String, val columnsValue: Array<ColumnValue>)
 
         this.columnsValue.forEach { value ->
             query.append(", '")
-            query.append(value.value)
+            query.append(security.encrypt(value.value))
             query.append('\'')
         }
 
