@@ -1,5 +1,6 @@
 package khelp.database
 
+import khelp.database.condition.Condition
 import khelp.database.condition.EQUALS
 import java.io.File
 
@@ -398,6 +399,39 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
         val id = this.biggestID(insertQuery.table)
         this.updateQuery(insertQuery.toInsertString(id + 1, this.security))
         return this.biggestID(insertQuery.table)
+    }
+
+    /**
+     * Insert or update data.
+     *
+     * If the given condition match to one and only one column, then the column is updated.
+     * Else the value is inserted
+     * @param table Table name
+     * @param columnsValue Columns value
+     * @param where Condition to check
+     * @return ID of inserted or updated column
+     */
+    fun insertOrUpdate(table: String, columnsValue: Array<ColumnValue>, where: Condition): Int
+    {
+        this.checkClose()
+        this.checkAllowedOperationOn(table)
+        val result = this.select(SelectQuery(table, arrayOf(ID_COLUMN_NAME)) WHERE where)
+        val column = result.next()
+
+        if (column != null)
+        {
+            val id = column.id(0)
+
+            if (result.next() == null)
+            {
+                result.close()
+                this.update(UpdateQuery(table, columnsValue, where))
+                return id
+            }
+        }
+
+        result.close()
+        return this.insert(InsertQuery(table, columnsValue))
     }
 
     /**
