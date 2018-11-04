@@ -25,6 +25,7 @@ class ColumnValue(val columnName: String, internal val value: String)
     constructor(columnName: String, value: TimeStamp) : this(columnName, value.timeInMilliseconds.toString(16))
     constructor(columnName: String, value: ElapsedTime) : this(columnName, value.timeInMilliseconds.toString(16))
     constructor(columnName: String, value: ByteArray) : this(columnName, Base64.getEncoder().encodeToString(value))
+    constructor(columnName: String, value: Value) : this(columnName, value.databaseValue)
 }
 
 /**

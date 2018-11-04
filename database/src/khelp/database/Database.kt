@@ -2,6 +2,7 @@ package khelp.database
 
 import khelp.database.condition.Condition
 import khelp.database.condition.EQUALS
+import khelp.text.computeNotInsideName
 import java.io.File
 
 /**
@@ -345,6 +346,12 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
     fun select(selectQuery: SelectQuery, columnSort: String? = null, ascending: Boolean = false): QueryResult
     {
         this.checkClose()
+
+        if (!this.internally && selectQuery.table == PASSWORD_TABLE)
+        {
+            throw IllegalArgumentException("For security reasons, it is not allowed to read the password table")
+        }
+
         val statement = this.databaseConnection.createStatement()
         val resultSet = statement.executeQuery(selectQuery.toSelectString(this.security, columnSort, ascending))
         return QueryResult(resultSet, statement, selectQuery.columns, this.tableDescription(selectQuery.table),
@@ -433,6 +440,146 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
 
         result.close()
         return this.insert(InsertQuery(table, columnsValue))
+    }
+
+    /**
+     * Delete a table from database
+     * @param table Table to delete
+     */
+    fun deleteTable(table: String)
+    {
+        this.checkClose()
+        this.checkAllowedOperationOn(table)
+
+        if (!this.tableList().contains(table))
+        {
+            //Table not exits, so nothing to do
+            return
+        }
+
+        this.updateQuery("DROP TABLE $table")
+        this.internally = true
+        val result = this.select(SelectQuery(METADATA_TABLE_TABLE,
+                                             arrayOf(ID_COLUMN_NAME)) WHERE (METADATA_TABLE_COLUMN_TABLE EQUALS table))
+        val id = result.next()?.id(0) ?: -1
+        result.close()
+
+        if (id < 0)
+        {
+            return
+        }
+
+        this.delete(DeleteQuery(METADATA_COLUMN_TABLE, METADATA_COLUMN_COLUMN_TABLE_ID EQUALS id))
+        this.delete(DeleteQuery(METADATA_TABLE_TABLE, ID_COLUMN_NAME EQUALS id))
+        this.internally = false
+    }
+
+    /**
+     * Adda a column
+     * @param addColumnQuery AddColumnQuery
+     */
+    fun addColumn(addColumnQuery: AddColumnQuery)
+    {
+        val table = addColumnQuery.table
+        this.checkClose()
+        this.checkAllowedOperationOn(table)
+        this.updateQuery(addColumnQuery.toAddColumnQuery(this.databaseAccess, this.security))
+        this.update(UpdateQuery(table,
+                                arrayOf(khelp.database.ColumnValue(addColumnQuery.column,
+                                                                   addColumnQuery.defaultValue))))
+        this.internally = true
+        val result = this.select(SelectQuery(METADATA_TABLE_TABLE,
+                                             arrayOf(ID_COLUMN_NAME)) WHERE (METADATA_TABLE_COLUMN_TABLE EQUALS table))
+        val id = result.next()!!.id(0)
+        result.close()
+        this.insert(InsertQuery(METADATA_COLUMN_TABLE,
+                                arrayOf(ColumnValue(METADATA_COLUMN_COLUMN_NAME, addColumnQuery.column),
+                                        ColumnValue(METADATA_COLUMN_COLUMN_TYPE, addColumnQuery.type.name),
+                                        ColumnValue(METADATA_COLUMN_COLUMN_TABLE_ID, id))))
+        this.internally = false
+    }
+
+    /**
+     * Rename a table
+     * @param currentName Current table name
+     * @param newName New table name
+     */
+    fun renameTable(currentName: String, newName: String)
+    {
+        if (currentName == newName)
+        {
+            return
+        }
+
+        this.checkClose()
+        this.checkAllowedOperationOn(currentName)
+        this.checkAllowedOperationOn(newName)
+        this.updateQuery("ALTER TABLE $currentName RENAME TO $newName")
+        this.internally = true
+        this.update(UpdateQuery(METADATA_TABLE_TABLE,
+                                arrayOf(ColumnValue(METADATA_TABLE_COLUMN_TABLE, newName)),
+                                METADATA_TABLE_COLUMN_TABLE EQUALS currentName))
+        this.internally = false
+    }
+
+    /**
+     * Remove a column from a table
+     * @param table Table
+     * @param column Column to remove
+     */
+    fun removeColumn(table: String, column: String)
+    {
+        this.checkClose()
+        this.checkAllowedOperationOn(table)
+
+        if (column == ID_COLUMN_NAME)
+        {
+            throw  IllegalArgumentException("Can't remove '$ID_COLUMN_NAME' column")
+        }
+
+        val tableDescription = this.tableDescription(table)
+        val newColumns = tableDescription.columns.filterNot { it.name == column || it.name == ID_COLUMN_NAME }
+        val temporaryTable = computeNotInsideName("temporary", this.tableList(), true)
+        this.createTable(temporaryTable, *newColumns.map { Pair<String, DataType>(it.name, it.type) }.toTypedArray())
+        var result = this.select(SelectQuery(table, newColumns.map { it.name }.toTypedArray()))
+        var columnValue = result.next()
+
+        while (columnValue != null)
+        {
+            val colVal: QueryColumn = columnValue
+            val columnsValues = ArrayList<ColumnValue>()
+
+            (0 until colVal.numberOfColumns).forEach { index ->
+                when (colVal.columnType(index))
+                {
+                    DataType.DATA         ->
+                        columnsValues += ColumnValue(colVal.columnName(index), colVal.data(index))
+                    DataType.DOUBLE       ->
+                        columnsValues += ColumnValue(colVal.columnName(index), colVal.double(index))
+                    DataType.FLOAT        ->
+                        columnsValues += ColumnValue(colVal.columnName(index), colVal.float(index))
+                    DataType.LONG         ->
+                        columnsValues += ColumnValue(colVal.columnName(index), colVal.long(index))
+                    DataType.TIMESTAMP    ->
+                        columnsValues += ColumnValue(colVal.columnName(index), colVal.timeStamp(index))
+                    DataType.BOOLEAN      ->
+                        columnsValues += ColumnValue(colVal.columnName(index), colVal.boolean(index))
+                    DataType.ELAPSED_TIME ->
+                        columnsValues += ColumnValue(colVal.columnName(index), colVal.elapsedTime(index))
+                    DataType.INTEGER      ->
+                        columnsValues += ColumnValue(colVal.columnName(index), colVal.integer(index))
+                    DataType.TEXT         ->
+                        columnsValues += ColumnValue(colVal.columnName(index), colVal.string(index))
+                }
+            }
+
+            this.insert(InsertQuery(temporaryTable, columnsValues.toTypedArray()))
+            columnValue = result.next()
+        }
+
+        result.close()
+        this.deleteTable(table)
+        this.renameTable(temporaryTable, table)
     }
 
     /**

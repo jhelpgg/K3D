@@ -4,6 +4,7 @@ import khelp.database.ElapsedTime
 import khelp.database.ID_COLUMN_NAME
 import khelp.database.Security
 import khelp.database.TimeStamp
+import khelp.database.Value
 import java.util.Base64
 
 /**
@@ -92,6 +93,14 @@ class ConditionColumnEquals : Condition
         this.columnName = columnName
         this.id = -1
         this.value = Base64.getEncoder().encodeToString(value)
+    }
+
+    constructor(columnName: String, value: Value)
+    {
+        this.checkColumnName(columnName)
+        this.columnName = columnName
+        this.id = -1
+        this.value = value.databaseValue
     }
 
     /**

@@ -339,13 +339,14 @@ fun lastIndexOf(charSequence: CharSequence, offset: Int = charSequence.length, v
  *
  * @param base  Base name
  * @param names Set of names
+ * @param ignoreCase Indicates if ignore the case or not
  * @return Created name
  */
-fun computeNotInsideName(base: String, names: Collection<String>): String
+fun computeNotInsideName(base: String, names: Collection<String>, ignoreCase: Boolean = false): String
 {
     var base = base
 
-    while (names.contains(base))
+    while (names.any { it.equals(base, ignoreCase) })
     {
         base = computeOtherName(base)
     }
@@ -378,7 +379,7 @@ fun computeOtherName(name: String): String
 
     if (index >= length)
     {
-        return concatenateText(name, " 0")
+        return concatenateText(name, "_0")
     }
 
     return if (index == 0)
@@ -421,3 +422,18 @@ fun String.upperCaseWithoutAccent() = this.toUpperCase().removeAccent()
  */
 fun Char.upperCaseWithoutAccent() = this.toUpperCase().removeAccent()
 
+/**Format an integer to have at least given number of characters*/
+fun Int.format(size: Int): String
+{
+    val format = StringBuilder(this.toString())
+    (format.length until size).forEach { format.insert(0, '0') }
+    return format.toString()
+}
+
+/**Format an integer to have at least given number of characters*/
+fun Long.format(size: Int): String
+{
+    val format = StringBuilder(this.toString())
+    (format.length until size).forEach { format.insert(0, '0') }
+    return format.toString()
+}

@@ -87,7 +87,7 @@ class QueryColumn internal constructor(private val resultSet: ResultSet, val col
 
     /**Column value type*/
     fun columnType(columnName: String) =
-            this.tableDescription.columns.firstOrNull { it.name == columnName }?.type ?: DataType.TEXT
+            this.tableDescription.columns.firstOrNull { it.name == columnName }?.type
 
     /**Column value type at index in the answer*/
     fun columnType(index: Int) = this.columnType(this.columnsName[index])
@@ -217,4 +217,21 @@ class QueryColumn internal constructor(private val resultSet: ResultSet, val col
 
     /** Obtain value as ByteArray */
     fun data(column: String) = this.data(this.columnIndex(column))
+
+    fun value(column: Int) =
+            when (this.columnType(column))
+            {
+                DataType.TEXT         -> Value(this.string(column))
+                DataType.BOOLEAN      -> Value(this.boolean(column))
+                DataType.INTEGER      -> Value(this.integer(column))
+                DataType.LONG         -> Value(this.long(column))
+                DataType.FLOAT        -> Value(this.float(column))
+                DataType.DOUBLE       -> Value(this.double(column))
+                DataType.TIMESTAMP    -> Value(this.timeStamp(column))
+                DataType.ELAPSED_TIME -> Value(this.elapsedTime(column))
+                DataType.DATA         -> Value(this.data(column))
+                else                  -> null
+            }
+
+    fun value(column: String) = this.value(this.columnIndex(column))
 }
