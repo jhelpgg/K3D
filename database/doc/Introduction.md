@@ -1,4 +1,4 @@
-#Introduction
+# Introduction
 This package is dedicated to database manipulation.
 
 It contains access (actually) access to two database types : HyperSQL (or HSQL) and SQLite.
@@ -11,7 +11,7 @@ For SQLite, a SQLite database manager is necessary on the computer. In Linux:
 
 The embed jar is a bridge between JVM and the database manager.
 
-#Details
+# Details
 
 Database is store in file. File format depends on the database manager targeted.
 
