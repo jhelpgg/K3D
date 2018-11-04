@@ -1,5 +1,6 @@
 package khelp.database
 
+import khelp.database.DataType.BOOLEAN
 import khelp.debug.debug
 import khelp.debug.todo
 import java.util.Base64
@@ -7,7 +8,7 @@ import java.util.Base64
 /**
  * Column associated to its value
  */
-class ColumnValue(val columnName: String, internal val value: String)
+class ColumnValue private constructor(val columnName: String, internal val value: String, val type: DataType)
 {
     init
     {
@@ -17,15 +18,22 @@ class ColumnValue(val columnName: String, internal val value: String)
         }
     }
 
-    constructor(columnName: String, value: Int) : this(columnName, value.toString(16))
-    constructor(columnName: String, value: Long) : this(columnName, value.toString(16))
-    constructor(columnName: String, value: Float) : this(columnName, value.toBits().toString(16))
-    constructor(columnName: String, value: Double) : this(columnName, value.toBits().toString(16))
-    constructor(columnName: String, value: Boolean) : this(columnName, if (value) "TRUE" else "FALSE")
-    constructor(columnName: String, value: TimeStamp) : this(columnName, value.timeInMilliseconds.toString(16))
-    constructor(columnName: String, value: ElapsedTime) : this(columnName, value.timeInMilliseconds.toString(16))
-    constructor(columnName: String, value: ByteArray) : this(columnName, Base64.getEncoder().encodeToString(value))
-    constructor(columnName: String, value: Value) : this(columnName, value.databaseValue)
+    constructor(columnName: String, value: String) : this(columnName, value, DataType.TEXT)
+    constructor(columnName: String, value: Int) : this(columnName, value.toString(16), DataType.INTEGER)
+    constructor(columnName: String, value: Long) : this(columnName, value.toString(16), DataType.LONG)
+    constructor(columnName: String, value: Float) : this(columnName, value.toBits().toString(16), DataType.FLOAT)
+    constructor(columnName: String, value: Double) : this(columnName, value.toBits().toString(16), DataType.DOUBLE)
+    constructor(columnName: String, value: Boolean) : this(columnName, if (value) "TRUE" else "FALSE", DataType.BOOLEAN)
+    constructor(columnName: String, value: TimeStamp) : this(columnName, value.timeInMilliseconds.toString(16),
+                                                             DataType.TIMESTAMP)
+
+    constructor(columnName: String, value: ElapsedTime) : this(columnName, value.timeInMilliseconds.toString(16),
+                                                               DataType.ELAPSED_TIME)
+
+    constructor(columnName: String, value: ByteArray) : this(columnName, Base64.getEncoder().encodeToString(value),
+                                                             DataType.DATA)
+
+    constructor(columnName: String, value: Value) : this(columnName, value.databaseValue, value.type)
 }
 
 /**

@@ -366,6 +366,7 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
     {
         this.checkClose()
         this.checkAllowedOperationOn(updateQuery.table)
+        this.checkColumnsValueFor(updateQuery.table, updateQuery.columnsValue)
         this.updateQuery(updateQuery.toUpdateString(this.security))
     }
 
@@ -396,6 +397,31 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
     }
 
     /**
+     * Check if columns value are compatible with a table
+     * @param table Table name
+     * @param columnsValue Columns value to validate
+     */
+    private fun checkColumnsValueFor(table: String, columnsValue: Array<ColumnValue>)
+    {
+        val tableDescriptionColumns = this.tableDescription(table).columns
+
+        columnsValue.forEach { columnValue ->
+            val matchColumn = tableDescriptionColumns.firstOrNull { it.name == columnValue.columnName }
+
+            if (matchColumn == null)
+            {
+                throw IllegalArgumentException("The column ${columnValue.columnName} not exists in table $table")
+            }
+
+            if (columnValue.type != matchColumn.type)
+            {
+                throw IllegalArgumentException(
+                        "The column ${columnValue.columnName} in table $table type is ${matchColumn.type} not ${columnValue.type}")
+            }
+        }
+    }
+
+    /**
      * Add a column to a table
      * @param insertQuery  Query to execute
      * @return Column add ID
@@ -404,6 +430,7 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
     {
         this.checkClose()
         this.checkAllowedOperationOn(insertQuery.table)
+        this.checkColumnsValueFor(insertQuery.table, insertQuery.columnsValue)
         val id = this.biggestID(insertQuery.table)
         this.updateQuery(insertQuery.toInsertString(id + 1, this.security))
         return this.biggestID(insertQuery.table)
@@ -423,6 +450,7 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
     {
         this.checkClose()
         this.checkAllowedOperationOn(table)
+        this.checkColumnsValueFor(table, columnsValue)
         val result = this.select(SelectQuery(table, arrayOf(ID_COLUMN_NAME)) WHERE where)
         val column = result.next()
 
