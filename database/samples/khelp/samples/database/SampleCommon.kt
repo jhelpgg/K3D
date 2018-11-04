@@ -15,7 +15,8 @@ import khelp.debug.debug
 
 fun treatDatabase(database: Database)
 {
-    database.createTable("Person", Pair<String, DataType>("age", DataType.INTEGER),
+    database.createTable("Person",
+                         Pair<String, DataType>("age", DataType.INTEGER),
                          Pair<String, DataType>("name", DataType.TEXT))
     database.delete(DeleteQuery("Person"))
     database.insert(InsertQuery("Person", arrayOf(ColumnValue("age", 42), ColumnValue("name", "Toto"))))

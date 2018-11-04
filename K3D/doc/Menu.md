@@ -26,6 +26,6 @@ Window closing event: [Do something before close](Misc/ClosingApplication.md)
 
 Application preferences: [Application preferences](Misc/Preferences.md) 
 
-The tow hierarchy types: [Hierarchy](3D/Hierarchy.md)
+The two hierarchy types: [Hierarchy](3D/Hierarchy.md)
 
 **"Et voilà" :)**
