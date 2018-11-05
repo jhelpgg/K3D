@@ -9,3 +9,5 @@ val osmResources = Resources(OSMResources::class.java)
 fun smallMap() = osmResources.obtainResourceStream("map.xml")
 
 fun bigMap() = osmResources.obtainResourceStream("map_big.xml")
+
+fun parisRoads() = osmResources.obtainResourceStream("roads")

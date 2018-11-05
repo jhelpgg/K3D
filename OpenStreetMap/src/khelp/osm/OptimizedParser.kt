@@ -1,5 +1,6 @@
 package khelp.osm
 
+import khelp.debug.debug
 import khelp.io.createDirectory
 import khelp.io.createFile
 import khelp.io.delete
@@ -12,6 +13,7 @@ import khelp.io.write
 import khelp.io.writeDouble
 import khelp.io.writeLong
 import khelp.list.ArrayLong
+import khelp.math.distanceOnPlanet
 import khelp.osm.map.MapGraph
 import khelp.osm.map.MapNode
 import khelp.osm.resources.bigMap
@@ -149,6 +151,8 @@ fun readRoads(inputStream: InputStream): MapGraph
                          var roadStart = false
                          var start: MapNode? = null
                          var id = readLong(inputStream)
+                         var nodeCount = 0
+                         var roadCount = 0
 
                          while (id != -2L)
                          {
@@ -156,6 +160,7 @@ fun readRoads(inputStream: InputStream): MapGraph
                              {
                                  id == -1L ->
                                  {
+                                     roadCount++
                                      roadStart = true
                                      start = null
                                  }
@@ -176,11 +181,13 @@ fun readRoads(inputStream: InputStream): MapGraph
                                      val latitude = readDouble(inputStream)
                                      val longitude = readDouble(inputStream)
                                      graph += MapNode(id, latitude, longitude)
+                                     nodeCount++
                                  }
                              }
 
                              id = readLong(inputStream)
                          }
+                         debug("Load finished : ", nodeCount, " Nodes and ", roadCount, " Roads.")
                      })
     return graph
 }
