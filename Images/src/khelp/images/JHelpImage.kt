@@ -3203,7 +3203,7 @@ class JHelpImage(
      * @param percentStart Path percent to start drawing in [0, 1]
      * @param percentEnd   Path percent to stop drawing in [0, 1]
      */
-    fun drawNeon(path: Path, thin: Int, color: ColorInt, percentStart: Double, percentEnd: Double)
+    fun drawNeon(path: Path, thin: Int, color: ColorInt, percentStart: Double = 0.0, percentEnd: Double = 1.0)
     {
         var thin = thin
         var color = color
@@ -4320,6 +4320,174 @@ class JHelpImage(
         }
     }
 
+    fun fillFunction(contains: (Double, Double) -> Boolean, x: Int, y: Int, width: Int, height: Int, color: ColorInt,
+                     doAlphaMix: Boolean = true)
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        if (width <= 0 || height <= 0)
+        {
+            return
+        }
+
+        val x2 = x + width - 1
+        val y2 = y + height - 1
+
+        val startX = Math.max(this.clip.xMin, x)
+        val endX = Math.min(this.clip.xMax, x2)
+        val startY = Math.max(this.clip.yMin, y)
+        val endY = Math.min(this.clip.yMax, y2)
+
+        if (startX > endX || startY > endY)
+        {
+            return
+        }
+
+        val alpha = color.alpha()
+
+        if (alpha == 0 && doAlphaMix)
+        {
+            return
+        }
+
+        var line = startX + startY * this.width
+        var pix: Int
+
+        if (alpha == 255 || !doAlphaMix)
+        {
+            for (yy in startY..endY)
+            {
+                pix = line
+
+                for (xx in startX..endX)
+                {
+                    if (contains(xx.toDouble(), yy.toDouble()))
+                    {
+                        this.pixels[pix] = color
+                    }
+
+                    pix++
+                }
+
+                line += this.width
+            }
+
+            return
+        }
+
+        val red = (color.red()) * alpha
+        val green = (color.green()) * alpha
+        val blue = (color.blue()) * alpha
+
+        for (yy in startY..endY)
+        {
+            pix = line
+
+            for (xx in startX..endX)
+            {
+                if (contains(xx.toDouble(), yy.toDouble()))
+                {
+                    this.mixColor(pix, alpha, red, green, blue)
+                }
+
+                pix++
+            }
+
+            line += this.width
+        }
+    }
+
+    fun fillMask(mask: BooleanArray, x: Int, y: Int, width: Int, height: Int, color: ColorInt,
+                 doAlphaMix: Boolean = true)
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        if (width <= 0 || height <= 0)
+        {
+            return
+        }
+
+        val x2 = x + width - 1
+        val y2 = y + height - 1
+
+        val startX = Math.max(this.clip.xMin, x)
+        val endX = Math.min(this.clip.xMax, x2)
+        val startY = Math.max(this.clip.yMin, y)
+        val endY = Math.min(this.clip.yMax, y2)
+
+        if (startX > endX || startY > endY)
+        {
+            return
+        }
+
+        val alpha = color.alpha()
+
+        if (alpha == 0 && doAlphaMix)
+        {
+            return
+        }
+
+        var line = startX + startY * this.width
+        var pix: Int
+        var maskLine = startX - x
+        var maskPix: Int
+
+        if (alpha == 255 || !doAlphaMix)
+        {
+            for (yy in startY..endY)
+            {
+                pix = line
+                maskPix = maskLine
+
+                for (xx in startX..endX)
+                {
+                    if (mask[maskPix])
+                    {
+                        this.pixels[pix] = color
+                    }
+
+                    pix++
+                    maskPix++
+                }
+
+                line += this.width
+                maskLine += width
+            }
+
+            return
+        }
+
+        val red = (color.red()) * alpha
+        val green = (color.green()) * alpha
+        val blue = (color.blue()) * alpha
+
+        for (yy in startY..endY)
+        {
+            pix = line
+            maskPix = maskLine
+
+            for (xx in startX..endX)
+            {
+                if (mask[maskPix])
+                {
+                    this.mixColor(pix, alpha, red, green, blue)
+                }
+
+                pix++
+                maskPix++
+            }
+
+            line += this.width
+            maskLine += width
+        }
+    }
+
     /**
      * Filter on using a palette color
      *
@@ -5407,6 +5575,157 @@ class JHelpImage(
         }
     }
 
+    fun fillMask(mask: BooleanArray, x: Int, y: Int, width: Int, height: Int,
+                 texture: JHelpImage, doAlphaMix: Boolean = true)
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        if (width <= 0 || height <= 0)
+        {
+            return
+        }
+
+        val x2 = x + width - 1
+        val y2 = y + height - 1
+
+        val startX = Math.max(this.clip.xMin, x)
+        val endX = Math.min(this.clip.xMax, x2)
+        val startY = Math.max(this.clip.yMin, y)
+        val endY = Math.min(this.clip.yMax, y2)
+
+        if (startX > endX || startY > endY)
+        {
+            return
+        }
+
+        var line = startX + startY * this.width
+        var pix: Int
+        var lineMask = startX - x
+        var pixMask: Int
+
+        val startTextureX = (startX - x) % texture.width
+        var yTexture = (startY - y) % texture.height
+        var pixTexture: Int
+        var colorTexture: ColorInt
+
+        var alpha: Int
+
+        var yy = startY
+        while (yy <= endY)
+        {
+            pixTexture = yTexture * texture.width
+            pix = line
+            pixMask = lineMask
+
+            var xx = startX
+            var xTexture = startTextureX
+            while (xx <= endX)
+            {
+                if (mask[pixMask])
+                {
+                    colorTexture = texture.pixels[pixTexture + xTexture]
+
+                    alpha = colorTexture.alpha()
+
+                    if (alpha == 255 || !doAlphaMix)
+                    {
+                        this.pixels[pix] = colorTexture
+                    }
+                    else if (alpha > 0)
+                    {
+                        this.mixColor(pix, alpha, colorTexture)
+                    }
+                }
+
+                pix++
+                pixMask++
+                xx++
+                xTexture = (xTexture + 1) % texture.width
+            }
+
+            line += this.width
+            lineMask += width
+            yy++
+            yTexture = (yTexture + 1) % texture.height
+        }
+    }
+
+    fun fillFunction(contains: (Double, Double) -> Boolean, x: Int, y: Int, width: Int, height: Int,
+                     texture: JHelpImage, doAlphaMix: Boolean = true)
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        if (width <= 0 || height <= 0)
+        {
+            return
+        }
+
+        val x2 = x + width - 1
+        val y2 = y + height - 1
+
+        val startX = Math.max(this.clip.xMin, x)
+        val endX = Math.min(this.clip.xMax, x2)
+        val startY = Math.max(this.clip.yMin, y)
+        val endY = Math.min(this.clip.yMax, y2)
+
+        if (startX > endX || startY > endY)
+        {
+            return
+        }
+
+        var line = startX + startY * this.width
+        var pix: Int
+
+        val startTextureX = (startX - x) % texture.width
+        var yTexture = (startY - y) % texture.height
+        var pixTexture: Int
+        var colorTexture: ColorInt
+
+        var alpha: Int
+
+        var yy = startY
+        while (yy <= endY)
+        {
+            pixTexture = yTexture * texture.width
+            pix = line
+
+            var xx = startX
+            var xTexture = startTextureX
+            while (xx <= endX)
+            {
+                if (contains(xx.toDouble(), yy.toDouble()))
+                {
+                    colorTexture = texture.pixels[pixTexture + xTexture]
+
+                    alpha = colorTexture.alpha()
+
+                    if (alpha == 255 || !doAlphaMix)
+                    {
+                        this.pixels[pix] = colorTexture
+                    }
+                    else if (alpha > 0)
+                    {
+                        this.mixColor(pix, alpha, colorTexture)
+                    }
+                }
+
+                pix++
+                xx++
+                xTexture = (xTexture + 1) % texture.width
+            }
+
+            line += this.width
+            yy++
+            yTexture = (yTexture + 1) % texture.height
+        }
+    }
+
     /**
      * Fill a shape
      *
@@ -5490,6 +5809,157 @@ class JHelpImage(
             }
 
             line += this.width
+            yy++
+            yPaint++
+        }
+    }
+
+    fun fillFunction(contains: (Double, Double) -> Boolean, x: Int, y: Int, width: Int, height: Int, paint: JHelpPaint,
+                     doAlphaMix: Boolean = true)
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        if (width <= 0 || height <= 0)
+        {
+            return
+        }
+
+        val x2 = x + width - 1
+        val y2 = y + height - 1
+
+        val startX = Math.max(this.clip.xMin, x)
+        val endX = Math.min(this.clip.xMax, x2)
+        val startY = Math.max(this.clip.yMin, y)
+        val endY = Math.min(this.clip.yMax, y2)
+
+        if (startX > endX || startY > endY)
+        {
+            return
+        }
+
+        paint.initializePaint(width, height)
+
+        var line = startX + startY * this.width
+        var pix: Int
+
+        val startXPaint = startX - x
+        var yPaint = startY - y
+        var colorPaint: ColorInt
+
+        var alpha: Int
+
+        var yy = startY
+        while (yy <= endY)
+        {
+            pix = line
+
+            var xx = startX
+            var xPaint = startXPaint
+            while (xx <= endX)
+            {
+                if (contains(xx.toDouble(), yy.toDouble()))
+                {
+                    colorPaint = paint.obtainColor(xPaint, yPaint)
+
+                    alpha = colorPaint.alpha()
+
+                    if (alpha == 255 || !doAlphaMix)
+                    {
+                        this.pixels[pix] = colorPaint
+                    }
+                    else if (alpha > 0)
+                    {
+                        this.mixColor(pix, alpha, colorPaint)
+                    }
+                }
+
+                pix++
+                xx++
+                xPaint++
+            }
+
+            line += this.width
+            yy++
+            yPaint++
+        }
+    }
+
+    fun fillMask(mask: BooleanArray, x: Int, y: Int, width: Int, height: Int, paint: JHelpPaint,
+                 doAlphaMix: Boolean = true)
+    {
+        if (!this.drawMode)
+        {
+            throw IllegalStateException("Must be in draw mode !")
+        }
+
+        if (width <= 0 || height <= 0)
+        {
+            return
+        }
+
+        val x2 = x + width - 1
+        val y2 = y + height - 1
+
+        val startX = Math.max(this.clip.xMin, x)
+        val endX = Math.min(this.clip.xMax, x2)
+        val startY = Math.max(this.clip.yMin, y)
+        val endY = Math.min(this.clip.yMax, y2)
+
+        if (startX > endX || startY > endY)
+        {
+            return
+        }
+
+        paint.initializePaint(width, height)
+
+        var line = startX + startY * this.width
+        var pix: Int
+        var lineMask = startX - x
+        var pixMask: Int
+
+        val startXPaint = startX - x
+        var yPaint = startY - y
+        var colorPaint: ColorInt
+
+        var alpha: Int
+
+        var yy = startY
+        while (yy <= endY)
+        {
+            pix = line
+            pixMask = lineMask
+
+            var xx = startX
+            var xPaint = startXPaint
+            while (xx <= endX)
+            {
+                if (mask[pixMask])
+                {
+                    colorPaint = paint.obtainColor(xPaint, yPaint)
+
+                    alpha = colorPaint.alpha()
+
+                    if (alpha == 255 || !doAlphaMix)
+                    {
+                        this.pixels[pix] = colorPaint
+                    }
+                    else if (alpha > 0)
+                    {
+                        this.mixColor(pix, alpha, colorPaint)
+                    }
+                }
+
+                pix++
+                pixMask++
+                xx++
+                xPaint++
+            }
+
+            line += this.width
+            lineMask += width
             yy++
             yPaint++
         }

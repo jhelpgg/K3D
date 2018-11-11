@@ -466,6 +466,7 @@ class DynamicReadXML(inputStream: InputStream)
                     when (firstChar)
                     {
                         '?'  -> this.ignoreUntil('?', '>')
+                        '!'  -> this.ignoreUntil('-', '-', '>')
                         '/'  ->
                         {
                             this.readEndTag()

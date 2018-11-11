@@ -4,13 +4,13 @@ import khelp.database.ColumnValue
 import khelp.database.DataType
 import khelp.database.Database
 import khelp.database.DeleteQuery
-import khelp.database.ElapsedTime
 import khelp.database.ID_COLUMN_NAME
 import khelp.database.InsertQuery
 import khelp.database.SelectQuery
-import khelp.database.TimeStamp
 import khelp.database.condition.EQUALS
+import khelp.database.condition.MATCH
 import khelp.database.condition.OR
+import khelp.database.condition.oneOf
 import khelp.debug.debug
 
 fun treatDatabase(database: Database)
@@ -25,7 +25,7 @@ fun treatDatabase(database: Database)
     database.insert(InsertQuery("Person", arrayOf(ColumnValue("age", 24), ColumnValue("name", "Joe"))))
     val result = database.select(SelectQuery("Person",
                                              arrayOf(ID_COLUMN_NAME,
-                                                     "name", "age")) WHERE (("age" EQUALS 42) OR ("name" EQUALS "Joe")))
+                                                     "name", "age")) WHERE "age".oneOf(intArrayOf(42, 27)))
     val size = result.numberOfColumns
     var line = StringBuilder()
     line.append('|')
@@ -84,5 +84,26 @@ fun treatDatabase(database: Database)
         column = result.next()
     }
 
+    database.createTable("Reduction",
+                         Pair<String, DataType>("age", DataType.INTEGER),
+                         Pair<String, DataType>("Percent", DataType.DOUBLE))
+    database.delete(DeleteQuery("Reduction"))
+    database.insert(InsertQuery("Reduction", arrayOf(ColumnValue("age", 54), ColumnValue("Percent", 23.0))))
+    database.insert(InsertQuery("Reduction", arrayOf(ColumnValue("age", 42), ColumnValue("Percent", 18.81))))
+    database.insert(InsertQuery("Reduction", arrayOf(ColumnValue("age", 18), ColumnValue("Percent", 1.0))))
+    database.insert(InsertQuery("Reduction", arrayOf(ColumnValue("age", 33), ColumnValue("Percent", 3.3))))
+
+    val result2 = database.select(
+            SelectQuery("Person",
+                        arrayOf("name")) WHERE ("age" MATCH SelectQuery("Reduction", arrayOf("age"))))
+    column = result2.next()
+
+    while (column != null)
+    {
+        debug("Person=", column.string(0))
+        column = result2.next()
+    }
+
+    result2.close()
     database.closeDatabase()
 }
