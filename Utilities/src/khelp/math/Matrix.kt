@@ -353,29 +353,26 @@ class Matrix(private val width: Int, private val height: Int)
             when (x)
             {
                 0 ->
-                {
                     when (y)
                     {
                         0 -> return this.matrix[4] * this.matrix[8] - this.matrix[5] * this.matrix[7]
                         1 -> return this.matrix[1] * this.matrix[8] - this.matrix[2] * this.matrix[7]
                         2 -> return this.matrix[1] * this.matrix[5] - this.matrix[2] * this.matrix[4]
                     }
-                }
                 1 ->
-                {
                     when (y)
                     {
                         0 -> return this.matrix[3] * this.matrix[8] - this.matrix[5] * this.matrix[6]
                         1 -> return this.matrix[0] * this.matrix[8] - this.matrix[2] * this.matrix[6]
                         2 -> return this.matrix[0] * this.matrix[5] - this.matrix[2] * this.matrix[3]
                     }
-                }
-                2 -> when (y)
-                {
-                    0 -> return this.matrix[3] * this.matrix[7] - this.matrix[4] * this.matrix[6]
-                    1 -> return this.matrix[0] * this.matrix[7] - this.matrix[1] * this.matrix[6]
-                    2 -> return this.matrix[0] * this.matrix[4] - this.matrix[1] * this.matrix[3]
-                }
+                2 ->
+                    when (y)
+                    {
+                        0 -> return this.matrix[3] * this.matrix[7] - this.matrix[4] * this.matrix[6]
+                        1 -> return this.matrix[0] * this.matrix[7] - this.matrix[1] * this.matrix[6]
+                        2 -> return this.matrix[0] * this.matrix[4] - this.matrix[1] * this.matrix[3]
+                    }
             }
         }
 

@@ -2,7 +2,10 @@ package khelp.database
 
 import khelp.database.condition.Condition
 import khelp.database.condition.EQUALS
+import khelp.database.condition.oneOf
+import khelp.text.RegexPart
 import khelp.text.computeNotInsideName
+import khelp.util.smartFilter
 import java.io.File
 
 /**
@@ -710,5 +713,43 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
 
         this.security = future
         this.internally = false
+    }
+
+    fun stringIteratorFromColumn(table: String, column: String, where: Condition? = null): Iterator<String> =
+            StringIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where), column, true))
+
+    fun intIteratorFromColumn(table: String, column: String, where: Condition? = null): IntIterator =
+            IntIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where), column, true))
+
+    fun longIteratorFromColumn(table: String, column: String, where: Condition? = null): LongIterator =
+            LongIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where), column, true))
+
+    fun booleanIteratorFromColumn(table: String, column: String, where: Condition? = null): BooleanIterator =
+            BooleanIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where), column, true))
+
+    fun conditionRegex(table: String, column: String, regex: RegexPart): Condition?
+    {
+        val tableDescription = this.tableDescription(table)
+        val columnDescription = tableDescription.columns.first { it.name == column }
+
+        if (columnDescription.type != DataType.TEXT)
+        {
+            throw IllegalArgumentException("Column '$column' is not a TEXT in table '$table'")
+        }
+
+        val collect = ArrayList<String>();
+        val iterator = this.stringIteratorFromColumn(table, column).smartFilter { regex.matches(it) }
+
+        while (iterator.hasNext())
+        {
+            collect += iterator.next()
+        }
+
+        if (collect.isEmpty())
+        {
+            return null
+        }
+
+        return column.oneOf(collect.toTypedArray())
     }
 }

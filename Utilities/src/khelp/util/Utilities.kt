@@ -632,3 +632,7 @@ fun <T> Iterable<T>.onFirstIndexed(condition: (T) -> Boolean,
 
     firstNotFound()
 }
+
+fun <E> Collection<E>.notContains(element: E) = !this.contains(element)
+
+fun <E> MutableCollection<E>.addIfNotContains(element: E) = if (this.notContains(element)) this.add(element) else false

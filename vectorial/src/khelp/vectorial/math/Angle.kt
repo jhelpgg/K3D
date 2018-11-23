@@ -17,9 +17,9 @@ class Angle(value: Double, val unit: AngleUnit) : Comparable<Angle>
 
     operator fun minus(angle: Angle) = Angle(this.value - angle.convert(this.unit).value, this.unit)
 
-    operator fun times(factor: Double) = Angle(this.value * factor, this.unit)
+    operator fun times(factor: Number) = Angle(this.value * factor.toDouble(), this.unit)
 
-    operator fun div(factor: Double) = Angle(this.value / factor, this.unit)
+    operator fun div(factor: Number) = Angle(this.value / factor.toDouble(), this.unit)
 
     fun convert(angleUnit: AngleUnit) =
             when (this.unit)
@@ -77,4 +77,4 @@ val AngleZero = Angle(0.0, AngleUnit.RADIAN)
 val AngleQuarter = Angle(PI / 2.0, AngleUnit.RADIAN)
 val AngleMiddle = Angle(PI, AngleUnit.RADIAN)
 
-operator fun Double.times(angle: Angle) = angle * this
+operator fun Number.times(angle: Angle) = angle * this

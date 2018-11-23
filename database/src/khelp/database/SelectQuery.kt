@@ -17,6 +17,11 @@ class SelectQuery(val table: String, val columns: Array<String>)
     /**Condition to respect*/
     private var where: Condition? = null
 
+    internal constructor(table: String, columns: Array<String>, where: Condition?) : this(table, columns)
+    {
+        this.where = where
+    }
+
     /**
      * Convert to SQL query
      * @param security Security to use
