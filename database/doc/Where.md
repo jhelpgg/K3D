@@ -20,7 +20,7 @@ It is possible to use the object:
 ConditionColumnEquals("name", "Joe")
 ````
 
-Or the infix String extension **EQUALS":
+Or the infix String extension **EQUALS**:
 
 ````Kotlin
 "name" EQUALS "Joe"
