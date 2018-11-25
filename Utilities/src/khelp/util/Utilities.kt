@@ -20,6 +20,7 @@ import java.util.regex.Pattern
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
+import kotlin.math.min
 
 typealias ColorInt = Int
 typealias Pixels = IntArray
@@ -242,6 +243,7 @@ fun <T> Iterable<T>.forEachAsync(action: suspend (T) -> Unit, context: Coroutine
 
 fun <T> Array<T>.forEachAsync(action: suspend (T) -> Unit, context: CoroutineContext = MainPoolContext) =
         this.forEach { launch2<T, Unit>(context)(action)(it) }
+
 /**
  * Search in given context the first element that match given condition
  * @param condition Condition to full fill
@@ -457,6 +459,36 @@ fun <T> Array<T>.scramble()
             temporary = this[index1]
             this[index1] = this[index2]
             this[index2] = temporary
+        }
+    }
+}
+
+fun <T> scramble(array1: Array<T>, array2: Array<T>)
+{
+    val size = min(array1.size, array2.size)
+
+    if (size < 2)
+    {
+        return
+    }
+
+    var index1: Int
+    var index2: Int
+    var temporary: T
+
+    (size downTo 1).forEach {
+        index1 = it - 1
+        index2 = random(it)
+
+        if (index1 != index2)
+        {
+            temporary = array1[index1]
+            array1[index1] = array1[index2]
+            array1[index2] = temporary
+
+            temporary = array2[index1]
+            array2[index1] = array2[index2]
+            array2[index2] = temporary
         }
     }
 }

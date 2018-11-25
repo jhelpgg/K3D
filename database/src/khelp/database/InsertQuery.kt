@@ -8,7 +8,7 @@ import java.util.Base64
 /**
  * Column associated to its value
  */
-class ColumnValue private constructor(val columnName: String, internal val value: String, val type: DataType)
+class ColumnValue internal constructor(val columnName: String, internal val value: String, val type: DataType)
 {
     init
     {

@@ -40,7 +40,7 @@ internal class StringIteratorFromQueryResult(val queryResult: QueryResult) : Ite
     }
 }
 
-internal class IntIteratorFromQueryResult(val queryResult: QueryResult) : IntIterator()
+internal class IntIteratorFromQueryResult(val queryResult: QueryResult, val isID: Boolean) : IntIterator()
 {
     private var queryColumn = queryResult.next()
     /**
@@ -68,7 +68,16 @@ internal class IntIteratorFromQueryResult(val queryResult: QueryResult) : IntIte
             throw IllegalStateException("No next element")
         }
 
-        val value = this.queryColumn!!.integer(0)
+        val value =
+                if (this.isID)
+                {
+                    this.queryColumn!!.id(0)
+                }
+                else
+                {
+                    this.queryColumn!!.integer(0)
+                }
+
         this.queryColumn = queryResult.next()
 
         if (this.queryColumn == null)

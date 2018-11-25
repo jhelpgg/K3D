@@ -1,12 +1,11 @@
 package khelp.fileManager
 
-import khelp.fileManager.database.FileDatabase
-import java.io.File
+import khelp.fileManager.ui.FileManagerFrame
+import khelp.ui.initializeGUI
 
 fun main(args: Array<String>)
 {
-    val fileDatabase = FileDatabase()
-    File.listRoots().forEach {
-        fileDatabase += it
-    }
+    initializeGUI()
+    val fileManagerFrame = FileManagerFrame()
+    fileManagerFrame.isVisible = true
 }

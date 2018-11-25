@@ -92,4 +92,4 @@ database.closeDatabase()
 
 Notice the only small difference on the all program
 
-[Menu](Menu.md#menu)
+[Back to menu](Menu.md#menu)

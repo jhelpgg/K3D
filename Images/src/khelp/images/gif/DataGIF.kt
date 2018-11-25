@@ -281,7 +281,8 @@ fun computeGifSize(file: File?): Dimension?
                          dataGIF.readHeader(inputStream)
                          dataGIF.readLogicalScreen(inputStream)
                          dimension = Dimension(dataGIF.width, dataGIF.height)
-                     })
+                     },
+                     {})
     return dimension
 }
 

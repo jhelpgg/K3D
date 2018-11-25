@@ -7,11 +7,14 @@ import khelp.database.DeleteQuery
 import khelp.database.ID_COLUMN_NAME
 import khelp.database.InsertQuery
 import khelp.database.SelectQuery
-import khelp.database.condition.EQUALS
 import khelp.database.condition.MATCH
-import khelp.database.condition.OR
 import khelp.database.condition.oneOf
 import khelp.debug.debug
+import khelp.debug.mark
+import khelp.text.ANY
+import khelp.text.plus
+import khelp.text.regex
+import khelp.text.zeroOrMore
 
 fun treatDatabase(database: Database)
 {
@@ -105,5 +108,12 @@ fun treatDatabase(database: Database)
     }
 
     result2.close()
+
+    mark("REGEX")
+
+    val condition = database.conditionRegex("Person", "name", 'T'.regex() + ANY.zeroOrMore())
+    val result3 = database.stringIteratorFromColumn("Person", "name", condition)
+    result3.forEach { debug("Regex : person = ", it) }
+
     database.closeDatabase()
 }

@@ -26,3 +26,5 @@ Here we add 4 rows to the table.
 Not specify the **`id`** column, it is automatically filled.
 
 The insert query returns the **`id`** of added row.
+
+[Back to menu](Menu.md#menu)

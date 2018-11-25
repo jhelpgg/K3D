@@ -112,7 +112,8 @@ fun loadBitmap(file: File): Optional<BitmapImage>
     var bitmapImage: Optional<BitmapImage> = Optional.empty()
 
     treatInputStream({ FileInputStream(file) },
-                     { bitmapImage = Optional.of(parseBitmap(it)) })
+                     { bitmapImage = Optional.of(parseBitmap(it)) },
+                     {})
 
     return bitmapImage
 }

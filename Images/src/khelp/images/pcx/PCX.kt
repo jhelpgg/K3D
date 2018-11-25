@@ -1026,7 +1026,8 @@ fun computePcxSize(file: File?): Dimension?
                          val pcx = PCX()
                          pcx.readHeader(inputStream)
                          dimension = Dimension(pcx.width, pcx.height)
-                     })
+                     },
+                     {})
     return dimension
 }
 

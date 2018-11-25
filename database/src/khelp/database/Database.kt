@@ -3,6 +3,7 @@ package khelp.database
 import khelp.database.condition.Condition
 import khelp.database.condition.EQUALS
 import khelp.database.condition.oneOf
+import khelp.list.ArrayInt
 import khelp.text.RegexPart
 import khelp.text.computeNotInsideName
 import khelp.util.smartFilter
@@ -53,6 +54,9 @@ val METADATA_COLUMN_DESCRIPTION = TableDescription(METADATA_COLUMN_TABLE,
                                                                              DataType.TEXT),
                                                            ColumnDescription(METADATA_COLUMN_COLUMN_TABLE_ID,
                                                                              DataType.INTEGER)))
+
+const val ROW_NOT_EXISTS = -1
+const val ROW_NOT_UNIQUE = -2
 
 /**
  * Database access.
@@ -198,16 +202,12 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
 
         if (this.ready)
         {
-            val result = this.select(SelectQuery(METADATA_TABLE_TABLE,
-                                                 arrayOf(ID_COLUMN_NAME)) WHERE (METADATA_TABLE_COLUMN_TABLE EQUALS tableName))
+            val id = this.rowID(METADATA_TABLE_TABLE, METADATA_TABLE_COLUMN_TABLE EQUALS tableName)
 
-            if (result.next() != null)
+            if (id != ROW_NOT_EXISTS)
             {
-                result.close()
                 return
             }
-
-            result.close()
         }
 
         val query = StringBuilder()
@@ -284,24 +284,19 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
             METADATA_COLUMN_TABLE -> return METADATA_COLUMN_DESCRIPTION
         }
 
-        var result = this.select(SelectQuery(METADATA_TABLE_TABLE,
-                                             arrayOf(ID_COLUMN_NAME)) WHERE (METADATA_TABLE_COLUMN_TABLE EQUALS tableName))
+        val tableID = this.rowID(METADATA_TABLE_TABLE, METADATA_TABLE_COLUMN_TABLE EQUALS tableName)
 
-        var column = result.next()
-
-        if (column == null)
+        if (tableID < 0)
         {
             throw IllegalArgumentException("Table $tableName not exists")
         }
 
-        val tableID = column.id(0)
-        result.close()
         val columns = ArrayList<ColumnDescription>()
 
-        result = this.select(SelectQuery(METADATA_COLUMN_TABLE,
-                                         arrayOf(METADATA_COLUMN_COLUMN_NAME,
-                                                 METADATA_COLUMN_COLUMN_TYPE)) WHERE (METADATA_COLUMN_COLUMN_TABLE_ID EQUALS tableID))
-        column = result.next()
+        val result = this.select(SelectQuery(METADATA_COLUMN_TABLE,
+                                             arrayOf(METADATA_COLUMN_COLUMN_NAME,
+                                                     METADATA_COLUMN_COLUMN_TYPE)) WHERE (METADATA_COLUMN_COLUMN_TABLE_ID EQUALS tableID))
+        var column = result.next()
 
         while (column != null)
         {
@@ -454,22 +449,14 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
         this.checkClose()
         this.checkAllowedOperationOn(table)
         this.checkColumnsValueFor(table, columnsValue)
-        val result = this.select(SelectQuery(table, arrayOf(ID_COLUMN_NAME)) WHERE where)
-        val column = result.next()
+        val id = this.rowID(table, where)
 
-        if (column != null)
+        if (id >= 0)
         {
-            val id = column.id(0)
-
-            if (result.next() == null)
-            {
-                result.close()
-                this.update(UpdateQuery(table, columnsValue, where))
-                return id
-            }
+            this.update(UpdateQuery(table, columnsValue, where))
+            return id
         }
 
-        result.close()
         return this.insert(InsertQuery(table, columnsValue))
     }
 
@@ -490,10 +477,7 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
 
         this.updateQuery("DROP TABLE $table")
         this.internally = true
-        val result = this.select(SelectQuery(METADATA_TABLE_TABLE,
-                                             arrayOf(ID_COLUMN_NAME)) WHERE (METADATA_TABLE_COLUMN_TABLE EQUALS table))
-        val id = result.next()?.id(0) ?: -1
-        result.close()
+        val id = this.rowID(METADATA_TABLE_TABLE, METADATA_TABLE_COLUMN_TABLE EQUALS table)
 
         if (id < 0)
         {
@@ -517,12 +501,16 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
         this.updateQuery(addColumnQuery.toAddColumnQuery(this.databaseAccess, this.security))
         this.update(UpdateQuery(table,
                                 arrayOf(khelp.database.ColumnValue(addColumnQuery.column,
-                                                                   addColumnQuery.defaultValue))))
+                                                                   addColumnQuery.defaultValue,
+                                                                   addColumnQuery.type))))
         this.internally = true
-        val result = this.select(SelectQuery(METADATA_TABLE_TABLE,
-                                             arrayOf(ID_COLUMN_NAME)) WHERE (METADATA_TABLE_COLUMN_TABLE EQUALS table))
-        val id = result.next()!!.id(0)
-        result.close()
+        val id = this.rowID(METADATA_TABLE_TABLE, METADATA_TABLE_COLUMN_TABLE EQUALS table)
+
+        if (id < 0)
+        {
+            throw IllegalArgumentException("Table '$table' not found")
+        }
+
         this.insert(InsertQuery(METADATA_COLUMN_TABLE,
                                 arrayOf(ColumnValue(METADATA_COLUMN_COLUMN_NAME, addColumnQuery.column),
                                         ColumnValue(METADATA_COLUMN_COLUMN_TYPE, addColumnQuery.type.name),
@@ -715,18 +703,80 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
         this.internally = false
     }
 
-    fun stringIteratorFromColumn(table: String, column: String, where: Condition? = null): Iterator<String> =
-            StringIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where), column, true))
+    /**
+     * Iterator on column of strings
+     *
+     * The column must have [DataType.TEXT] type
+     */
+    fun stringIteratorFromColumn(table: String, column: String,
+                                 where: Condition? = null,
+                                 ascending: Boolean = true): Iterator<String> =
+            StringIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where), column, ascending))
 
+    /**
+     * Iterator on column of integers
+     *
+     * The column must have [DataType.INTEGER] type or the [ID_COLUMN_NAME]
+     */
     fun intIteratorFromColumn(table: String, column: String, where: Condition? = null): IntIterator =
-            IntIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where), column, true))
+            IntIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where)),
+                                       column == ID_COLUMN_NAME)
 
+    /**
+     * List corresponds to column of integers
+     *
+     * The column must have [DataType.INTEGER] type or the [ID_COLUMN_NAME]
+     */
+    fun intListFromColumn(table: String, columnName: String, where: Condition? = null): ArrayInt
+    {
+        val arrayInt = ArrayInt()
+        val result = this.select(SelectQuery(table, arrayOf(columnName), where))
+        var column = result.next()
+
+        if (columnName == ID_COLUMN_NAME)
+        {
+            while (column != null)
+            {
+                arrayInt += column.id(0)
+                column = result.next()
+            }
+        }
+        else
+        {
+            while (column != null)
+            {
+                arrayInt += column.integer(0)
+                column = result.next()
+            }
+        }
+
+        result.close()
+        return arrayInt
+    }
+
+    /**
+     * Iterator on column of longs
+     *
+     * The column must have [DataType.LONG] type
+     */
     fun longIteratorFromColumn(table: String, column: String, where: Condition? = null): LongIterator =
-            LongIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where), column, true))
+            LongIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where)))
 
+    /**
+     * Iterator on column of booleans
+     *
+     * The column must have [DataType.BOOLEAN] type
+     */
     fun booleanIteratorFromColumn(table: String, column: String, where: Condition? = null): BooleanIterator =
-            BooleanIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where), column, true))
+            BooleanIteratorFromQueryResult(this.select(SelectQuery(table, arrayOf(column), where)))
 
+    /**
+     * Create condition for a column match a regular expression
+     * @param table Table name
+     * @param column Column name
+     * @param regex Regular expression to match
+     * @return The computed condition **OR** `null` if no column element match to regular expression
+     */
     fun conditionRegex(table: String, column: String, regex: RegexPart): Condition?
     {
         val tableDescription = this.tableDescription(table)
@@ -751,5 +801,37 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
         }
 
         return column.oneOf(collect.toTypedArray())
+    }
+
+    /**
+     * Obtain ID of row match a condition.
+     *
+     * If no row match [ROW_NOT_EXISTS] is returned
+     *
+     * If at least 2 rows match [ROW_NOT_UNIQUE] is returned
+     *
+     * @return Row ID **OR** [ROW_NOT_EXISTS] **OR** [ROW_NOT_UNIQUE]
+     */
+    fun rowID(table: String, where: Condition): Int
+    {
+        val result = this.select(SelectQuery(table, kotlin.arrayOf(ID_COLUMN_NAME)) WHERE where)
+        val column = result.next()
+
+        if (column == null)
+        {
+            result.close()
+            return ROW_NOT_EXISTS
+        }
+
+        val id = column.id(0)
+
+        if (result.next() != null)
+        {
+            result.close()
+            return ROW_NOT_UNIQUE
+        }
+
+        result.close()
+        return id
     }
 }

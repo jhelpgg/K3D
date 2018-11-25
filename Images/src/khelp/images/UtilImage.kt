@@ -690,6 +690,9 @@ fun MayaNumber.totemImage(baseSize: Int = 32, horizontal: Boolean = true): JHelp
     return totem
 }
 
-val MAYA_JHELP_FONT = createFont(Type.TRUE_TYPE,
-                                 MayaNumber::class.java.getResourceAsStream("Roboto-Regular-Maya.ttf"),
-                                 32, Value.FREE, Value.FREE, false)
+val MAYA_JHELP_FONT by lazy {
+    createFont(Type.TRUE_TYPE,
+               MayaNumber::class.java.getResourceAsStream("Roboto-Regular-Maya.ttf"),
+               32, Value.FREE, Value.FREE, false)
+}
+

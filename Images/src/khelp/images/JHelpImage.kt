@@ -2,6 +2,7 @@
 
 package khelp.images
 
+import khelp.images.bmp.loadBitmap
 import khelp.images.pcx.PCX
 import khelp.images.pcx.isPCX
 import khelp.images.raster.RasterImage
@@ -18,12 +19,14 @@ import khelp.math.minimum
 import khelp.math.sign
 import khelp.text.JHelpTextAlign
 import khelp.thread.Mutex
+import khelp.thread.SwingContext
 import khelp.ui.AFFINE_TRANSFORM
 import khelp.ui.FLATNESS
 import khelp.util.BLACK_ALPHA_MASK
 import khelp.util.COLOR_MASK
 import khelp.util.ColorInt
 import khelp.util.Pixels
+import khelp.util.async2
 import java.awt.Component
 import java.awt.Graphics
 import java.awt.Image
@@ -688,7 +691,7 @@ class JHelpImage(
                         imageReader = imagesReaders.next()
 
                         imageReader!!.input = stream
-                        bufferedImage = imageReader.read(0)
+                        bufferedImage = async2<ImageReader, BufferedImage>(SwingContext)({ it.read(0) })(imageReader)()
                         imageReader.dispose()
 
                         return bufferedImage
@@ -764,6 +767,13 @@ class JHelpImage(
 
                     }
                 }
+            }
+
+            val bitmap = loadBitmap(image)
+
+            if (bitmap.isPresent)
+            {
+                return bitmap.get().toJHelpImage()
             }
 
             val bufferedImage = JHelpImage.loadBufferedImage(image)

@@ -4,6 +4,8 @@ import khelp.images.gif.computeGifSize
 import khelp.images.pcx.computePcxSize
 import khelp.list.EnumerationIterator
 import khelp.text.concatenateText
+import khelp.thread.SwingContext
+import khelp.util.async
 import java.io.File
 import java.io.FileFilter
 import java.util.ArrayList
@@ -162,7 +164,8 @@ class FileImageInformation(val file: File)
 
             for (suffix in suffixs)
             {
-                for (imageReader in EnumerationIterator(ImageIO.getImageReadersBySuffix(suffix)))
+                for (imageReader in EnumerationIterator(
+                        async<Iterator<ImageReader>>(SwingContext)({ ImageIO.getImageReadersBySuffix(suffix) })()))
                 {
                     imageReaders.add(imageReader)
                 }

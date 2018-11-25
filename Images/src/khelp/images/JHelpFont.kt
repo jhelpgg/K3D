@@ -6,7 +6,9 @@ import khelp.text.JHelpTextAlign.LEFT
 import khelp.text.JHelpTextAlign.RIGHT
 import khelp.text.StringExtractor
 import khelp.text.lastIndexOf
+import khelp.thread.SwingContext
 import khelp.ui.FONT_RENDER_CONTEXT
+import khelp.util.async
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Font
@@ -601,61 +603,61 @@ fun createFont(type: JHelpFont.Type, stream: InputStream, size: Int,
  */
 fun obtainFont(type: JHelpFont.Type, stream: InputStream, size: Int,
                bold: JHelpFont.Value = JHelpFont.Value.FREE, italic: JHelpFont.Value = JHelpFont.Value.FREE,
-               underline: Boolean = false): JHelpFont
-{
-    try
-    {
-        val fontFormat =
-                if (type == JHelpFont.Type.TYPE1)
-                {
-                    Font.TYPE1_FONT
-                }
-                else
-                {
-                    Font.TRUETYPE_FONT
-                }
+               underline: Boolean = false) =
+        async<JHelpFont>(SwingContext)({
+                                           try
+                                           {
+                                               val fontFormat =
+                                                       if (type == JHelpFont.Type.TYPE1)
+                                                       {
+                                                           Font.TYPE1_FONT
+                                                       }
+                                                       else
+                                                       {
+                                                           Font.TRUETYPE_FONT
+                                                       }
 
-        var font = Font.createFont(fontFormat, stream)
-        val fontSize = font.size
-        val fontStyle = font.style
+                                               var font = Font.createFont(fontFormat, stream)
+                                               val fontSize = font.size
+                                               val fontStyle = font.style
 
-        var style = 0
+                                               var style = 0
 
-        when (bold)
-        {
-            JHelpFont.Value.FALSE -> Unit
-            JHelpFont.Value.FREE  -> style = style or (fontStyle and Font.BOLD)
-            JHelpFont.Value.TRUE  -> style = style or Font.BOLD
-        }
+                                               when (bold)
+                                               {
+                                                   JHelpFont.Value.FALSE -> Unit
+                                                   JHelpFont.Value.FREE  -> style = style or (fontStyle and Font.BOLD)
+                                                   JHelpFont.Value.TRUE  -> style = style or Font.BOLD
+                                               }
 
-        when (italic)
-        {
-            JHelpFont.Value.FALSE -> Unit
-            JHelpFont.Value.FREE  -> style = style or (fontStyle and Font.ITALIC)
-            JHelpFont.Value.TRUE  -> style = style or Font.ITALIC
-        }
+                                               when (italic)
+                                               {
+                                                   JHelpFont.Value.FALSE -> Unit
+                                                   JHelpFont.Value.FREE  -> style = style or (fontStyle and Font.ITALIC)
+                                                   JHelpFont.Value.TRUE  -> style = style or Font.ITALIC
+                                               }
 
-        if (fontSize != size || style != fontStyle)
-        {
-            if (fontSize == size)
-            {
-                font = font.deriveFont(style)
-            }
-            else if (style == fontStyle)
-            {
-                font = font.deriveFont(size.toFloat())
-            }
-            else
-            {
-                font = font.deriveFont(style, size.toFloat())
-            }
-        }
+                                               if (fontSize != size || style != fontStyle)
+                                               {
+                                                   if (fontSize == size)
+                                                   {
+                                                       font = font.deriveFont(style)
+                                                   }
+                                                   else if (style == fontStyle)
+                                                   {
+                                                       font = font.deriveFont(size.toFloat())
+                                                   }
+                                                   else
+                                                   {
+                                                       font = font.deriveFont(style, size.toFloat())
+                                                   }
+                                               }
 
-        return JHelpFont(font, underline)
-    }
-    catch (exception: Exception)
-    {
-        khelp.debug.exception(exception, "Failed to create the font")
-        return DEFAULT_FONT
-    }
-}
+                                               JHelpFont(font, underline)
+                                           }
+                                           catch (exception: Exception)
+                                           {
+                                               khelp.debug.exception(exception, "Failed to create the font")
+                                               DEFAULT_FONT
+                                           }
+                                       })()

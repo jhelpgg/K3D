@@ -9,18 +9,29 @@
    1. [Creation table query](CreateTable.md#creation-table-query)
    1. [The **"id"** column](CreateTable.md#the-**"id"**-column)
 1. [Add data in table](AddData.md#add-data-in-table)
-1. Select data in table
-   1. Build the query
-   1. Collect the result
-1. Modify data in table
-1. Add or modify a data in table
-1. Delete data in table
-1. Metadata
-   1. Role of metadata
-   1. Table list
-   1. Table description
-1. Change the password
-1. Add a column
-1. Remove a column
-1. Rename a table
-1. Delete a table
+1. [Select data in table](SelectData.md#select-data-in-table)
+   1. [What is select ?](SelectData.md#what-is-select-?)
+   1. [Build the query](SelectData.md#build-the-query)
+   1. [Collect the result](SelectData.md#collect-the-result)
+   1. [Iterators on one column](SelectData.md#iterators-on-one-column)
+1. [Where clause](Where.md#where-clause)
+   1. [Column equals a value](Where.md#column-equals-a-value)
+   1. [Column inside a set of values](Where.md#column-inside-a-set-of-values)
+   1. [Column match a select request](Where.md#column-match-a-select-request)
+   1. [Create condition for column match a regular expression](Where.md#create-condition-for-column-match-a-regular-expression)
+   1. [Conditions combination](Where.md#conditions-combination)
+      1. [**not()**: Negate a condition](Where.md#not():-negate-a-condition)
+      1. [**AND**: Match two conditions](Where.md#and:-match-two-conditions)
+      1. [**OR**: Match at least one condition](Where.md#or:-match-at-least-one-condition)
+1. [Modify data in table](UpdateData.md#modify-data-in-table)
+1. [Add or modify a data in table](InsertOrUpdate.md#add-or-modify-a-data-in-table)
+1. [Delete data in table](DeleteData.md#delete-data-in-table)
+1. [Metadata](Metadata.md#metadata)
+   1. [Role of metadata](Metadata.md#role-of-metadata)
+   1. [Table list](Metadata.md#table-list)
+   1. [Table description](Metadata.md#table-description)
+1. [Change the password](ChangePassword.md#change-the-password)
+1. [Add a column](AddColumn.md#add-a-column)
+1. [Remove a column](RemoveColumn.md#remove-a-column)
+1. [Rename a table](RenameTable.md#rename-a-table)
+1. [Delete a table](DeleteTable.md#delete-a-table)

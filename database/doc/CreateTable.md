@@ -31,6 +31,6 @@ This column is the table primary key, represented by an integer.
 
 The name is reserved and can't be used in other column name creation.
 
-[Menu](Menu.md#menu)
+[Back to menu](Menu.md#menu)
 
 

@@ -7,10 +7,10 @@ fun File.fileType() = FileType.values().firstOrNull { this.extension.toLowerCase
 enum class FileType(val extensions: Array<String>)
 {
     SOUND(arrayOf("mp3", "wav", "au", "mid", "midi")),
-    VIDEO(arrayOf("mp4", "webm")),
+    VIDEO(arrayOf("mp4", "webm", "ogg", "mov", "avi", "mkv", "wmv", "flv")),
     IMAGE(arrayOf("jpg", "png", "gif", "bmp", "pcx", "ani", "cur")),
     TEXT(arrayOf("txt")),
-    CODE(arrayOf("java", "c", "cpp", "h", "js", "kt")),
+    CODE(arrayOf("java", "c", "cpp", "h", "js", "kt", "py")),
     WEB(arrayOf("htm", "html")),
     ZIP(arrayOf("zip", "jar", "apk")),
     OTHER(arrayOf())
