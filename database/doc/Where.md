@@ -4,9 +4,9 @@
    1. [Column match a select request](Where.md#column-match-a-select-request)
    1. [Create condition for column match a regular expression](Where.md#create-condition-for-column-match-a-regular-expression)
    1. [Conditions combination](Where.md#conditions-combination)
-      1. [**not()**: Negate a condition](Where.md#not():-negate-a-condition)
-      1. [**AND**: Match two conditions](Where.md#and:-match-two-conditions)
-      1. [**OR**: Match at least one condition](Where.md#or:-match-at-least-one-condition)
+      1. [not(): Negate a condition](Where.md#not():-negate-a-condition)
+      1. [AND: Match two conditions](Where.md#and:-match-two-conditions)
+      1. [OR: Match at least one condition](Where.md#or:-match-at-least-one-condition)
 
 Where clause is way to specify condition in row selection, for show, delete, modify data.
 
