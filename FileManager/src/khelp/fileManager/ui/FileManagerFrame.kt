@@ -52,7 +52,7 @@ class FileManagerFrame : JFrame("File Manager")
         val panelSouth = JPanel(GridLayout(1, 0))
         panelSouth.add(this.buttonNext)
 
-        panelSouth.add(buttonRefresh)
+        // panelSouth.add(buttonRefresh)
 
         this.add(panelSouth, BorderLayout.SOUTH)
         packedSize(this)
