@@ -43,6 +43,36 @@ class TestUtilities
     }
 
     @Test
+    fun testSmartFilter2()
+    {
+        val list = listOf("Honey", "Plane", "Handler", "Abort", "Black", "Help")
+        val iterable = list.smartFilter { it[0] == 'H' }.smartFilter { it[1] == 'a' }
+        val iterator = iterable.iterator()
+        Assert.assertTrue(iterator.hasNext())
+        Assert.assertEquals("Handler", iterator.next())
+        Assert.assertFalse(iterator.hasNext())
+    }
+
+    @Test
+    fun testSmartFilter3()
+    {
+        val list = listOf("Honey", "Plane", "Handler", "Abort", "Black", "Help")
+        val iterable = list.smartFilter { it[0] == 'H' }
+        val iterator = iterable.iterator().smartFilter { it[1] == 'a' }
+        Assert.assertTrue(iterator.hasNext())
+        Assert.assertEquals("Handler", iterator.next())
+        Assert.assertFalse(iterator.hasNext())
+    }
+
+    @Test
+    fun testContains()
+    {
+        val list = listOf("Honey", "Plane", "Handler", "Abort", "Black", "Help")
+        Assert.assertTrue(list.contains { it[0] == 'A' })
+        Assert.assertFalse(list.contains { it[0] == 'Y' })
+    }
+
+    @Test
     fun testTransform()
     {
         val list = listOf("1", "42", "73", "666", "123456789", "-85")
@@ -60,9 +90,46 @@ class TestUtilities
         Assert.assertFalse(iterator.hasNext())
     }
 
+    @Test
+    fun testTransform2()
+    {
+        val list = listOf("1", "42", "73", "666", "123456789", "-85")
+        val iterable = list.transform { it.toInt() }.transform { -it }
+        val iterator = iterable.iterator()
+        Assert.assertTrue(iterator.hasNext())
+        Assert.assertEquals(-1, iterator.next())
+        Assert.assertEquals(-42, iterator.next())
+        Assert.assertTrue(iterator.hasNext())
+        Assert.assertEquals(-73, iterator.next())
+        Assert.assertTrue(iterator.hasNext())
+        Assert.assertEquals(-666, iterator.next())
+        Assert.assertEquals(-123456789, iterator.next())
+        Assert.assertEquals(85, iterator.next())
+        Assert.assertFalse(iterator.hasNext())
+    }
+
+    @Test
+    fun testTransform3()
+    {
+        val list = listOf("1", "42", "73", "666", "123456789", "-85")
+        val iterable = list.transform { it.toInt() }
+        val iterator = iterable.iterator().transform { -it }
+        Assert.assertTrue(iterator.hasNext())
+        Assert.assertEquals(-1, iterator.next())
+        Assert.assertEquals(-42, iterator.next())
+        Assert.assertTrue(iterator.hasNext())
+        Assert.assertEquals(-73, iterator.next())
+        Assert.assertTrue(iterator.hasNext())
+        Assert.assertEquals(-666, iterator.next())
+        Assert.assertEquals(-123456789, iterator.next())
+        Assert.assertEquals(85, iterator.next())
+        Assert.assertFalse(iterator.hasNext())
+    }
+
     interface TestInterface
     {
         fun testFun()
+        fun operation(integer: Int): Int
     }
 
     class TestImplementation : TestInterface
@@ -73,6 +140,8 @@ class TestUtilities
             this.count.getAndIncrement()
             debug("Implementation")
         }
+
+        override fun operation(integer: Int) = integer + (integer shr 1)
     }
 
     @Test
@@ -82,12 +151,23 @@ class TestUtilities
         val count = test.count
         val weak = test.weak(TestInterface::class.java)
         weak.testFun()
+        Assert.assertEquals(18, weak.operation(12))
         test = TestImplementation()
         System.gc()
         Thread.sleep(1024)
         weak.testFun()
         mark("DONE")
         Assert.assertEquals(1, count.get())
+
+        try
+        {
+            val weak2 = test.weak(TestImplementation::class.java)
+            Assert.fail("We should have an exception")
+        }
+        catch (excepted: IllegalArgumentException)
+        {
+            // That's what we expected
+        }
     }
 
     fun theAnswer()
@@ -217,6 +297,21 @@ class TestUtilities
     }
 
     @Test
+    fun testForEachAsync2()
+    {
+        val listSource = arrayOf("85", "44", "666", "69", "42", "73")
+        val listDestination = ArrayList<Int>()
+        listSource.forEachAsync({ listDestination.add(it.toInt()) })
+        Thread.sleep(1024)
+        Assert.assertTrue(listDestination.contains(85))
+        Assert.assertTrue(listDestination.contains(44))
+        Assert.assertTrue(listDestination.contains(666))
+        Assert.assertTrue(listDestination.contains(69))
+        Assert.assertTrue(listDestination.contains(42))
+        Assert.assertTrue(listDestination.contains(73))
+    }
+
+    @Test
     fun testFirstAsync()
     {
         val list = listOf("85", "44", "666", "69", "42", "73")
@@ -275,5 +370,91 @@ class TestUtilities
         someMove = false
         (0..array.size - 1).forEach { if (it != (array[it][0].toInt() - 'a'.toInt())) someMove = true }
         Assert.assertTrue(someMove)
+
+        val arrayIntSmall = intArrayOf(73)
+        arrayIntSmall.scramble()
+        Assert.assertEquals(73, arrayIntSmall[0])
+
+        val arraySmall = arrayOf("Ploki")
+        arraySmall.scramble()
+        Assert.assertEquals("Ploki", arraySmall[0])
+
+        val array1 = arrayOf<String>("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o")
+        val array2 = arrayOf<String>("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o")
+        scramble(array1, array2)
+        (0 until array1.size).forEach { Assert.assertEquals(array1[it], array2[it]) }
+
+        scramble(arraySmall, arraySmall)
+        Assert.assertEquals("Ploki", arraySmall[0])
     }
+
+    fun reverse(integer: Int) = -integer
+
+    @Test
+    fun testReverse()
+    {
+        synchronized(this.lock)
+        {
+            this.integer.set(0)
+            ({ i: Int -> this.integer.set(this.reverse(i)) }.suspended<Int, Unit>()).startCoroutine(45)
+
+            synchronized(this.lock)
+            {
+                this.lock.wait(1024)
+            }
+
+            Assert.assertEquals(-45, integer.get())
+        }
+    }
+
+    @Test
+    fun testRemoveAllInMap()
+    {
+        val map = HashMap<String, String>()
+        map.put("A", "Airport")
+        map.put("B", "Banana")
+        map.put("C", "Error")
+        map.put("D", "Door")
+        map.put("E", "Elephant")
+        map.put("F", "Error")
+        map.removeAll { key, value -> key[0] != value[0] }
+        Assert.assertEquals(4, map.size)
+        Assert.assertFalse(map.containsKey("C"))
+        Assert.assertFalse(map.containsKey("F"))
+        Assert.assertFalse(map.containsValue("Error"))
+    }
+
+    @Test
+    fun testOnFirst()
+    {
+        val list = listOf(85, 44, 666, 69, 42, 73)
+        list.onFirst({ it > 100 }, { Assert.assertEquals(666, it) }, { Assert.fail("Should found something") })
+        list.onFirst({ it < 10 }, { Assert.fail("Should found nothing. $it<10 ???") })
+    }
+
+    @Test
+    fun testOnFirstIndexed()
+    {
+        val list = listOf(85, 44, 666, 69, 42, 73)
+        list.onFirstIndexed({ it > 100 },
+                            { index, value ->
+                                Assert.assertEquals(2, index)
+                                Assert.assertEquals(666, value)
+                            }, { Assert.fail("Should found something") })
+        list.onFirstIndexed({ it < 10 },
+                            { index, value -> Assert.fail("Should found nothing. $value<10 at $index ???") })
+    }
+
+    @Test
+    fun testGetFirst()
+    {
+        val list = listOf("85", "44", "666", "69", "42", "73")
+        var optional = list.getFirst { it[0] == '6' }
+        Assert.assertTrue(optional.isPresent)
+        Assert.assertEquals("666", optional.get())
+        optional = list.getFirst { it[0] == 'P' }
+        Assert.assertFalse(optional.isPresent)
+    }
+
+
 }

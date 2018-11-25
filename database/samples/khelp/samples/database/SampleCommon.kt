@@ -9,6 +9,7 @@ import khelp.database.InsertQuery
 import khelp.database.SelectQuery
 import khelp.database.condition.MATCH
 import khelp.database.condition.oneOf
+import khelp.database.debugInASCII
 import khelp.debug.debug
 import khelp.debug.mark
 import khelp.text.ANY
@@ -29,63 +30,8 @@ fun treatDatabase(database: Database)
     val result = database.select(SelectQuery("Person",
                                              arrayOf(ID_COLUMN_NAME,
                                                      "name", "age")) WHERE "age".oneOf(intArrayOf(42, 27)))
-    val size = result.numberOfColumns
-    var line = StringBuilder()
-    line.append('|')
-    (0 until size).forEach { index ->
-        val name = result.columnName(index)
-        val space = (16 - name.length) shr 1
-        val left = 16 - space - name.length
-        (0 until space).forEach { line.append(' ') }
-        line.append(name)
-        (0 until left).forEach { line.append(' ') }
-        line.append('|')
-    }
 
-    debug(line)
-    line = StringBuilder()
-    line.append('|')
-    (0 until size).forEach { line.append("----------------|") }
-    debug(line)
-    line = StringBuilder()
-    line.append('|')
-    var column = result.next()
-
-    while (column != null)
-    {
-        var value = column.id(0).toString()
-        var length = value.length
-        var space = (16 - length) shr 1
-        var left = 16 - space - length
-        (0 until space).forEach { line.append(' ') }
-        line.append(value)
-        (0 until left).forEach { line.append(' ') }
-        line.append('|')
-        val col = column!!
-
-        value = col.string("name")
-        length = value.length
-        space = (16 - length) shr 1
-        left = 16 - space - length
-        (0 until space).forEach { line.append(' ') }
-        line.append(value)
-        (0 until left).forEach { line.append(' ') }
-        line.append('|')
-
-        value = col.integer(2).toString()
-        length = value.length
-        space = (16 - length) shr 1
-        left = 16 - space - length
-        (0 until space).forEach { line.append(' ') }
-        line.append(value)
-        (0 until left).forEach { line.append(' ') }
-        line.append('|')
-
-        debug(line)
-        line = StringBuilder()
-        line.append('|')
-        column = result.next()
-    }
+    debugInASCII(result)
 
     database.createTable("Reduction",
                          Pair<String, DataType>("age", DataType.INTEGER),
@@ -99,7 +45,7 @@ fun treatDatabase(database: Database)
     val result2 = database.select(
             SelectQuery("Person",
                         arrayOf("name")) WHERE ("age" MATCH SelectQuery("Reduction", arrayOf("age"))))
-    column = result2.next()
+    var column = result2.next()
 
     while (column != null)
     {
