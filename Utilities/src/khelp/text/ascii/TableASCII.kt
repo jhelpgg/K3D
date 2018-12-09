@@ -438,7 +438,7 @@ class TableASCII
         var index: Int
 
         this.elements.forEach { line ->
-            if (line[0].type == ElementASCIIType.SEPARATOR)
+            if (line.isNotEmpty() && line[0].type == ElementASCIIType.SEPARATOR)
             {
                 index = y
 
