@@ -20,6 +20,7 @@ import java.util.regex.Pattern
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
+import kotlin.math.max
 import kotlin.math.min
 
 typealias ColorInt = Int
@@ -668,3 +669,17 @@ fun <T> Iterable<T>.onFirstIndexed(condition: (T) -> Boolean,
 fun <E> Collection<E>.notContains(element: E) = !this.contains(element)
 
 fun <E> MutableCollection<E>.addIfNotContains(element: E) = if (this.notContains(element)) this.add(element) else false
+
+fun <E> Iterable<E>.minimumValueOf(toValue: (E) -> Int): Int
+{
+    var value = Int.MAX_VALUE
+    this.forEach { value = min(value, toValue(it)) }
+    return value
+}
+
+fun <E> Iterable<E>.maximumValueOf(toValue: (E) -> Int): Int
+{
+    var value = Int.MIN_VALUE
+    this.forEach { value = max(value, toValue(it)) }
+    return value
+}
