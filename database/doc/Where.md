@@ -56,21 +56,26 @@ database.delete(DeleteQuery("Person", "age".oneOf(intArrayOf(42, 73, 21, 12, 37)
 
 ### Column match a select request
 
-Imagine have two table:
+Imagine have two tables:
 
-     PERSON
- 
-     | Name | Age |
-     |------+-----|
+     +------------+
+     |   Person   |
+     +======+=====+
+     | name | age |
+     +------+-----+
      | Joe  | 42  |
-     ......
+     |    ...     |
+     +------------+
      
-     PROMOTION
-     
-     | Reduction | Age |
-     |-----------+-----|
-     |  25       | 20  |
-     ....
+     +------------------+
+     |    Promotion     |
+     +===========+======+
+     | reduction | age  |
+     +-----------+------+
+     | 25%       |  20  |
+     |       ...        |
+     +------------------+
+
      
 Now for get all persons name that can have a specific reduction, it have to: 
 - Select all age corresponds to the reduction

@@ -12,6 +12,13 @@ database.createTable("Person",
                      Pair<String, DataType>("name", DataType.TEXT))
 ````
 
+     +-----------------+
+     |     Person      |
+     +====+======+=====+
+     | id | name | age |
+     +----+------+-----+
+
+
 Add data can be :
 
 ````Kotlin
@@ -20,6 +27,18 @@ database.insert(InsertQuery("Person", arrayOf(ColumnValue("age", 27), ColumnValu
 database.insert(InsertQuery("Person", arrayOf(ColumnValue("age", 42), ColumnValue("name", "Large name"))))
 database.insert(InsertQuery("Person", arrayOf(ColumnValue("age", 24), ColumnValue("name", "Joe"))))
 ````
+
+     +-----------------------+
+     |        Person         |
+     +====+============+=====+
+     | id |    name    | age |
+     +----+------------+-----+
+     | 1  | Toto       | 42  |
+     | 2  | Titi       | 27  |
+     | 3  | Large name | 42  |
+     | 4  | Joe        | 24  |
+     +----+------------+-----+
+
 
 Here we add 4 rows to the table.
 

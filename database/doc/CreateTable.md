@@ -22,6 +22,13 @@ database.createTable("Person",
                      Pair<String, DataType>("name", DataType.TEXT))
 ````
 
+     +-----------------+
+     |     Person      |
+     +====+======+=====+
+     | id | name | age |
+     +----+------+-----+
+
+
 If the table already exists, nothing is created
 
 ### The **"id"** column

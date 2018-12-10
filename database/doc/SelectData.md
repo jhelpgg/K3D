@@ -45,7 +45,7 @@ After a close, the link to database is free, so the result object can't be use.
 
 Each element give by **QueryResult** is a **QueryColumn**.
 
-**QueryColumn** represents a column value. Ecah column are in the order given by the **SelectQuery** request.
+**QueryColumn** represents a column value. Each column are in the order given by the **SelectQuery** request.
 
 **WARNING** : 
 > **QueryColumn** can't be use after **QueryResult** is close since the link to database is lost.

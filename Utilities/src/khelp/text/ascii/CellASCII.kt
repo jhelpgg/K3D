@@ -5,7 +5,7 @@ import khelp.util.maximumValueOf
 import java.util.regex.Pattern
 import kotlin.math.max
 
-val WORD_SEPARATORS = Pattern.compile("([!\"#\$%&()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~]|\\s)+")
+val WORD_SEPARATORS = Pattern.compile("([!\"#\$%&()*+,./:;<=>?@\\[\\\\\\]^`{|}~]|\\s)+")
 
 /**
  * Table cell
