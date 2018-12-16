@@ -3,6 +3,9 @@ package khelp.text
 import java.nio.charset.Charset
 import java.text.Normalizer
 import java.util.regex.Pattern
+import java.awt.SystemColor.text
+
+
 
 /**
  * Pattern for class reference
@@ -437,3 +440,149 @@ fun Long.format(size: Int): String
     (format.length until size).forEach { format.insert(0, '0') }
     return format.toString()
 }
+
+/**
+ * Replace character that follow an \ by it's symbol : \n by carriage return, \t by tabulation ...
+ */
+fun String.interpretAntiSlash(): String
+{
+    val stringBuilder = java.lang.StringBuilder(this.length)
+    val limit = this.length - 1
+    var start = 0
+    var index = this.indexOf('\\')
+    var char: Char
+
+    while (index >= 0)
+    {
+        stringBuilder.append(this.substring(start, index))
+
+        if (index < limit)
+        {
+            char = this[index + 1]
+
+            when (char)
+            {
+                'n'  -> stringBuilder.append('\n')
+                't'  -> stringBuilder.append('\t')
+                'r'  -> stringBuilder.append('\r')
+                'b'  -> stringBuilder.append('\b')
+                else -> stringBuilder.append(char)
+            }
+        }
+
+        start = index + 2
+        index = this.indexOf('\\', start)
+    }
+
+    stringBuilder.append(this.substring(start))
+    return stringBuilder.toString()
+}
+
+/**
+ * Compute the index of a character in a string on ignoring characters between `"` or `'` an in ignore characters with `\` just before them
+ *
+ * @return Index of character or -1 if not found
+ */
+fun String.indexOfIgnoreString(character: Char, startIndex: Int = 0): Int
+{
+    val characters = this.toCharArray()
+    val length = characters.size
+    var char: Char
+    var delimiterString = 0.toChar()
+    var antiSlash = false
+
+    (kotlin.math.max(0, startIndex) until length).forEach { index ->
+        char = characters[index]
+
+        when
+        {
+            antiSlash                    -> antiSlash = false
+            delimiterString > 0.toChar() ->
+                if (delimiterString == char)
+                {
+                    delimiterString = 0.toChar()
+                }
+            char == '\\'                 -> antiSlash = true
+            char == '"' || char == '\''  -> delimiterString = char
+            else                         ->
+                if (char == character)
+                {
+                    return index
+                }
+        }
+    }
+
+    return -1
+}
+
+/**
+ *  Give index of a string inside an other one on ignoring characters bettwen string delimiters.
+ *
+ * By example you type:
+ *
+ * ````Kotlin
+ * val index="Hello 'this is a test' and this end".indexOfIgnoreStrings("this", 0, DEFAULT_STRING_LIMITERS)
+ * ````
+ *
+ * The index will be 26 (not 6)
+ *
+ * @return Index found or -1 if not found
+ */
+fun String.indexOfIgnoreStrings(search: String, startIndex: Int = 0,
+                                stringLimiters: String = DEFAULT_STRING_LIMITERS): Int
+{
+    val lengthText = this.length
+    val charsText = this.toCharArray()
+    val lengthSearch = search.length
+    val charsSearch = search.toCharArray()
+    val limiters = stringLimiters.toCharArray()
+    var insideString = false
+    var currentStringLimiter = ' '
+    var index = startIndex
+    var i: Int
+    var character: Char
+
+    while ((index + lengthSearch) <= lengthText)
+    {
+        character = charsText[index];
+
+        when
+        {
+            insideString                ->
+                if (character == currentStringLimiter)
+                {
+                    insideString = false
+                }
+            character == charsSearch[0] ->
+            {
+                i = 1
+
+                while (i < lengthSearch)
+                {
+                    if (charsText[index + i] != charsSearch[i])
+                    {
+                        break
+                    }
+
+                    i++
+                }
+
+                if (i == lengthSearch)
+                {
+                    return index
+                }
+            }
+            character in limiters       ->
+            {
+                insideString = true
+                currentStringLimiter = character
+            }
+        }
+
+        index++
+    }
+
+    return -1
+}
+
+fun Char.repeat(time: Int) = String(CharArray(time) { this })

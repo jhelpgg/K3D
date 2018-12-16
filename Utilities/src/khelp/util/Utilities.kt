@@ -683,3 +683,15 @@ fun <E> Iterable<E>.maximumValueOf(toValue: (E) -> Int): Int
     this.forEach { value = max(value, toValue(it)) }
     return value
 }
+
+inline fun <T> List<T>.forEachIndexedReversed(task: (index: Int, T) -> Unit) =
+        (this.size - 1 downTo 0).forEach { task(it, this[it]) }
+
+inline fun <T> List<T>.forEachReversed(task: (T) -> Unit) =
+        this.forEachIndexedReversed { _, element -> task(element) }
+
+inline fun <T> Array<T>.forEachIndexedReversed(task: (index: Int, T) -> Unit) =
+        (this.size - 1 downTo 0).forEach { task(it, this[it]) }
+
+inline fun <T> Array<T>.forEachReversed(task: (T) -> Unit) =
+        this.forEachIndexedReversed { _, element -> task(element) }
