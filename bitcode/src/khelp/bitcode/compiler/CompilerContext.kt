@@ -85,6 +85,8 @@ class CompilerContext
     /** Resolved types  */
     private val types = HashMap<String, Type>()
     private var needEmptyConstructor = true
+    var classIsAbstract = false
+    var classIsInterface = false
 
     /**
      * Add or get a reference
@@ -685,8 +687,8 @@ class CompilerContext
             throw CompilerException(lineNumber, "Reference '$name' is a $parameterType not compatible with $realName")
         }
 
-        if ((type === Type.BOOLEAN || type === Type.BYTE || type === Type.CHAR || type === Type.INT || type === Type.SHORT) && (parameterType === Type.BOOLEAN || parameterType === Type.BYTE || parameterType === Type.CHAR || parameterType === Type.INT
-                        || parameterType === Type.SHORT))
+        if ((type === Type.BOOLEAN || type === Type.BYTE || type === Type.CHAR || type === Type.INT || type === Type.SHORT)
+                && (parameterType === Type.BOOLEAN || parameterType === Type.BYTE || parameterType === Type.CHAR || parameterType === Type.INT || parameterType === Type.SHORT))
         {
             return
         }
@@ -716,17 +718,44 @@ class CompilerContext
             return
         }
 
-        this.classGen = ClassGen(this.className, this.parent, null, ACCES_FLAGS_CLASS.toInt(),
-                                 this.interfaces.toTypedArray())
+        val accessFlags =
+                when
+                {
+                    this.classIsAbstract  -> ACCES_FLAGS_CLASS.toInt() or Constants.ACC_ABSTRACT.toInt()
+                    this.classIsInterface -> Constants.ACC_PUBLIC.toInt() or Constants.ACC_INTERFACE.toInt()
+                    else                  -> ACCES_FLAGS_CLASS.toInt()
+                }
+
+        this.classGen = ClassGen(this.className, this.parent, null, accessFlags, this.interfaces.toTypedArray())
+
         this.constantPoolGen = this.classGen!!.getConstantPool()
     }
 
     fun generateEmptyConstructorIfNeed()
     {
-        if (this.needEmptyConstructor)
+        if (this.needEmptyConstructor && !this.classIsInterface)
         {
             this.classGen!!.addEmptyConstructor(Constants.ACC_PUBLIC.toInt())
         }
+    }
+
+    fun createMethodAbstract(accesFlags: Int, returnType: Type, methodName: String, parametersType: Array<Type>,
+                             parametersName: Array<String>)
+    {
+        // Create and initialize the method generator
+        val methodGen = MethodGen(accesFlags, returnType, parametersType, parametersName, methodName, this.className,
+                                  null, this.constantPoolGen)
+
+        for (exception in this.exceptions)
+        {
+            methodGen.addException(exception)
+        }
+
+        // Create and add the method to the class
+        this.constantPoolGen?.addMethodref(methodGen)
+        methodGen.setMaxLocals()
+        methodGen.setMaxStack()
+        this.classGen?.addMethod(methodGen.method)
     }
 
     /**

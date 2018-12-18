@@ -21,7 +21,6 @@ import com.sun.org.apache.bcel.internal.generic.IFNULL
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPNE
 import com.sun.org.apache.bcel.internal.generic.IF_ICMPEQ
-import com.sun.org.apache.bcel.internal.generic.IF_ICMPGE
 import com.sun.org.apache.bcel.internal.generic.IF_ICMPGT
 import com.sun.org.apache.bcel.internal.generic.IF_ICMPLE
 import com.sun.org.apache.bcel.internal.generic.IF_ICMPLT
@@ -47,7 +46,6 @@ import com.sun.org.apache.bcel.internal.generic.PUTSTATIC
 import com.sun.org.apache.bcel.internal.generic.TABLESWITCH
 import com.sun.org.apache.bcel.internal.generic.Type
 import khelp.util.forEachIndexedReversed
-import khelp.util.forEachReversed
 import java.util.Stack
 import java.util.TreeSet
 
@@ -228,28 +226,28 @@ class StackInspector(private val instructionList: InstructionList,
                 // ... => ..., value (int/float/objectref)
                 Constants.LDC_W           -> this.push((instruction as LDC_W).getType(constantPool))
                 // ... => ..., value (long/double)
-                Constants.LDC2_W          -> this.push((instruction as LDC2_W).getType(constantPool))
+                Constants.LDC2_W  -> this.push((instruction as LDC2_W).getType(constantPool))
                 // ... => ..., value (int)
-                Constants.ILOAD           -> this.push(Type.INT)
+                Constants.ILOAD   -> this.push(Type.INT)
                 // ... => ..., value (long)
-                Constants.LLOAD           -> this.push(Type.LONG)
+                Constants.LLOAD   -> this.push(Type.LONG)
                 // ... => ..., value (float)
-                Constants.FLOAD           -> this.push(Type.FLOAT)
+                Constants.FLOAD   -> this.push(Type.FLOAT)
                 // ... => ..., value (double)
-                Constants.DLOAD           -> this.push(Type.DOUBLE)
+                Constants.DLOAD   -> this.push(Type.DOUBLE)
                 // ... => ..., value (objectref)
-                Constants.ALOAD           -> this.push(
-                        this.compilerContext.getParameter((instruction as ALOAD).index).type)
+                Constants.ALOAD   ->
+                    this.push(this.compilerContext.getParameter((instruction as ALOAD).index).type)
                 // ... => ..., value (int)
-                Constants.ILOAD_0         -> this.push(Type.INT)
+                Constants.ILOAD_0 -> this.push(Type.INT)
                 // ... => ..., value (int)
-                Constants.ILOAD_1         -> this.push(Type.INT)
+                Constants.ILOAD_1 -> this.push(Type.INT)
                 // ... => ..., value (int)
-                Constants.ILOAD_2         -> this.push(Type.INT)
+                Constants.ILOAD_2 -> this.push(Type.INT)
                 // ... => ..., value (int)
-                Constants.ILOAD_3         -> this.push(Type.INT)
+                Constants.ILOAD_3 -> this.push(Type.INT)
                 // ... => ..., value (long)
-                Constants.LLOAD_0         -> this.push(Type.LONG)
+                Constants.LLOAD_0 -> this.push(Type.LONG)
                 // ... => ..., value (long)
                 Constants.LLOAD_1         -> this.push(Type.LONG)
                 // ... => ..., value (long)
@@ -265,27 +263,27 @@ class StackInspector(private val instructionList: InstructionList,
                 // ... => ..., value (float)
                 Constants.FLOAD_3         -> this.push(Type.FLOAT)
                 // ... => ..., value (double)
-                Constants.DLOAD_0         -> this.push(Type.DOUBLE)
+                Constants.DLOAD_0 -> this.push(Type.DOUBLE)
                 // ... => ..., value (double)
-                Constants.DLOAD_1         -> this.push(Type.DOUBLE)
+                Constants.DLOAD_1 -> this.push(Type.DOUBLE)
                 // ... => ..., value (double)
-                Constants.DLOAD_2         -> this.push(Type.DOUBLE)
+                Constants.DLOAD_2 -> this.push(Type.DOUBLE)
                 // ... => ..., value (double)
-                Constants.DLOAD_3         -> this.push(Type.DOUBLE)
+                Constants.DLOAD_3 -> this.push(Type.DOUBLE)
                 // ... => ..., value (objectref)
-                Constants.ALOAD_0         -> this.push(
-                        this.compilerContext.getParameter((instruction as ALOAD).index).type)
+                Constants.ALOAD_0 ->
+                    this.push(this.compilerContext.getParameter((instruction as ALOAD).index).type)
                 // ... => ..., value (objectref)
-                Constants.ALOAD_1         -> this.push(
-                        this.compilerContext.getParameter((instruction as ALOAD).index).type)
+                Constants.ALOAD_1 ->
+                    this.push(this.compilerContext.getParameter((instruction as ALOAD).index).type)
                 // ... => ..., value (objectref)
-                Constants.ALOAD_2         -> this.push(
-                        this.compilerContext.getParameter((instruction as ALOAD).index).type)
+                Constants.ALOAD_2 ->
+                    this.push(this.compilerContext.getParameter((instruction as ALOAD).index).type)
                 // ... => ..., value (objectref)
-                Constants.ALOAD_3         -> this.push(
-                        this.compilerContext.getParameter((instruction as ALOAD).index).type)
+                Constants.ALOAD_3 ->
+                    this.push(this.compilerContext.getParameter((instruction as ALOAD).index).type)
                 // ..., arrayref, index (int) => ..., value (int)
-                Constants.IALOAD          ->
+                Constants.IALOAD  ->
                 {
                     if (size < 2 || !this.stack[size - 2].isArrayRef() || !this.stack[size - 1].isInt())
                     {

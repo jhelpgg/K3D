@@ -570,7 +570,7 @@ class CodeLine(val instruction: String, private val parameters: List<String>, va
                 if (parameter1 == null || parameter2 == null)
                 {
 
-                    throw CompilerException(this.lineNumber, "")
+                    throw CompilerException(this.lineNumber, "Miss IINC parameters")
                 }
 
                 try

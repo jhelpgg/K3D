@@ -81,6 +81,9 @@ val FINAL = "final"
 /** Remove method or filed final  */
 val OPEN = "open"
 
+val ABSTRACT = "abstract"
+val INTERFACE = "interface"
+
 /**
  * Add exception throws by method:<br></br>
  * `throws <ClassName>`

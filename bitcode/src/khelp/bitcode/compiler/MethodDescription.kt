@@ -8,7 +8,7 @@ import com.sun.org.apache.bcel.internal.generic.Type
 private fun subroutineLabel(subroutineName: String) = "jhelpSubroutine_${subroutineName}_Label"
 private fun subroutineReturnValue(subroutineName: String) = "jhelpSubroutine_${subroutineName}_ReturnValue"
 
-class MethodDescription(val name: String, val accessFlags: Int = ACCES_FLAGS_METHOD)
+class MethodDescription(val name: String, var accessFlags: Int = ACCES_FLAGS_METHOD)
 {
     var insideCode = false
     var returnType: Type = Type.VOID
@@ -96,6 +96,26 @@ class MethodDescription(val name: String, val accessFlags: Int = ACCES_FLAGS_MET
                 }
                 else    -> this.code.add(CodeLine(instruction, parameters, lineNumber))
             }
+
+    @Throws(CompilerException::class)
+    fun compileAbstract(compilerContext: CompilerContext, lineNumber: Int)
+    {
+        val length = this.parameters.size
+        val parametersType = Array<Type>(length) { Type.NULL }
+        val parametersName = Array<String>(length) { "" }
+        var parameter: Parameter
+
+        // Collect method parameters
+        (0 until length).forEach { index ->
+            parameter = this.parameters[index]
+            parametersType[index] = parameter.type
+            parametersName[index] = parameter.name
+            compilerContext.addGetLocalReference(parametersName[index], parametersType[index].toString(), lineNumber)
+        }
+
+        val accessFlags = this.accessFlags and Constants.ACC_FINAL.toInt().inv() and Constants.ACC_PRIVATE.toInt().inv()
+        compilerContext.createMethodAbstract(accessFlags, this.returnType, this.name, parametersType, parametersName)
+    }
 
     @Throws(CompilerException::class)
     fun compile(compilerContext: CompilerContext, lineNumber: Int, intervals: Intervals)

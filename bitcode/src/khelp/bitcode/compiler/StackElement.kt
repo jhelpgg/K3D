@@ -4,6 +4,8 @@ import com.sun.org.apache.bcel.internal.generic.ArrayType
 import com.sun.org.apache.bcel.internal.generic.ObjectType
 import com.sun.org.apache.bcel.internal.generic.Type
 
+//import com.sun.org.apache.bcel.internal.Repository
+
 class StackElement(val type: Type)
 {
     /**
@@ -15,7 +17,7 @@ class StackElement(val type: Type)
                 this.type == type       -> true
                 this.isInt()            -> type === Type.BOOLEAN || type === Type.CHAR || type === Type.BYTE || type === Type.SHORT || type === Type.INT
                 this.type === Type.NULL -> type is ObjectType || type is ArrayType
-                this.type is ObjectType -> type === Type.NULL || type is ObjectType
+                this.type is ObjectType -> type === Type.NULL || (type is ObjectType/* && Repository.instanceOf(this.type.className, type.className)*/)
                 this.type is ArrayType  -> type === Type.NULL || type is ObjectType || type is ArrayType
                 else                    -> false
             }

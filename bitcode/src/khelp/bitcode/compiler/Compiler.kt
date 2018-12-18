@@ -163,13 +163,15 @@ class Compiler
         while (element != null)
 
         // Do specific parse, depends on instruction
-        if (CLASS == instruction)
+        if (CLASS == instruction || (ABSTRACT == instruction && this.compilerContext.className == null) || INTERFACE == instruction)
         {
             if (parameters.isEmpty())
             {
                 throw CompilerException(lineNumber, "Miss the class name !")
             }
 
+            this.compilerContext.classIsAbstract = ABSTRACT == instruction
+            this.compilerContext.classIsInterface = INTERFACE == instruction
             this.compilerContext.setClassName(parameters[0], lineNumber)
             return
         }
@@ -240,6 +242,11 @@ class Compiler
                 (parameters.size - 1 downTo 2).forEach { index ->
                     parameter = parameters[index]
                     accessFlags = this.computeAccessFlag(accessFlags, parameter, lineNumber)
+                }
+
+                if (this.compilerContext.classIsInterface && ((accessFlags and Constants.ACC_STATIC.toInt()) == 0))
+                {
+                    throw CompilerException(lineNumber, "Interfaces can only have static fields !")
                 }
 
                 this.compilerContext.addField(parameters[1], parameters[0], accessFlags, lineNumber)
@@ -345,8 +352,26 @@ class Compiler
 
             // If reach here, instruction is for code of current method
 
+            ABSTRACT    ->
+            {
+                if (!this.compilerContext.classIsInterface && !this.compilerContext.classIsAbstract)
+                {
+                    throw CompilerException(lineNumber, "Abstract method can only be in abstract class or interface")
+                }
+
+                this.methodDescription!!.accessFlags = this.methodDescription!!.accessFlags or Constants.ACC_ABSTRACT.toInt()
+                this.methodDescription?.compileAbstract(this.compilerContext, lineNumber)
+                this.methodDescription = null
+                return
+            }
+
             OPEN_BLOCK  ->
             {
+                if (this.compilerContext.classIsInterface && ((this.methodDescription!!.accessFlags and Constants.ACC_STATIC.toInt()) == 0))
+                {
+                    throw CompilerException(lineNumber, "Inside interfaces only static methods have concrete code !")
+                }
+
                 if (this.methodDescription!!.insideCode)
                 {
                     throw CompilerException(lineNumber, "Already inside the code !")
