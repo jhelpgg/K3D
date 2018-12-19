@@ -22,4 +22,6 @@ fun main(args: Array<String>)
     printInfo("div.asm")
     printInfo("MyInterface.asm")
     printInfo("MyAbstract.asm")
+    printInfo("HelloWorld.asm")
+
 }
