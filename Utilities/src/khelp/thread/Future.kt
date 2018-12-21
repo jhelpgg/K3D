@@ -8,6 +8,7 @@ import khelp.util.ifElse
 import khelp.util.suspended
 import java.util.Optional
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.experimental.CoroutineContext
 
 /**
@@ -675,3 +676,23 @@ infix fun <T2, T3> (() -> T2).and(function: (T2) -> T3): Future<T3> = this.paral
 fun <T2, T3> and(function1: suspend () -> T2, function2: suspend (T2) -> T3): Future<T3> =
         async<T2>()(function1) and function2
 
+fun waitAll(vararg futures: Future<*>): Future<Unit>
+{
+    val promise = Promise<Unit>()
+    val atomicCount = AtomicInteger(futures.size)
+
+    if (atomicCount.get() == 0)
+    {
+        promise.result(Unit)
+    }
+
+    val task = { _: Future<*> ->
+        if (atomicCount.decrementAndGet() == 0)
+        {
+            promise.result(Unit)
+        }
+    }.suspended()
+
+    futures.forEach { it.then(task) }
+    return promise.future()
+}

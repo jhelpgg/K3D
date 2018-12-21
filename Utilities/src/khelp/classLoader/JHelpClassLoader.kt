@@ -172,13 +172,12 @@ class JHelpClassLoader : ClassLoader
     {
         val path = name.split('.').toTypedArray()
 
-        var file: File? = null
         var tempFile: File?
         var index: Int
 
-        for (f in this.files)
+        for (file in this.files)
         {
-            tempFile = f
+            tempFile = file
             index = path.size - 1
 
             while (tempFile != null && tempFile.name == path[index])
@@ -188,20 +187,9 @@ class JHelpClassLoader : ClassLoader
 
                 if (index < 0)
                 {
-                    file = f
-                    break
+                    return file.toURI().toURL()
                 }
             }
-
-            if (file != null)
-            {
-                break
-            }
-        }
-
-        if (file != null)
-        {
-            return file.toURI().toURL()
         }
 
         var url: URL?

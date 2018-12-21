@@ -3,12 +3,17 @@
 The language proposed here is design for JVM. 
 It is the bytecode compiled from Java or Kotlin files.
 
+Note:
+> We consider in this documentation that the reader have already develop application with an oriented object language like C++, Java, Kotlin, ... 
+> 
+> So we suppose reader knows what is class, interface, object and inheritance.
+
 The instructions used inside methods codes and the method stack are exactly the bytecode behaviors.
 
 We have simplified the constant pool management to by managing it automatically at compilation time.
 
 We had some key words to be able easily manage:
-* Labels an jump instructions
+* Labels and jump instructions
 * Try/catch blocks
 * Blocks
 
@@ -65,3 +70,29 @@ As we will see, know the stack state is very important, so we recommend to write
 
 We hope our comments are enough to understand what is going on. 
 The details will come at their time.
+
+For compile the code in bytecode format, use [Compiler](../src/khelp/bitcode/compiler/Compiler.kt)
+
+Example usage in [HelloWorldInFile](../sample/khelp/samples/bitcode/HelloWorldInFile.kt)
+
+Extract: 
+
+````Kotlin
+val compiler = Compiler()
+val className = compiler.compile(input, output)
+````
+
+Just create an instance, give it the source stream and the where to write stream.
+
+It returns the generated class complete name.
+In the sample, the `bytecode` file is generte inside a `khelp` repository. 
+ 
+To use it in a project, just link the path where `khelp` directory is. 
+ 
+In Intellij : Open module Settings => Dependencies => Add jar or directory : Then choose the directory where the `khelp` directory lies.
+
+In terminal got to in the directory where `khelp` lies and type :
+````SH
+java khelp.asm.HelloWorld
+````
+Like any classic `class` file
