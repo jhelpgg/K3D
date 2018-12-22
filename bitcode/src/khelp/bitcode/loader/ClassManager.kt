@@ -23,6 +23,11 @@ class ClassManager
     private val jarClassLoader = JHelpJarClassLoader()
     private val compiler = Compiler()
 
+    init
+    {
+        this.classLoader += this.jarClassLoader
+    }
+
     fun addJar(file: JarFile)
     {
         this.jarClassLoader += file
@@ -50,33 +55,15 @@ class ClassManager
         return className
     }
 
-    fun <T> obtainClass(className: String): Class<T>?
-    {
-        var clazz =
-                try
-                {
-                    this.classLoader.loadClass(className)
-                }
-                catch (ignored: Exception)
-                {
-                    null
-                }
-
-        if (clazz == null)
-        {
-            clazz =
-                    try
-                    {
-                        this.jarClassLoader.loadClass(className)
-                    }
-                    catch (ignored: Exception)
-                    {
-                        null
-                    }
-        }
-
-        return clazz as Class<T>?
-    }
+    fun <T> obtainClass(className: String) =
+            try
+            {
+                this.classLoader.loadClass(className) as Class<T>?
+            }
+            catch (ignored: Exception)
+            {
+                null
+            }
 
     fun <T> newInstance(className: String, vararg parameters: Any?): T
     {

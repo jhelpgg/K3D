@@ -1,0 +1,17 @@
+@startuml
+start
+if (The class reference is a complete name ?) then (yes)
+   : Use as is ;
+else (no)
+   if (The class refence inside the import list ?) then (yes)
+      : Use the coresponding import one ;
+   else (no)
+      if (The class reference inside "java.lang" ?) then (yes)
+         : Use the corresponding "java.lang" one ;
+      else (no)
+         : Use the current class/interface package to complete the name ;
+      endif
+   endif
+endif
+stop
+@enduml

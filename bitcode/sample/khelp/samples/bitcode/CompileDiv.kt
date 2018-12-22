@@ -4,6 +4,7 @@ import khelp.bitcode.compiler.Compiler
 import khelp.classLoader.JHelpClassLoader
 import khelp.debug.verbose
 import java.io.ByteArrayOutputStream
+import java.io.InputStream
 
 class CompileDiv
 
