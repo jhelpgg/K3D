@@ -1,6 +1,15 @@
 class khelp.asm.Div
 
 field int test public final
+field int magic public final static
+
+method <clinit> static
+{
+    PUSH 73
+    PUTSTATIC magic
+    RETURN
+}
+
 
 method <init>
     parameter   int test

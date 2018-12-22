@@ -907,7 +907,13 @@ class CompilerContext
         stackInspector.checkStack(this.constantPoolGen!!, this.tryCatches)
 
         // Create and add the method to the class
-        this.constantPoolGen?.addMethodref(methodGen)
+
+        if (methodName != "<clinit>")
+        {
+            // Static initializer must not be inside constant pool, else class not load :-s
+            this.constantPoolGen?.addMethodref(methodGen)
+        }
+
         methodGen.setMaxLocals()
         methodGen.setMaxStack()
         this.classGen?.addMethod(methodGen.method)

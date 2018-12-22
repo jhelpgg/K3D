@@ -31,6 +31,9 @@ fun main(args: Array<String>)
         val fieldTest = divClass.getField("test")
         val test = fieldTest.get(div)
         verbose("test=", test)
+        val fieldMagic = divClass.getDeclaredField("magic")
+        val magic = fieldMagic.get(null)
+        verbose("magic=", magic)
     }
     catch (exception: Exception)
     {
