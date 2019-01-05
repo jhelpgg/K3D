@@ -9,6 +9,6 @@ method calculate
 {					; []
 	ILOAD first     ; []				->	[first]
 	ILOAD second    ; [first]		    ->	[first, second]
-    IADD            ; [first, second]   ->	[first/second]
-	IRETURN         ; [first/second]	->	[] EXIT
+    IADD            ; [first, second]   ->	[first+second]
+	IRETURN         ; [first+second]	->	[] EXIT
 }

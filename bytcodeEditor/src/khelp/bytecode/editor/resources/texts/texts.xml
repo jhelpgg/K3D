@@ -1,0 +1,23 @@
+<Texts>
+    <Text key="New">
+        New project
+    </Text>
+    <Text key="Open">
+        Open a project
+    </Text>
+    <Text key="Save">
+        Save current project
+    </Text>
+    <Text key="Exit">
+        Exit
+    </Text>
+    <Text key="NewClass">
+        +
+    </Text>
+    <Text key="Compile">
+        Compile
+    </Text>
+    <Text key="Launch">
+        Run
+    </Text>
+</Texts>

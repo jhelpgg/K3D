@@ -3,6 +3,8 @@ package khelp.text
 import java.util.ArrayList
 import java.util.StringTokenizer
 
+data class OpenClose(val open: Char, val close: Char, val countOpenClose: Boolean, var counter: Int = 0)
+
 /**
  * Cut string with separator, like [StringTokenizer], but in addition it can detect Strings and not cut on them,
  * it can also ignore escaped character.
@@ -57,7 +59,7 @@ class StringExtractor(string: String,
     /**
      * Open/close pairs, to consider like "normal" character something between an open and a close character
      */
-    private val openCloseIgnore: ArrayList<Pair<Char, Char>>
+    private val openCloseIgnore: ArrayList<OpenClose>
     /**
      * Separators characters
      */
@@ -100,7 +102,7 @@ class StringExtractor(string: String,
         this.currentWordStart = -1
         this.length = string.length
 
-        this.openCloseIgnore = ArrayList<Pair<Char, Char>>()
+        this.openCloseIgnore = ArrayList<OpenClose>()
         this.isCanReturnEmptyString = true
         this.isStopAtString = true
     }
@@ -108,17 +110,28 @@ class StringExtractor(string: String,
     /**
      * Add a open close pairs, to consider like "normal" character something between an open and a close character
      *
+     * It can specifies if have to count the number of open/close.
+     *
+     * If have to count:
+     * * Each time open is meet counter is incremented.
+     * * Each time close is meet counter is decremented
+     * * When a close meet and counter reach zero, the "normal" is resolved
+     *
+     * Note:
+     * > If close meet and counter at 0 (No open match), the close character is treat as other characters
+     *
      * @param open  Open character
      * @param close Close character
+     * @param countOpenClose Indicates if have to count open/close
      */
-    fun addOpenCloseIgnore(open: Char, close: Char)
+    fun addOpenCloseIgnore(open: Char, close: Char, countOpenClose: Boolean = false)
     {
         if (open == close)
         {
             throw IllegalArgumentException("Open and close can't have same value")
         }
 
-        for ((first, second) in this.openCloseIgnore)
+        for ((first, second, _) in this.openCloseIgnore)
         {
             if (first == open || second == open || first == close || second == close)
             {
@@ -126,7 +139,7 @@ class StringExtractor(string: String,
             }
         }
 
-        this.openCloseIgnore.add(Pair(open, close))
+        this.openCloseIgnore.add(OpenClose(open, close, countOpenClose))
     }
 
     /**
@@ -169,7 +182,7 @@ class StringExtractor(string: String,
         var start = this.index
         var end = this.length
         var currentStringLimiter = ' '
-        var openClose: Pair<Char, Char>? = null
+        var openClose: OpenClose? = null
         var character = this.string[this.index]
 
         do
@@ -178,9 +191,10 @@ class StringExtractor(string: String,
             {
                 for (openClos in this.openCloseIgnore)
                 {
-                    if (openClos.first == character)
+                    if (openClos.open == character)
                     {
                         openClose = openClos
+                        openClose.counter = 0
                         break
                     }
                 }
@@ -258,9 +272,18 @@ class StringExtractor(string: String,
                     start++
                 }
             }
-            else if (character == openClose.second)
+            else if (character == openClose.open && openClose.countOpenClose)
             {
-                openClose = null
+                openClose.counter++
+            }
+            else if (character == openClose.close)
+            {
+                openClose.counter--
+
+                if (!openClose.countOpenClose || openClose.counter == 0)
+                {
+                    openClose = null
+                }
             }
 
             this.index++

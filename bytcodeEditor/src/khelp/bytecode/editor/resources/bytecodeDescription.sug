@@ -1,0 +1,2179 @@
+# *****************************
+# *** Declaration key words ***
+# *****************************
+
+class
+Concrete class|class\s+(<completeClassName>[a-zA-Z][a-zA-Z0-9_.]*)
+Declare a concrete class:
+[class <classCompleteName>]
+
+abstract
+Abstract class/method|abstract(?:\s+(<completeClassName>[a-zA-Z][a-zA-Z0-9_.]*))?
+Abstract class declaration:
+[abstract <classCompleteName>]
+For abstract method, add the word *abstract* at the end of method.
+Example:
+[method mouseClicked
+	parameter MouseEvent mouseEvent
+abstract]
+
+interface
+Interface|interface\s+(<completeClassName>[a-zA-Z][a-zA-Z0-9_.]*)
+Declare an interface:
+[interface <interfaceCompleteName>]
+
+import
+Import class/interface|import\s+(<completeClassName>[a-zA-Z][a-zA-Z0-9_.]*)
+Import a class or interface:
+[import <classOrInterfaceCompleteName>]
+
+extends
+Parent class|extends\s+(<className>[a-zA-Z][a-zA-Z0-9_.]*)
+Specifies the parent class:
+[extends <parentClassName>]
+
+implements
+Implements interface|implements\s+(<className>[a-zA-Z][a-zA-Z0-9_.]*)
+Specifies an interface to implements:
+[implements <interfaceClassName>]
+
+field
+Filed declaration|field\s+(<type>[a-zA-Z][a-zA-Z0-9_.\[\]]*)\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)(<modifiers>(?:\s+(?:public|protected|package|private|final|open|static))*)
+Declare a field:
+[field <type> <name> <modifiers>]
+Where:
+- *type*: Filed type (class name or primitive)
+- *name*: Filed name
+- *modifiers*: zero or more in {public protected package private final open static}
+
+field_reference
+External field|field_reference\s+(<className>[a-zA-Z][a-zA-Z0-9_.]*)\s+(<type>[a-zA-Z][a-zA-Z0-9_.\[\]]*)\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)\s+(<alias>[a-zA-Z][a-zA-Z0-9_]*)
+Reference to an external field from an other class:
+[field_reference <className> <fieldType> <filedName> <alias>]
+Where:
+- *className*: Name of the class where the field is.
+- *fieldType*: Referenced field type. Class name or primitive
+- *fieldName*: Referenced field name.
+- *alias*: Alias for use the reference
+
+method
+Method|method\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)(<modifiers>(?:\s+(?:public|protected|package|private|final|open|static))*)
+Declare a method:
+[method <methodName> <modifiers>]
+Where:
+- *methodName*: Method name
+- *modifiers*: zero or more in {public protected package private final open static}
+
+parameter
+Method parameter|parameter\s+(<type>[a-zA-Z][a-zA-Z0-9_.\[\]]*)\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Declare a parameter:
+[parameter <type> <name>]
+
+return
+Return value|return\s+(<type>[a-zA-Z][a-zA-Z0-9_.\[\]]*)
+Specify the method return type:
+[return <type>]
+
+throws
+May throw|throws\s+(<className>[a-zA-Z][a-zA-Z0-9_.]*)
+Declare the method may throw an exception:
+[throws <exceptionClassName>]
+
+public
+Method/field public|public
+Specify that a method or a field is public visible
+
+protected
+Method/field protected|protected
+Specify that a method or a field is protected visible
+
+package
+Method/field package|package
+Specify that a method or a field is package visible
+
+private
+Method/field private|private
+Specify that a method or a field is private visible
+
+final
+Method/field final|final
+Specify that a method or a field is final access
+
+open
+Remove final|open
+Specify that a method or a field is not final.
+Useful for methods, since they are final by default
+
+static
+Method/field static|static
+Specify that a method or a field is static
+
+
+# *********************
+# *** Operands code ***
+# *********************
+
+# -- A --
+
+AALOAD
+Load object from array|AALOAD|array,int->object
+Load an object reference from an array to the method stack.
+[AALOAD]
+Stack effect :
+[ ..., array, index -> ..., object ]
+Where:
+- *array*: Array of elements instance
+- *index*: Int that specify the element to load index
+- *object*: Element at the given index value
+
+AASTORE
+Store object to array|AASTORE|array,int,object->
+Store an object inside an array.
+[AASTORE]
+Stack effect:
+[ ..., array, index, object -> ... ]
+Where:
+- *array*: Array of elements instance
+- *index*: Int that specify store element index
+- *object*: Element to write at the given index
+
+ACONST_NULL
+Push null|ACONST_NULL|->null
+Push *null* on the stack.
+[ACONST_NULL]
+Stack effect:
+[ ... -> ..., null ]
+
+ALOAD
+Load a local variable|ALOAD\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|->object
+Load reference from local variable.
+[ALOAD <localVariableName>]
+Where:
+- *localVariableName*: *this* OR current method parameter or variable
+Note: *this* can only use in not static method
+Stack effect
+[ ... -> ..., object ]
+Where:
+- *object*: Value of loaded variable
+
+ANEWARRAY
+Create an object array|ANEWARRAY\s+(<className>[a-zA-Z][a-zA-Z0-9_.]*)|int->array
+Create a new object array.
+[ANEWARRAY <className>]
+Where:
+- *className*: Element array type
+Stack effect:
+[ ..., count -> ..., array ]
+Where:
+- *count*: Array size
+- *array*: Created array
+
+ARETURN
+Return an object|ARETURN|object->[]
+Return an object.
+[ARETURN]
+Stack effect:
+[ ..., object -> EMPTY ]
+Where:
+- *object*: Object instance to return
+Details:
+If the method is synchronized, the monitor entered or reentered on invocation of the method is updated and possibly exited as if by execution of a *monitorexit* instruction in the current thread.
+If no exception is thrown, *value* is popped from the operand stack of the current frame and pushed onto the operand stack of the frame of the invoker.
+Any other values on the operand stack of the current method are discarded.
+
+ARRAYLENGTH
+Array length|ARRAYLENGTH|array->int
+Get an array length.
+[ARRAYLENGTH]
+Stack effect:
+[ ..., array -> ..., length ]
+Where:
+- *array*: Array instance
+- *length*: Array length
+
+ASTORE
+Store in local variable|ASTORE\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|object->
+Store an object in a local variable.
+[ASTORE <localVariableName>]
+Where:
+- *localVariableName*: Current method parameter or variable
+Stack effect:
+[ ..., object -> ... ]
+Where:
+- *object*: Value to give to the local variable
+
+ATHROW
+Throw an exception|ATHROW|object->[]
+Throw an exception or error.
+[ATHROW]
+Stack effect:
+[ ..., object -> object ]
+Where:
+- *object*: Exception or error instance to throw
+Note:
+The stack is not completely clear, it left the exception instance on it before exit.
+So the caller method see an abnormal situation (stack not clear), and know that an exception happen.
+
+# -- B --
+
+BALOAD
+Load byte/boolean from array|BALOAD|array,int->int
+Load byte or boolean from an array.
+[BALOAD]
+Stack effect:
+[ ..., array, index -> .., value ]
+Where:
+- *array*: Array instance where get the value
+- *index*: Integer index of element to get
+- *value*: The *byte* or the *boolean*
+Details:
+The byte value in the component of the array at *index* is retrieved,
+sign-extended to an int value, and pushed onto the top of the operand stack.
+
+BASTORE
+Store byte/boolean to array|BASTORE|array,int,int->
+Store a boolean or a byte inside an array
+[BASTORE]
+Stack effect:
+[ ..., array, index, value -> ... ]
+Where:
+- *array*: Array instance where set the value
+- *index*: Integer index of element to set
+- *value*: The *byte* or the *boolean*
+Details:
+The int *value* is truncated to a byte and stored as the component of the array indexed by *index*.
+
+BIPUSH
+Push byte|BIPUSH\s+(<value>[-]?[0-9]+)|->int
+Push a constant byte on the stack.
+[BIPUSH <value>]
+Where:
+- *value*: Value to push (Must be a valid byte: -128 to 127)
+Stack effect:
+[ ... -> ..., value ]
+- *value*: Value pushed
+Details:
+The immediate *value* is sign-extended to an int value.
+That value is pushed onto the operand stack.
+
+BREAKPOINT
+Breakpoint|BREAKPOINT
+Make a break point.
+Actually does nothing
+
+# -- C --
+
+CALOAD
+Load char from array|CALOAD|array,int->int
+Load a char from a char array.
+[CALOAD]
+Stack effect:
+[ ..., array, index -> ..., value ]
+Where:
+- *array*: Array instance where get the char
+- *index*: Element to get index
+- *value*: Array element value
+Details:
+The component of the array at index is retrieved and zero-extended to an int value.
+That value is pushed onto the operand stack.
+
+CASTORE
+Store char in array|CASTORE|array,int,int->
+Store a char into a char array.
+[CASTORE]
+Stack effect:
+[ ..., array, index, value -> ... ]
+Where:
+- *array*: Array where store to array
+- *index*: Index in array where put the character
+- *value*: The character to write
+Details:
+The value is truncated to a char and stored as the component of the array indexed by index.
+
+CHECKCAST
+Cast object|CHECKCAST\s+(<className>[a-zA-Z][a-zA-Z0-9_]*)|object->object
+Cast object to given class
+[CHECKCAST <className>]
+Where:
+- *className*: Desired class to cast the object
+Stack effect:
+[ ..., objectToCast -> ..., castedObject ]
+Where:
+- *objectToCast*: Instance of object to cast
+- *castedObject*: Object casted on desired class
+Details:
+The cast must be possible else a ClassCastException happen
+
+# -- D --
+
+D2F
+Double to float|D2F|double->float
+Convert double to float
+[D2F]
+Stack effect:
+[ ..., doubleValue -> ..., floatResult ]
+Where:
+- *doubleValue*: Double to convert
+- *floatResult: Float result from conversion
+Details:
+The value is converted to a float result using IEEE 754 round to nearest mode
+
+D2I
+Double to int|D2I|double->int
+Convert double to int
+[D2I]
+Stack effect:
+[ ..., doubleValue -> ..., intResult ]
+Where:
+- *doubleValue*: Double to convert
+- *intResult*: Int result from conversion
+Details:
+- If the value is NaN, the result of the conversion is an int 0
+- Otherwise, if the value is not an infinity, it is rounded to an integer value V,
+= rounding towards zero using IEEE 754 round towards zero mode.
+= If this integer value V can be represented as an int, then the result is the int value V.
+- Otherwise, either the value must be too small (a negative value of large magnitude or negative infinity),
+= and the result is the smallest representable value of type int,
+= or the value must be too large (a positive value of large magnitude or positive infinity),
+= and the result is the largest representable value of type int.
+
+D2L
+Double to long|D2L|double->long
+Convert double to long
+[D2L]
+Stack effect:
+[ ..., doubleValue -> ..., longResult ]
+Where:
+- *doubleValue*: Double to convert
+- *longResult*: Long result from conversion
+Details:
+- If the value' is NaN, the result of the conversion is a long 0.
+- Otherwise, if the value' is not an infinity, it is rounded to an integer value V,
+= rounding towards zero using IEEE 754 round towards zero mode.
+= If this integer value V can be represented as a long, then the result is the long value V.
+- Otherwise, either the value must be too small (a negative value of large magnitude or negative infinity),
+= and the result is the smallest representable value of type long,
+= or the value must be too large (a positive value of large magnitude or positive infinity),
+= and the result is the largest representable value of type long.
+
+DADD
+Double addition|DADD|double,double->double
+Addition of two double
+[DADD]
+Stack effect
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First double
+- *value2*: Second double
+- *result*: Result of value1+value2
+
+DALOAD
+Load double from array|DALOAD|array,int->double
+Load a double from an array
+[DALOAD]
+Stack effect:
+[ ..., array, index -> ..., value ]
+Where:
+- *array*: Array instance where get the value
+- *index*: Index in array
+- *value*: Value get an given index in the array
+
+DASTORE
+Store double to array|DASTORE|array,int,double->
+Store a double in array
+[DASTORE]
+Stack effect:
+[ ..., array, index, value -> ... ]
+Where:
+- *array*: Array instance where store the double
+- *index*: Index where insert the double
+- *value*: Double to insert in array
+
+DCMPG
+Compare double|DCMPG|double,double->int
+Compare two double with great if NaN rule
+[DCMPG]
+Stack effect:
+[ ..., firstDouble, secondDouble -> ..., comparison ]
+Where:
+- *firstDouble*: First double to compare
+- *secondDouble*: Second double to compare
+- *comparison*: Comparison result.
+=	-1 if first before second
+=	0 if first equals second
+=	1 if first after second
+If one of the values is NaN, 1 if used as result
+
+DCMPL
+Compare double|DCMPL|double,double->int
+Compare two double with lowl if NaN rule
+[DCMPL]
+Stack effect:
+[ ..., firstDouble, secondDouble -> ..., comparison ]
+Where:
+- *firstDouble*: First double to compare
+- *secondDouble*: Second double to compare
+- *comparison*: Comparison result.
+=	-1 if first before second
+=	0 if first equals second
+=	1 if first after second
+If one of the values is NaN, -1 if used as result
+
+DCONST
+Push 0 or 1|DCONST\s+(<0-1>[01])|->double
+Push the double 0 or 1
+[DCONST <zeroOrOne>]
+Where:
+- *zeroOrOne*: 0 or 1
+Stack effect:
+[ ... -> ..., zeroOrOne ]
+Where:
+- *zeroOrOne*: Value pushed
+
+DDIV
+Double division|DDIV|double,double->double
+Division of two double
+[DDIV]
+Stack effect
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First double
+- *value2*: Second double
+- *result*: Result of value1/value2
+
+DLOAD
+Load local variable|DLOAD\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Load a double from local variable.
+[DLOAD <name>]
+Where:
+- *name*: Local variable name.
+Stack effect:
+[ ... -> ..., value ]
+Where:
+- *value*: Local variable value
+Details:
+A local variable is one of method parameter of variables declare with *VAR* inside the method.
+For variables declare with var, they must have previously initialized (Even with 0).
+Since the variable must contains a double, *this* can't be used
+
+DMUL
+Double multiplication|DMUL|double,double->double
+Multiplication of two double
+[DMUL]
+Stack effect
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First double
+- *value2*: Second double
+- *result*: Result of value1*value2
+
+DNEG
+Negate double|DNEG|double->double
+Negate a double. Take its opposite.
+[DNEG]
+Stack effect
+[ ..., value -> ..., negativeValue ]
+Where:
+- *value*: Value to take the opposite value
+- *negativeValue*: Opposite value
+
+DREM
+Double remainder|DREM|double,double->double
+Remainder of two double
+[DMUL]
+Stack effect
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First double
+- *value2*: Second double
+- *result*: Result of value1%value2
+
+DRETURN
+Return double|DRETURN|double->[]
+Return double from method
+[DRETURN]
+Stack effect
+[ ..., value -> EMPTY ]
+Where:
+- *value*: Value to return
+
+DSTORE
+Store in local variable|DSTORE\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|double->
+Store a double in local variable.
+[DSTORE <name>]
+Where:
+- *name*: Local variable name
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Value to store
+Details:
+A local variable is one of method parameter of variables declare with *VAR* inside the method.
+
+DSUB
+Double subtraction|DSUB|double,double->double
+Subtraction of two double
+[DSUB]
+Stack effect
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First double
+- *value2*: Second double
+- *result*: Result of value1-value2
+
+DUP
+Duplicate stack|DUP|notDoubleNorLong->$0,$0
+Duplicate the last element on stack
+[DUP]
+Stack effect:
+[ ..., value -> ..., value, value ]
+Where:
+- *value*: The value to duplicates
+*Note*: The value can be anything except *double* or *long*
+
+DUP_X1
+Duplicate stack|DUP_X1|notDoubleNorLong,notDoubleNorLong->$1,$0,$1
+Duplicate the top operand stack value and insert two values down
+[DUP_X1]
+Stack effect:
+[ ..., value2, value1 -> ..., value1, value2, value1]
+Where:
+- *value1*: Value to duplicate
+- *value2*: Just moved value
+*Note*: The values (value1 and value2) can be anything except *double* or *long*
+
+DUP_X2
+Duplicate stack|DUP_X2|notDoubleNorLong,notDoubleNorLong,notDoubleNorLong->$2,$0,$1,$2|doubleOrLong,notDoubleNorLong->$1,$0,$1
+Duplicate the top operand stack value and insert two or three values down.
+The number of values down depend on the value before last stack element.
+[DUP_X2]
+	*Three down case*
+Stack effect:
+[ ..., value3, value2, value1 -> ..., value1, value3, value2, value1 ]
+Where:
+- *value1*: Element to duplicate. Not a double nor a long
+- *value2*: Element to move. Not a double nor a long
+- *value3*: Element to move. Not a double nor a long
+	*Two down case*
+Stack effect:
+[ ..., value2, value1 -> ..., value1, value2, value1]
+- *value1*: Element to duplicate. Not a double nor a long
+- *value2*: Element to move. Double or long
+
+DUP2
+Duplicate stack|DUP2|notDoubleNorLong,notDoubleNorLong->$0,$1,$0,$1|doubleOrLong->$0,$0
+Duplicate the top one or two operand stack values.
+[DUP2]
+Two possible cases:
+	*First case*
+Stack effect:
+[ ..., value2, value1 -> ..., value2, value1, value2, value1 ]
+Where:
+- *value1*: Value to duplicate. Not double nor long
+- *value2*: Value to duplicate. Not double nor long
+	*Second case*
+Stack effect:
+[ ..., value -> ..., value, value ]
+Where:
+- *value*: Value to duplicate. Long or double
+
+DUP2_X1
+Duplicate stack|DUP2_X1|notDoubleNorLong,notDoubleNorLong,notDoubleNorLong->$1,$2,$0,$1,$2|notDoubleNorLong,doubleOrLong->$1,$0,$1
+Duplicate the top one or two operand stack values and insert two or three values down
+[DUP2_X1]
+Two possible cases:
+	*First case*
+Stack effect:
+[ ..., value3, value2, value1 -> value2, value1, value3, value2, value1 ]
+- *value1*: Element to duplicate. Not a double nor a long
+- *value2*: Element to duplicate. Not a double nor a long
+- *value3*: Element to move. Not a double nor a long
+	*Second case*
+Stack effect:
+[ ..., value2, value1 -> ..., value1, value2, value1 ]
+- *value1*: Element to duplicate. Double or long
+- *value2*: Element to move. Not a double nor a long
+
+DUP2_X2
+Duplicate stack|DUP2_X2|notDoubleNorLong,notDoubleNorLong,notDoubleNorLong,notDoubleNorLong->$2,$3,$0,$1,$2,$3|notDoubleNorLong,notDoubleNorLong,doubleOrLong->$2,$0,$1,$2|doubleOrLong,notDoubleNorLong,notDoubleNorLong->$1,$2,$0,$1,$2|doubleOrLong,doubleOrLong->$1,$0,$1
+Duplicate the top one or two operand stack values and insert two, three, or four values down
+[DUP2_X2]
+Four possible cases:
+	*First case*
+Stack effect:
+[ ..., value4, value3, value2, value1 -> ..., value2, value1, value3, value4, value2, value1 ]
+Where:
+- *value1*: Element to duplicate. Not a double nor a long
+- *value2*: Element to duplicate. Not a double nor a long
+- *value3*: Element to move. Not a double nor a long
+- *value4*: Element to move. Not a double nor a long
+	*Second case*
+Stack effect:
+[ ..., value3, value2, value1 -> ..., value2, value1, value3, value2, value1 ]
+Where:
+- *value1*: Element to duplicate. Not a double nor a long
+- *value2*: Element to duplicate. Not a double nor a long
+- *value3*: Element to move. Double or long
+	*Third case*
+Stack effect:
+[ ..., value3, value2, value1 -> ..., value1, value3, value2, value1 ]
+Where:
+- *value1*: Element to duplicate. Double or long
+- *value2*: Element to move. Not a double nor a long
+- *value3*: Element to move. Not a double nor a long
+	*Fourth case*
+Stack effect:
+[ ..., value2, value1 -> ..., value1, value2, value1 ]
+Where:
+- *value1*: Element to duplicate. Double or long
+- *value2*: Element to move. Double or long
+
+# -- F --
+
+F2D
+Float to double|F2D|float->double
+Convert float to double.
+[F2D]
+Stack effect:
+[ ..., floatToConvert -> ..., convertedDouble ]
+Where:
+- *floatToConvert*: Float value to convert
+- *convertedDouble*: Value converted to double
+
+F2I
+Float to int|F2I|float->int
+Convert float to int.
+[F2I]
+Stack effect:
+[ ..., floatToConvert -> ..., convertedInt ]
+Where:
+- *floatToConvert*: Float value to convert
+- *convertedInt*: Value converted to int
+Details:
+- If the value is NaN, the result of the conversion is an int 0
+- Otherwise, if the value is not an infinity, it is rounded to an integer value V,
+= rounding towards zero using IEEE 754 round towards zero mode.
+= If this integer value V can be represented as an int, then the result is the int value V.
+- Otherwise, either the value must be too small (a negative value of large magnitude or negative infinity),
+= and the result is the smallest representable value of type int,
+= or the value must be too large (a positive value of large magnitude or positive infinity),
+= and the result is the largest representable value of type int.
+
+F2L
+Float to long|F2L|float->long
+Convert float to long
+[F2L]
+Stack effect:
+[ ..., floatToConvert -> ..., convertedLong ]
+Where:
+- *floatToConvert*: Float value to convert
+- *convertedLong*: Value converted to long
+Details:
+- If the value is NaN, the result of the conversion is an long 0
+- Otherwise, if the value is not an infinity, it is rounded to an integer value V,
+= rounding towards zero using IEEE 754 round towards zero mode.
+= If this integer value V can be represented as a long, then the result is the long value V.
+- Otherwise, either the value must be too small (a negative value of large magnitude or negative infinity),
+= and the result is the smallest representable value of type long,
+= or the value must be too large (a positive value of large magnitude or positive infinity),
+= and the result is the largest representable value of type long.
+
+FADD
+Float addition|FADD|float,float->float
+Addition on two floats
+[FADD]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First float
+- *value2*: First float
+- *result*: Result of value1+value2
+
+FALOAD
+Load float from array|FALOAD|array,int->float
+Load float from and array
+[FALOAD]
+Stack effect:
+[ ..., array, index -> ..., value ]
+Where:
+- *array*: Array where get the float
+- *index*: Index in array
+- *value*: Float in array at given index
+
+FASTORE
+Store float to array|FASTORE|array,int,float->
+Store float in array.
+[FASTORE]
+Stack effect:
+[ ..., array, index, value -> ... ]
+Where:
+- *array*: Array where store the float
+- *index*: Index in array
+- *value: Value to store
+
+FCMPG
+Compare float|FCMPG|float,float->int
+Compare two float with great if NaN rule
+[FCMPG]
+Stack effect:
+[ ..., firstFloat, secondFloat -> ..., comparison ]
+Where:
+- *firstFloat*: First float to compare
+- *secondFloat*: Second float to compare
+- *comparison*: Comparison result.
+=	-1 if first before second
+=	0 if first equals second
+=	1 if first after second
+If one of the values is NaN, 1 if used as result
+
+FCMPL
+Compare float|FCMPL|float,float->int
+Compare two float with low if NaN rule
+[FCMPL]
+Stack effect:
+[ ..., firstFloat, secondFloat -> ..., comparison ]
+Where:
+- *firstFloat*: First float to compare
+- *secondFloat*: Second float to compare
+- *comparison*: Comparison result.
+=	-1 if first before second
+=	0 if first equals second
+=	1 if first after second
+If one of the values is NaN, -1 if used as result
+
+FCONST
+Push 0, 1 or 2|FCONST\s+(<0-2>[012])|->float
+Push float 0, 1 or 2.
+[FCONST <value>]
+Where:
+- *value*: is 0, 1 or 2
+
+FDIV
+Float division|FDIV|float,float->float
+Division on two floats
+[FDIV]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First float
+- *value2*: First float
+- *result*: Result of value1/value2
+
+FLOAD
+Load local variable|FLOAD\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Load a float from local variable.
+[FLOAD <name>]
+Where:
+- *name*: Local variable name.
+Stack effect:
+[ ... -> ..., value ]
+Where:
+- *value*: Local variable value
+Details:
+A local variable is one of method parameter of variables declare with *VAR* inside the method.
+For variables declare with var, they must have previously initialized (Even with 0).
+Since the variable must contains a float, *this* can't be used.
+
+FMUL
+Float multiplication|FMUL|float,float->float
+Multiplication on two floats
+[FMUL]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First float
+- *value2*: First float
+- *result*: Result of value1*value2
+
+FNEG
+Negate float|FNEG|float->float
+Negate a float. Take its opposite.
+[FNEG]
+Stack effect:
+[ ..., value -> ..., result ]
+Where:
+- *value*: Value to negate
+- *result*: Opposite of given value
+
+FREM
+Float remainder|FREM|float,float->float
+Remainder on two floats
+[FREM]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First float
+- *value2*: First float
+- *result*: Result of value1%value2
+
+FRETURN
+Return float|FRETURN|float->[]
+Return float from method
+[FRETURN]
+Stack effect
+[ ..., value -> EMPTY ]
+Where:
+- *value*: Value to return
+
+FSTORE
+Store in local variable|FSTORE\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|float->
+Store a float in local variable.
+[FSTORE <name>]
+Where:
+- *name*: Local variable name
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Value to store
+Details:
+A local variable is one of method parameter of variables declare with *VAR* inside the method.
+
+FSUB
+Float subtraction|FSUB|float,float->float
+Subtraction of two float
+[FSUB]
+Stack effect
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First float
+- *value2*: Second float
+- *result*: Result of value1-value2
+
+# -- G --
+
+GETFIELD
+Obtain field|GETFIELD\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|object->object
+Obtain a not static field value. The field can comes from the object itself or an external object.
+[GETFIELD <name>]
+Where:
+- *name*: Field name (form *field* instruction) or alias (form *filed_reference*)
+Stack effect:
+[ ..., reference -> ..., value ]
+Where:
+- *reference*: Object instance where lies the field. (For object itself, use *this*)
+- *value*: Field value
+
+GETSTATIC
+Obtain static field|GETSTATIC\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|->object
+Obtain a static field value. The field can comes from the class itself or an external class.
+[GETSTATIC <name>]
+Where:
+- *name*: Field name (form *field* instruction) or alias (form *filed_reference*)
+Stack effect:
+[ ... -> ..., value ]
+Where:
+- *value*: Field value
+
+GOTO
+Go to label|GOTO\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|->
+Jump to given label.
+[GOTO <label>]
+Where:
+- *label*: Label to jump
+The label must be declare by *LABEL* somewhere in the method
+No stack effect
+
+GOTO_W
+Go to label|GOTO_W\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|->
+Jump to given label.
+[GOTO_W <label>]
+Where:
+- *label*: Label to jump
+The label must be declare by *LABEL* somewhere in the method
+No stack effect
+This instruction is designed for "big jump".
+Here compiler transform *GOTO* to *GOTO_W* if the label is too far.
+So use *GOTO" and let compiler decide if *GOTO_W* is necessary
+
+# -- I --
+
+I2B
+Int to byte|I2B|int->int
+Convert int to byte. Integer value is truncated to byte.
+[I2B]
+Stack effect:
+[ ..., value -> ..., result ]
+Where:
+- *value*: Int value to convert
+- *result*: Byte result
+Details:
+Truncated to a byte then sign-extended to an int result
+
+I2C
+Int to byte|I2C|int->int
+Convert int to char. Integer value is truncated to char.
+[I2C]
+Stack effect:
+[ ..., value -> ..., result ]
+Where:
+- *value*: Int value to convert
+- *result*: Char result
+Details:
+Truncated to char, then zero-extended to an int result
+
+I2D
+Int to double|I2D|int->double
+Convert int to double.
+[I2D]
+Stack effect:
+[ ..., value -> ..., result ]
+Where:
+- *value*: Int value to convert
+- *result*: Double result
+
+I2F
+Int to float|I2F|int->float
+Convert int to float.
+[I2F]
+Stack effect:
+[ ..., value -> ..., result ]
+Where:
+- *value*: Int value to convert
+- *result*: Float result
+
+I2L
+Int to long|I2L|int->long
+Convert int to long.
+[I2L]
+Stack effect:
+[ ..., value -> ..., result ]
+Where:
+- *value*: Int value to convert
+- *result*: Long result
+
+I2S
+Int to short|I2S|int->int
+Convert int to short. Integer value is truncated to short.
+[I2S]
+Stack effect:
+[ ..., value -> ..., result ]
+Where:
+- *value*: Int value to convert
+- *result*: Short result
+Details:
+Truncated to a short, then sign-extended to an int result
+
+IADD
+Int addition|IADD|int,int->int
+Addition on two int
+[IADD]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First int
+- *value2*: First int
+- *result*: Result of value1+value2
+
+IALOAD
+Load int from array|IALOAD|array,int->int
+Load int from an array
+[IALOAD]
+Stack effect:
+[ ..., array, index -> ..., value ]
+Where:
+- *array*: Array where get the float
+- *index*: Index in array
+- *value*: int in array at given index
+
+IASTORE
+Store int to array|IASTORE|array,int,int->
+Store int in array.
+[IASTORE]
+Stack effect:
+[ ..., array, index, value -> ... ]
+Where:
+- *array*: Array where store the int
+- *index*: Index in array
+- *value: Value to store
+
+ICONST
+Push -1 to 5|ICONST\s+(<-1-5>\-1|[0-5])|->int
+Push int -1, 0, 1, 2, 3, 4, or 5.
+[ICONST <value>]
+Where:
+- *value*: -1, 0, 1, 2, 3, 4, or 5.
+Stack effect:
+[ ... -> ..., value ]
+Where:
+- *value*: -1, 0, 1, 2, 3, 4, or 5.
+
+IDIV
+Int division|IDIV|int,int->int
+Division on two int
+[IDIV]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First int
+- *value2*: First int
+- *result*: Result of value1/value2
+
+IF_ACMPEQ
+IF == go label|IF_ACMPEQ\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|object,object->
+Jump to given label if objects are pointer to same object.
+[IF_ACMPEQ <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., object1, object2 -> ... ]
+Where:
+- *object1*: First object reference
+- *object2*: Second object reference
+
+IF_ACMPNE
+If != go label|IF_ACMPNE\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|object,object->
+Jump to given label if object are pointer to different object.
+[IF_ACMPNE <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., object1, object2 -> ... ]
+Where:
+- *object1*: First object reference
+- *object2*: Second object reference
+
+IF_ICMPEQ
+If == go label|IF_ICMPEQ\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int,int->
+Jump if the two last stack int are equals.
+[IF_ICMPEQ <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value1, value2 -> ... ]
+Where:
+- *value1*: First int to compare
+- *value2*: Second int to compare
+
+IF_ICMPGE
+If >= go label|IF_ICMPGE\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int,int->
+Jump if first >= second
+[IF_ICMPGE <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value1, value2 -> ... ]
+Where:
+- *value1*: First int to compare
+- *value2*: Second int to compare
+
+IF_ICMPGT
+If > go label|IF_ICMPGT\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int,int->
+Jump if first > second
+[IF_ICMPGT <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value1, value2 -> ... ]
+Where:
+- *value1*: First int to compare
+- *value2*: Second int to compare
+
+IF_ICMPLE
+If <= go label|IF_ICMPLE\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int,int->
+Jump if first <= second
+[IF_ICMPLE <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value1, value2 -> ... ]
+Where:
+- *value1*: First int to compare
+- *value2*: Second int to compare
+
+IF_ICMPLT
+If < go label|IF_ICMPLT\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int,int->
+Jump if first > second
+[IF_ICMPLT <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value1, value2 -> ... ]
+Where:
+- *value1*: First int to compare
+- *value2*: Second int to compare
+
+IF_ICMPNE
+If != go label|IF_ICMPNE\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int,int->
+Jump if first != second
+[IF_ICMPNE <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value1, value2 -> ... ]
+Where:
+- *value1*: First int to compare
+- *value2*: Second int to compare
+
+IFEQ
+If == 0 go label|IFEQ\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int->
+Jump if last stack element is 0
+[IFEQ <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Int to compare to 0
+
+IFGE
+If >= 0 go label|IFGE\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int->
+Jump if last stack element is >= 0
+[IFGE <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Int to compare to 0
+
+IFGT
+If > 0 go label|IFGT\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int->
+Jump if last stack element is > 0
+[IFGT <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Int to compare to 0
+
+IFLE
+If <= 0 go label|IFLE\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int->
+Jump if last stack element is <= 0
+[IFLE <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Int to compare to 0
+
+IFLT
+If < 0 go label|IFLT\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int->
+Jump if last stack element is < 0
+[IFLT <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Int to compare to 0
+
+IFNE
+If != 0 go label|IFNE\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|int->
+Jump if last stack element is not 0
+[IFNE <label>]
+Where:
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Int to compare to 0
+
+IFNONNULL
+If !=null go label|IFNONNULL\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|object->
+Jump if last stack element is not *null*
+[IFNONNULL <label>]
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., object -> ... ]
+Where:
+- *object*: Object to compare to *null*
+
+IFNULL
+If ==null go label|IFNULL\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)|object->
+Jump if last stack element is *null*
+[IFNULL <label>]
+- *label*: Label (defined by *VAR*) to go
+Stack effect:
+[ ..., object -> ... ]
+Where:
+- *object*: Object to compare to *null*
+
+IINC
+Increment local varaible|IINC\s+(<name[a-zA-Z][a-zA-Z0-9_]*)\s+(<value>\-?[0-9]+)|->
+Increment a local variable.
+[IINC <name> <value>]
+Where:
+- *name*: Local variable name
+- *value*: Number to increment (Can be negative to decrement)
+No stack effect
+The increment value is a signed short. (Negative value used for decrement)
+
+ILOAD
+Load local variable|ILOAD\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Load int from local variable.
+[ILOAD <name>]
+Where:
+- *name*: Local variable name.
+Stack effect:
+[ ... -> ..., value ]
+Where:
+- *value*: Local variable value
+Details:
+A local variable is one of method parameter of variables declare with *VAR* inside the method.
+For variables declare with var, they must have previously initialized (Even with 0).
+Since the variable must contains a int, *this* can't be used
+
+IMPDEP1
+Do not use|IMPDEP1
+@class:khelp.ui.resources.UIResources/images/warningIcon.png@
+Implementation dependent instruction.
+Not recommended to use it.
+
+IMPDEP2
+Do not use|IMPDEP2
+@class:khelp.ui.resources.UIResources/images/warningIcon.png@
+Implementation dependent instruction.
+Not recommended to use it.
+
+IMUL
+Int multiplication|IMUL|int,int->int
+multiplication on two int
+[IMUL]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First int
+- *value2*: First int
+- *result*: Result of value1*value2
+
+INEG
+Negate int|INEG|int->int
+Negate a int. Take its opposite.
+[INEG]
+Stack effect:
+[ ..., value -> ..., result ]
+Where:
+- *value*: Int to negate
+- *result*: *value* opposite
+
+INSTANCEOF
+Check type|INSTANCEOF\s+(<className>[a-zA-Z][a-zA-Z0-9_.\[\]]*)|object->int
+Check if an object can be cast as given type.
+[INSTANCEOF <className>]
+Where:
+- *className*: Class name to check. It can be an array check.
+Stack effect:
+[ ..., object -> ..., result ]
+Where:
+- *object*: Object instance to check
+- *result*: Check result. 1 if object can be cast. 0 if cannot cast or given object is *null*
+
+INVOKEINTERFACE
+Invoke interface method|INVOKEINTERFACE\s+(<methodCompleteDescription>[a-zA-Z][a-zA-Z0-9;,:\[\].\(\) ]*)|object->|object,object->|object,object,object->
+Invoke an interface method. It call the method from the object class or one of its parent.
+[INVOKEINTERFACE <methodCompleteName> ]
+Where:
+- *methodCompleteName*: Method to invoke complete name.
+= Complete name means <className>.<methodName><signature>.
+= In other world, have to specify the class form the method is called.
+= And specify the signature
+Stack effect:
+[ ..., object, parameter_1, parameter_2, ... -> ..., result]
+	if method return a value
+OR
+[ ..., object, parameter_1, parameter_2, ... -> ...]
+	if method is void
+Where:
+- *object*: Object where the method is called
+- *parameter_?*: method parameter value
+- *result*: Method value
+
+INVOKESPECIAL
+Invoke super/private/init|INVOKESPECIAL\s+(<methodCompleteDescription>[a-zA-Z][a-zA-Z0-9;,:<>\[\].\(\) ]*)|object->|object->object|object,object->|object,object->object
+Invoke instance method: special handling for superclass, private, and instance initialization method invocations
+[INVOKESPECIAL <methodCompleteName>]
+Where:
+- *methodCompleteName*: Method to invoke complete name.
+= Complete name means <className>.<methodName><signature>.
+= In other world, have to specify the class form the method is called.
+= And specify the signature
+Stack effect:
+[ ..., object, parameter_1, parameter_2, ... -> ..., result]
+	if method return a value
+OR
+[ ..., object, parameter_1, parameter_2, ... -> ...]
+	if method is void
+Where:
+- *object*: Object where the method is called
+- *parameter_?*: method parameter value
+- *result*: Method value
+Example:
+Call parent initializer:
+[*ALOAD* this
+*INVOKESPECIAL* Object.<init>()]
+
+INVOKESTATIC
+Invoke static method|INVOKESTATIC\s+(<methodCompleteDescription>[a-zA-Z][a-zA-Z0-9;,:\[\].\(\) ]*)|->|->object
+Invoke a static method.
+[INVOKESTATIC <methodCompleteDescription>]
+Where:
+- *methodCompleteName*: Method to invoke complete name.
+= Complete name means <className>.<methodName><signature>.
+= In other world, have to specify the class form the method is called.
+= And specify the signature
+Stack effect:
+[ ..., parameter_1, parameter_2, ... -> ..., result]
+	if method return a value
+OR
+[ ..., parameter_1, parameter_2, ... -> ...]
+	if method is void
+Where:
+- *parameter_?*: method parameter value
+- *result*: Method value
+
+
+INVOKEVIRTUAL
+Invoke not static method|INVOKEVIRTUAL\s+(<methodCompleteDescription>[a-zA-Z][a-zA-Z0-9;,:\[\].\(\) ]*)|->|->object
+Invoke a not static method.
+Work with exposed method, for private method, call super method or invoke the constructor, use *INVOKESPECIAL*
+[INVOKEVIRTUAL <methodCompleteDescription>]
+Where:
+- *methodCompleteName*: Method to invoke complete name.
+= Complete name means <className>.<methodName><signature>.
+= In other world, have to specify the class form the method is called.
+= And specify the signature
+Stack effect:
+[ ..., object, parameter_1, parameter_2, ... -> ..., result]
+	if method return a value
+OR
+[ ..., object, parameter_1, parameter_2, ... -> ...]
+	if method is void
+Where:
+- *object*: Object where the method is called
+- *parameter_?*: method parameter value
+- *result*: Method value
+Example:
+[*GETSTATIC* systemOut
+*PUSH* "Hello World!"
+*INVOKEVIRTUAL* PrintStream.println(String)]
+
+IOR
+OR on int|IOR|int,int->int
+Binary OR on two int
+[IOR]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First int
+- *value2*: Second int
+- *result*: first OR second
+
+IREM
+Remainder int|IREM|int,int->int
+Remainder on two int
+[IREM]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First int
+- *value2*: Second int
+- *result*: first%second
+
+IRETURN
+Return an int|IRETURN|int->[]
+Retun an int from method.
+[IRETURN]
+Stack effect:
+[ ..., value -> EMPTY ]
+Where:
+- *value*: Returned int
+
+ISHL
+Shift left on int|ISHL|int,int->int
+Shift left on int
+[ISHL]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First int
+- *value2*: Second int
+- *result*: first << second
+
+ISHR
+Shift right on int|ISHR|int,int->int
+Shift right on int
+[ISHR]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First int
+- *value2*: Second int
+- *result*: first >> second
+
+ISTORE
+Store int to local variable|ISTORE\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|int->
+Store int in local variable.
+[ISTORE <name>]
+Where:
+- *name*: Local variable name
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Value to store
+
+ISUB
+Subtraction int|ISUB|int,int->int
+Subtraction on int
+[ISUB]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First int
+- *value2*: Second int
+- *result*: first-second
+
+IUSHR
+Shift right on int|IUSHR|int,int->int
+Logical shift right on int
+[IUSHR]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First int
+- *value2*: Second int
+- *result*: first >>> second
+
+IXOR
+XOR on int|IXOR|int,int->int
+Binary XOR on two int
+[IXOR]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First int
+- *value2*: Second int
+- *result*: first XOR second
+
+# -- J --
+
+JSR
+Jump subroutine|JSR\s+(<label>[a-zA-Z][a-zA-Z0-9_])|->object
+Jump in subroutine.
+[JSR <label>]
+Where:
+- *label*: Label to jump
+Stack effect:
+[ ... -> ..., address]
+Where:
+- *address*: Address to return when subroutine end. Store it, as object, to use with *RET*
+
+JSR_W
+Jump subroutine|JSR_W\s+(<label>[a-zA-Z][a-zA-Z0-9_])|->object
+Jump in subroutine. For long jump.
+[JSR_W <label>]
+Where:
+- *label*: Label to jump
+Stack effect:
+[ ... -> ..., address]
+Where:
+- *address*: Address to return when subroutine end. Store it, as object, to use with *RET*
+*Note:* Compiler will transform any *JSR* that need to *JSR_W*.
+So use *JSR* and let compiler decide.
+
+# -- L --
+
+L2D
+Long to double|L2D|long->double
+Convert long to double.
+[L2D]
+Stack effect
+[ ..., value -> ..., result ]
+here:
+- *value*: Long to convert
+- *result*: Converted double
+Details:
+Converted to a double result using IEEE 754 round to nearest mode
+
+L2F
+Long to float|L2F|long->float
+Convert long to float.
+[L2F]
+Stack effect
+[ ..., value -> ..., result ]
+here:
+- *value*: Long to convert
+- *result*: Converted float
+Details:
+Converted to a float result using IEEE 754 round to nearest mode
+
+L2I
+Long to int|L2I|long->int
+Convert long to int.
+[L2I]
+Stack effect
+[ ..., value -> ..., result ]
+here:
+- *value*: Long to convert
+- *result*: Converted int
+Details:
+Converted to an int result by taking the low-order 32 bits
+of the long value and discarding the high-order 32 bits.
+
+LADD
+Long addition|LADD|long,long->long
+Addition of two long.
+[LADD]
+Stack effect:
+[ ..., first, second -> ..., result ]
+Where:
+- *first*: First long
+- *second*: Second long
+- *result*: Result of first+second
+
+LALOAD
+Load long from array|LALOAD|array,int->long
+Load long from array.
+[LALOAD]
+Stack effect:
+[ ..., array, index -> ..., value ]
+Where:
+- *array*: Array where get the long
+- *index*: Index in the array
+- *value*: Value at array index
+
+LAND
+Long AND|LAND|long,long->long
+Binary AND on two long.
+[LAND]
+Stack effect:
+[ ..., first, second -> ..., result ]
+Where:
+- *first*: First long
+- *second*: Second long
+- *result*: Result of first AND second
+
+LASTORE
+Store long to array|LASTORE|array,int,long->
+Store long inside an array.
+[LASTORE]
+Stack effect:
+[ ..., array, index, value -> ... ]
+Where:
+- *array*: Array where put the long
+- *index*: Index in the array
+- *value*: Value to put at array index
+
+LCMP
+Compare long|LCMP|long,long->int
+Compare two long.
+[LCMP]
+Stack effect:
+[ ..., first, second -> ..., comparison ]
+Where:
+- *first*: First long
+- *second*: Second long
+- *comparison*: Int represent the comparison result
+The *comparision* is:
+- *-1* : If first < second
+- *0*  : If first == second
+- *1*  : If first > second
+
+LCONST
+Push 0 or 1|LCONST\s+(<0-1>[01])|->long
+Pulong constant 0 or 1
+[LCONST <zeroOrOne>]
+Where:
+- *zeroOrOne*: Is 0 or 1
+Stack effect:
+[ ... -> ..., value ]
+Where:
+- *value*: The value pushed (0 or 1)
+
+LDC
+Push constant|LDC\s+(<value>.+)|->object|->int|->float
+Push a constant. Reference in constant push is a "small" value.
+[LDC <constant>]
+Where:
+- *constant*: Pushed constant
+Stack effect:
+[ ... -> ..., constant ]
+Where:
+- *constant*: Pushed constant
+The constant can represents:
+- *boolean*: With *true* or *false* as value.
+= Example: [*LDC* true]
+- *char*: Like Java or Kotlin convention, between *'*.
+= Example: [*LDC* 'r']
+- *int*: Integer.
+= Example: [*LDC* 128]
+- *float*: Must end with *f*
+= Example: [*LDC* 3.14f]
+- *String*: Put text between *"* like Java or Kotlin.
+= Example: [*LDC* "Hello"]
+*byte* and *short* are *int* in stack point of view, so just use *int* construction.
+For *double* or *long*, use *LDC2_W*
+*Note*: Prefer use *PUSH* instruction that choose between *LDC*, *LDC_W*, *LDC2_W* or one of *?CONST*
+
+LDC_W
+Push constant|LDC_W\s+(<value>.+)|->object|->int|->float
+Push a constant. Reference in constant push is a "wide" value.
+[LDC_W <constant>]
+Where:
+- *constant*: Pushed constant
+Stack effect:
+[ ... -> ..., constant ]
+Where:
+- *constant*: Pushed constant
+The constant can represents:
+- *boolean*: With *true* or *false* as value.
+= Example: [*LDC_W* true]
+- *char*: Like Java or Kotlin convention, between *'*.
+= Example: [*LDC_W* 'r']
+- *int*: Integer.
+= Example: [*LDC_W* 128]
+- *float*: Must end with *f*
+= Example: [*LDC_W* 3.14f]
+- *String*: Put text between *"* like Java or Kotlin.
+= Example: [*LDC_W* "Hello"]
+*byte* and *short* are *int* in stack point of view, so just use *int* construction.
+For *double* or *long*, use *LDC2_W*
+*Note*: Prefer use *PUSH* instruction that choose between *LDC*, *LDC_W*, *LDC2_W* or one of *?CONST*
+
+LDC2_W
+Push a constant|LDC2_W\s+(<value>\-?[0-9.]+[lLdD]?)|->double|->long
+Push a double or long constant.
+[LDC2_W <constant>]
+Where:
+- *constant*: Pushed constant
+Stack effect:
+[ ... -> ..., constant ]
+Where:
+- *constant*: Pushed constant
+The constant can represents:
+- *long*: Long value end with *l*.
+= Example: [*LDC2_W* 1230L]
+- *double*: Double value. If their no decimal, end with *d* is mandatory
+= Example: [*LDC2_W* 3.21]
+= Example: [*LDC2_W* 73d]
+*Note*: Prefer use *PUSH* instruction that choose between *LDC*, *LDC_W*, *LDC2_W* or one of *?CONST*
+
+LDIV
+Long division|LDIV|long,long->long
+Division of two long.
+[LDIV]
+Stack effect:
+[ ..., first, second -> ..., result ]
+Where:
+- *first*: First long
+- *second*: Second long
+- *result*: Result of first/second
+
+LLOAD
+Load local variable|LLOAD\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Load long from local variable.
+[LLOAD <name>]
+Where:
+- *name*: Local variable name.
+Stack effect:
+[ ... -> ..., value ]
+Where:
+- *value*: Local variable value
+Details:
+A local variable is one of method parameter of variables declare with *VAR* inside the method.
+For variables declare with var, they must have previously initialized (Even with 0).
+Since the variable must contains a long, *this* can't be used
+
+LMUL
+Long multiplication|LMUL|long,long->long
+Multiplication of two long.
+[LMUL]
+Stack effect:
+[ ..., first, second -> ..., result ]
+Where:
+- *first*: First long
+- *second*: Second long
+- *result*: Result of first*second
+
+LNEG
+Negate long|LNEG|int->int
+Negate a long. Take its opposite.
+[LNEG]
+Stack effect:
+[ ..., value -> ..., result ]
+Where:
+- *value*: long to negate
+- *result*: *value* opposite
+
+LOOKUPSWITCH
+Switch to labels|LOOKUPSWITCH\s+(<matches>(?:[0-9]+\s+[a-zA-Z][a-zA-Z0-9_]*\s+)*)(<default>[a-zA-Z][a-zA-Z0-9_]*)|int->
+Jump to a label depends on given key.
+[LOOKUPSWITCH (<match1> <label1> <match2> <label2> ...) <default>]
+Where:
+- *match?*: Number reference. If the key have this value, it jump to following label
+- *label?*: Label to jump if key equals tho previous value
+- *default*: Default label to jump if key corresponds to none of matches
+Stack effect:
+[ ..., key -> ... ]
+Where:
+- *key*: Int value to compare to matches.
+*Note*: Values are fix numbers. They must be unique.
+*LOOKUPSWITCH* design to replace *TABLESWITCH* when constraints to use it can't be full fill.
+To choose wisely (Use *TABLESWITCH* when its possible) and optimize the case order,
+prefer use *SWITCH* and compiler will do the rest.
+
+LOR
+Long OR|LOR|long,long->long
+Binary OR of two long.
+[LOR]
+Stack effect:
+[ ..., first, second -> ..., result ]
+Where:
+- *first*: First long
+- *second*: Second long
+- *result*: Result of first OR second
+
+LREM
+Long remainder|LREM|long,long->long
+Remainder of two long.
+[LREM]
+Stack effect:
+[ ..., first, second -> ..., result ]
+Where:
+- *first*: First long
+- *second*: Second long
+- *result*: Result of first%second
+
+LRETURN
+Return a long|LRETURN|long->[]
+Return long from method.
+[LRETURN]
+Stack effect:
+[ ..., value -> EMPTY ]
+Where:
+- *value*: Value to return
+
+LSHL
+Shift left on long|LSHL|long,int->long
+Shift left on long
+[LSHL]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: Long to shit
+- *value2*: Number shift
+- *result*: first << second
+
+LSHR
+Shift right on long|LSHR|long,int->long
+Shift right on long
+[LSHR]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: Long to shit
+- *value2*: Number shift
+- *result*: first >> second
+
+LSTORE
+Store long to local variable|LSTORE\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|long->
+Store long in local variable.
+[LSTORE <name>]
+Where:
+- *name*: Local variable name
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Value to store
+
+LSUB
+Subtraction long|LSUB|long,long->long
+Subtraction on long
+[LSUB]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First long
+- *value2*: Second long
+- *result*: first-second
+
+LUSHR
+Shift right on long|LUSHR|long,int->long
+Logical shift right on long
+[LUSHR]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: Long to shit
+- *value2*: Number shift
+- *result*: first >>> second
+
+LXOR
+XOR on long|LXOR|long,long->long
+Binary XOR on two long
+[LXOR]
+Stack effect:
+[ ..., value1, value2 -> ..., result ]
+Where:
+- *value1*: First long
+- *value2*: Second long
+- *result*: first XOR second
+
+# -- M --
+
+MONITORENTER
+Monitor enter|MONITORENTER|object->
+Enter inside a monitor, with an object as reference.
+[MONITORENTER]
+Stack effect:
+[ ..., object -> ... ]
+Where:
+- *object*: Object to lock with
+Details:
+Each object is associated with a monitor.
+A monitor is locked if and only if it has an owner.
+The thread that executes *MONITORENTER* attempts to gain ownership
+of the monitor associated with *object*, as follows:
+- If the entry count of the monitor associated with *object* is zero,
+= the thread enters the monitor and sets its entry count to one.
+= The thread is then the owner of the monitor.
+- If the thread already owns the monitor associated with *object*,
+= it reenters the monitor, incrementing its entry count.
+- If another thread already owns the monitor associated with *object*,
+= the thread blocks until the monitor's entry count is zero,
+= then tries again to gain ownership.
+
+MONITOREXIT
+Monitor exit|MONITOREXIT|object->
+Exit from a monitor, from a reference object
+[MONITOREXIT]
+Stack effect:
+[ ..., object -> ... ]
+Where:
+- *object*: Object to lock with
+Details:
+The thread that executes *MONITOREXIT* must be the owner
+of the monitor associated with the instance referenced by *object*.
+The thread decrements the entry count of the monitor associated with *object*.
+If as a result the value of the entry count is zero,
+the thread exits the monitor and is no longer its owner.
+Other threads that are blocking to enter the monitor are allowed to attempt to do so.
+
+MULTIANEWARRAY
+New multidimensional array|MULTIANEWARRAY\s+(<type>[a-zA-Z][a-zA-Z0-9._$]*)\s+(<number>[0-9]+)|int->array|int,int->array|int,int,int->array
+Create new multidimensional array.
+[MULTIANEWARRAY <type> <number>]
+Where:
+- *type*: Array elements types
+- *number*: Number of dimension.
+Stack effect:
+[ ..., size1, (size2, size3, ...) -> ..., array ]
+Where:
+- *size?*: Size for each dimension.
+- *array*: Created array
+For one dimension array based on primitives prefer use *NEWARRAY*
+
+# -- N --
+
+NEW
+New object|NEW\s+(<type>[a-zA-Z][a-zA-Z0-9._$]*)|->object
+Create a new object.
+[NEW <type>]
+Where:
+- *type*: Object class
+Stack effect:
+[ ... -> ..., object ]
+Where:
+- *object*: Created reference.
+*Warning*: The object is not finished, only memory is reserved for store it.
+We receive a pointer to that memory.
+Have to invoke a constructor to have a valid object.
+
+NEWARRAY
+New array|NEWARRAY\s+(<primitiveType>boolean|char|byte|short|int|long|float|double)|int->array
+Create one dimension primitive array.
+[NEWARRAY <primitiveType>]
+Where:
+- *primitiveType*: Primitive type in: *{boolean, char, byte, short, int, long, float, double}*
+Stack effect:
+[ ..., size -> ..., array ]
+Where:
+- *size*: Array size
+- *array*: Created array
+
+NOP
+Does nothing|NOP|->
+Does nothing. Do a micro-pause
+[NOP]
+No stack effect
+
+# -- P --
+
+POP
+Pop value|POP|notDoubleNorLong->
+Remove last stack element. Work for any type except *double* or *long*.
+[POP]
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Value to remove. All except *double* or *long*.
+
+POP2
+Pop value|POP2|notDoubleNorLong,notDoubleNorLong->|doubleOrLong->
+Remove one or two value from stack.
+[POP]
+Stack effect:
+[ ..., value1, value2 -> ... ]
+Where:
+- *value1*: Value to remove. All except *double* or *long*.
+- *value2*: Value to remove. All except *double* or *long*.
+*OR*
+[ ..., value -> ... ]
+Where:
+- *value*: Value to remove. *double* or *long*.
+
+PUSH
+Push constant|PUSH\s+(<value>.+)|->int|->long|->double|->float|->float
+Convenient instruction for push any constant.
+Compiler replace it by the most optimized instruction for the given constant.
+[PUSH <constant>]
+Where:
+- *constant*: Constant to push
+Stack effect:
+[ ... -> ..., value ]
+Where:
+- *value*: Constant value
+The constant can represents:
+- *boolean*: With *true* or *false* as value.
+= Example: [*LDC* true]
+- *char*: Like Java or Kotlin convention, between *'*.
+= Example: [*LDC* 'r']
+- *int*: Integer.
+= Example: [*LDC* 128]
+- *float*: Must end with *f*
+= Example: [*LDC* 3.14f]
+- *String*: Put text between *"* like Java or Kotlin.
+= Example: [*LDC* "Hello"]
+- *long*: Long value end with *l*.
+= Example: [*LDC2_W* 1230L]
+- *double*: Double value. If their no decimal, end with *d* is mandatory
+= Example: [*LDC2_W* 3.21]
+= Example: [*LDC2_W* 73d]
+*byte* and *short* are *int* in stack point of view, so just use *int* construction.
+
+PUTFIELD
+Put value on field|PUTFIELD\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|object,notDoubleNorLong->|object,doubleOrLong->
+Put a value in a not static field.
+[PUTFIELD <name>]
+Where:
+- *name*: Field name (declare with *field*) or alias (with *field_reference*)
+Stack effect:
+[ ..., object, value -> ... ]
+Where:
+- *object*: Object reference where field lies. Use *this* for current object's fields
+- *value*: Value to set
+
+PUTSTATIC
+Put on static field|PUTSTATIC\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|notDoubleNorLong->|doubleOrLong->
+Put a value in static field.
+[PUTFIELD <name>]
+Where:
+- *name*: Field name (declare with *field*) or alias (with *field_reference*)
+Stack effect:
+[ ..., value -> ... ]
+Where:
+- *value*: Value to set
+
+# -- R --
+
+RET
+Return from subroutine|RET\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)|->
+Return from subroutine called by *JSR*.
+[RET <localVariable>]
+Where:
+- *localVariable*: Local variable where the return address is stored.
+= See *JSR*
+No stack effect
+Details:
+It is used in combination with *JSR* or *JSR_W*.
+When enter in subroutine, the return address is on the top of the stack,
+if you want things go properly, you can adopt 2 strategies :
+- The most easy is to store the return address in local variable as first instruction of subroutine
+= and not modify this variable until the end of the subroutine to use it only for *RET*
+- Or pay attention to stack status in way that the address not delete from the stack
+= and be at top at the end of subroutine and store it in local variable just before call the *RET*
+What ever strategy choose, only the *address* value must be use with *RET*.
+And the *address* must be consumed by the subroutine.
+
+RETURN
+Return void|RETURN|->[]
+Return void from method.
+[RETURN]
+Stack effect:
+[ ... -> EMPTY ]
+
+# -- S --
+
+SALOAD
+Load short from array|SALOAD|array,int->int
+Load short from array.
+[SALOAD]
+Stack effect:
+[ ..., array, index -> ..., value ]
+Where:
+- *array*: Array to read
+- *index*: Index in array
+- *value*: Value in array at given index
+
+SASTORE
+Store short to array|SASTORE|array,int,int->
+Store short in array.
+[SASTORE]
+Stack effect:
+[ ..., array, index, value -> ... ]
+Where:
+- *array*: Array where write
+- *index*: Index in array
+- *value*: Value to write
+
+SIPUSH
+Push a short|SIPUSH\s+(<value>[0-9]+)|->int
+Push a constant short.
+[SIPUSH <value>]
+Where:
+- *value*: Short value to push
+Stack effect:
+[ ... -> ..., value ]
+- *value*: Pushed value
+
+SWAP
+Exchange value|SWAP|notDoubleNorLong,notDoubleNorLong->$1,$0
+Exchange two last stack values.
+[SWAP]
+Stack effect:
+[ ..., value1, value2 -> ..., value2, value1 ]
+Where:
+Where:
+- *value1*: First value to exchange. All except *double* or *long*.
+- *value2*: Second value to exchange. All except *double* or *long*.
+
+SWITCH
+Switch to labels|SWITCH\s+(<matches>(?:[0-9]+\s+[a-zA-Z][a-zA-Z0-9_]*\s+)*)(<default>[a-zA-Z][a-zA-Z0-9_]*)|int->
+Jump to a label depends on given key.
+[SWITCH (<match1> <label1> <match2> <label2> ...) <default>]
+Where:
+- *match?*: Number reference. If the key have this value, it jump to following label
+- *label?*: Label to jump if key equals tho previous value
+- *default*: Default label to jump if key corresponds to none of matches
+Stack effect:
+[ ..., key -> ... ]
+Where:
+- *key*: Int value to compare to matches.
+*Note*: Values are fix numbers. They must be unique.
+
+# -- T --
+
+TABLESWITCH
+Switch to labels|TABLESWITCH\s+(<matches>(?:[0-9]+\s+[a-zA-Z][a-zA-Z0-9_]*\s+)*)(<default>[a-zA-Z][a-zA-Z0-9_]*)|int->
+Jump to a label depends on given key.
+[TABLESWITCH (<match1> <label1> <match2> <label2> ...) <default>]
+Where:
+- *match?*: Number reference. If the key have this value, it jump to following label
+- *label?*: Label to jump if key equals tho previous value
+- *default*: Default label to jump if key corresponds to none of matches
+Stack effect:
+[ ..., key -> ... ]
+Where:
+- *key*: Int value to compare to matches.
+*Note*: Values are fix numbers. They must be unique.
+*TABLESWITCH* designed to work a small number of case,
+in ascent order and gap between matches not too big
+To choose wisely (Use *TABLESWITCH* when its possible) and optimize the case order,
+prefer use *SWITCH* and compiler will do the rest.
+
+# ****************************
+# *** Additional key words ***
+# ****************************
+
+LABEL
+Declare a label|LABEL\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Declare a label to jump in it.
+[LABEL <name>]
+Where:
+- *name*: Label name
+
+SUB_C
+Subroutine call|SUB_C\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Convenient instruction for call subroutine
+[SUB_C <name>]
+Where:
+- *name*: Subroutine name
+Details:
+Instructions *SUB_C*, *SUB_S* and *SUB_E* are to facilitate the subroutine creation
+to resolve the problem of return address.
+Here it call the subroutine, just use its name.
+Warning subroutines must be have one *SUB_S* and one *SUB_E*
+(The sub routine code is between this 2 instructions).
+Then they MUST be call with *SUB_C* (You can use it in several places).
+Other branch instruction outside subroutine code that goes inside subroutine code
+may cause unexpected result or crash.
+Same risk apply if exit from subroutine code without *SUB_E*
+or call an other subroutine with *SUB_C*.
+The subroutine don't manage well the recursive call here, if you want some,
+you have to deal with *JSR*/*JSR_W* and *RET*
+and apply the second strategy explains in *RET*.
+
+SUB_E
+Subroutine end|SUB_E\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Convenient instruction for end subroutine
+[SUB_E <name>]
+Where:
+- *name*: Subroutine name
+Details:
+Instructions *SUB_C*, *SUB_S* and *SUB_E* are to facilitate the subroutine creation
+to resolve the problem of return address.
+Warning subroutines must be have one *SUB_S* and one *SUB_E*
+(The sub routine code is between this 2 instructions).
+Then they MUST be call with *SUB_C* (You can use it in several places).
+Other branch instruction outside subroutine code that goes inside subroutine code
+may cause unexpected result or crash.
+Same risk apply if exit from subroutine code without *SUB_E*
+or call an other subroutine with *SUB_C*.
+The subroutine don't manage well the recursive call here, if you want some,
+you have to deal with *JSR*/*JSR_W* and *RET*
+and apply the second strategy explains in *RET*.
+
+SUB_S
+Subroutine start|SUB_S\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Convenient instruction for start subroutine
+[SUB_S <name>]
+Where:
+- *name*: Subroutine name
+Details:
+Instructions *SUB_C*, *SUB_S* and *SUB_E* are to facilitate the subroutine creation
+to resolve the problem of return address.
+Warning subroutines must be have one *SUB_S* and one *SUB_E*
+(The sub routine code is between this 2 instructions).
+Then they MUST be call with *SUB_C* (You can use it in several places).
+Other branch instruction outside subroutine code that goes inside subroutine code
+may cause unexpected result or crash.
+Same risk apply if exit from subroutine code without *SUB_E*
+or call an other subroutine with *SUB_C*.
+The subroutine don't manage well the recursive call here, if you want some,
+you have to deal with *JSR*/*JSR_W* and *RET*
+and apply the second strategy explains in *RET*.
+
+VAR
+Declare local variable|VAR\s+(<type>[a-zA-Z][a-zA-Z0-9_.$\[\]]*)\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Create a local variable
+[VAR <type> <name>]
+Where:
+- *type*: Variable type
+- *name*: Variable name
+
+TRY
+Start try/catch block|TRY\s+(<exceptionType>[a-zA-Z][a-zA-Z0-9_.$]*)\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)
+Start a try/catch block.
+[TRY <exceptionType> <name>]
+Where:
+- *exceptionType*: Exception type to capture
+- *name*: Exception name
+
+CATCH
+End try/catch block|CATCH\s+(<name>[a-zA-Z][a-zA-Z0-9_]*)\s+(<label>[a-zA-Z][a-zA-Z0-9_]*)
+End a try/catch block.
+[CATCH <name> <label>]
+Where:
+- *name*: Exception name (Same as corresponding *TRY*)
+- *label*: Label to jump if exception happen.

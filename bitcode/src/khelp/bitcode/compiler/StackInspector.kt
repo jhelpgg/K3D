@@ -45,6 +45,7 @@ import com.sun.org.apache.bcel.internal.generic.PUTFIELD
 import com.sun.org.apache.bcel.internal.generic.PUTSTATIC
 import com.sun.org.apache.bcel.internal.generic.TABLESWITCH
 import com.sun.org.apache.bcel.internal.generic.Type
+import khelp.util.firstOrDefault
 import khelp.util.forEachIndexedReversed
 import java.util.Stack
 import java.util.TreeSet
@@ -97,18 +98,9 @@ class StackInspector(private val instructionList: InstructionList,
         return -1
     }
 
-    private fun obtainLineNumber(instructionHandle: InstructionHandle): Int
-    {
-        for (pair in this.linesTable)
-        {
-            if (pair.first === instructionHandle)
-            {
-                return pair.second
-            }
-        }
-
-        return -1
-    }
+    private fun obtainLineNumber(instructionHandle: InstructionHandle) =
+            this.linesTable.firstOrDefault({ (instruction, _) -> instruction == instructionHandle },
+                                           Pair(instructionHandle, -1)).second
 
     private fun pop(number: Int)
     {
@@ -218,13 +210,13 @@ class StackInspector(private val instructionList: InstructionList,
                 // ... => ..., 1 (double)
                 Constants.DCONST_1        -> this.push(Type.DOUBLE)
                 // ... => ..., value (int)
-                Constants.BIPUSH          -> this.push(Type.INT)
+                Constants.BIPUSH  -> this.push(Type.INT)
                 // ... => ..., value (int)
-                Constants.SIPUSH          -> this.push(Type.INT)
+                Constants.SIPUSH  -> this.push(Type.INT)
                 // ... => ..., value (int/float/objectref)
-                Constants.LDC             -> this.push((instruction as LDC).getType(constantPool))
+                Constants.LDC     -> this.push((instruction as LDC).getType(constantPool))
                 // ... => ..., value (int/float/objectref)
-                Constants.LDC_W           -> this.push((instruction as LDC_W).getType(constantPool))
+                Constants.LDC_W   -> this.push((instruction as LDC_W).getType(constantPool))
                 // ... => ..., value (long/double)
                 Constants.LDC2_W  -> this.push((instruction as LDC2_W).getType(constantPool))
                 // ... => ..., value (int)
@@ -249,19 +241,19 @@ class StackInspector(private val instructionList: InstructionList,
                 // ... => ..., value (long)
                 Constants.LLOAD_0 -> this.push(Type.LONG)
                 // ... => ..., value (long)
-                Constants.LLOAD_1         -> this.push(Type.LONG)
+                Constants.LLOAD_1 -> this.push(Type.LONG)
                 // ... => ..., value (long)
-                Constants.LLOAD_2         -> this.push(Type.LONG)
+                Constants.LLOAD_2 -> this.push(Type.LONG)
                 // ... => ..., value (long)
-                Constants.LLOAD_3         -> this.push(Type.LONG)
+                Constants.LLOAD_3 -> this.push(Type.LONG)
                 // ... => ..., value (float)
-                Constants.FLOAD_0         -> this.push(Type.FLOAT)
+                Constants.FLOAD_0 -> this.push(Type.FLOAT)
                 // ... => ..., value (float)
-                Constants.FLOAD_1         -> this.push(Type.FLOAT)
+                Constants.FLOAD_1 -> this.push(Type.FLOAT)
                 // ... => ..., value (float)
-                Constants.FLOAD_2         -> this.push(Type.FLOAT)
+                Constants.FLOAD_2 -> this.push(Type.FLOAT)
                 // ... => ..., value (float)
-                Constants.FLOAD_3         -> this.push(Type.FLOAT)
+                Constants.FLOAD_3 -> this.push(Type.FLOAT)
                 // ... => ..., value (double)
                 Constants.DLOAD_0 -> this.push(Type.DOUBLE)
                 // ... => ..., value (double)
@@ -294,7 +286,7 @@ class StackInspector(private val instructionList: InstructionList,
                     this.push(Type.INT)
                 }
                 // ..., arrayref, index (int) => ..., value (long)
-                Constants.LALOAD          ->
+                Constants.LALOAD  ->
                 {
                     if (size < 2 || !this.stack[size - 2].isArrayRef() || !this.stack[size - 1].isInt())
                     {

@@ -559,9 +559,14 @@ class Compiler
                 javaClass.methods.forEach { method ->
                     informationCollector.append("\n\t")
                     informationCollector.append(method)
-                    informationCollector.append("\n\t{\n\t\t")
-                    informationCollector.append(method.code)
-                    informationCollector.append("\n\t}")
+                    informationCollector.append("\n")
+
+                    if (method.code != null)
+                    {
+                        informationCollector.append("\t{\n\t\t")
+                        informationCollector.append(method.code)
+                        informationCollector.append("\n\t}")
+                    }
                 }
             }
 

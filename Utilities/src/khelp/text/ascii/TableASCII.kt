@@ -711,4 +711,87 @@ class TableASCII
 
         bufferedWriter.flush()
     }
+
+    /**
+     * Create table ASCII
+     */
+    fun createTableHtml(): String
+    {
+        val stringOutputStream = StringOutputStream()
+        this.createTableHtml(stringOutputStream)
+        return stringOutputStream.string
+    }
+
+    /**
+     * Create table ASCII and write it in given stream
+     */
+    fun createTableHtml(outputStream: OutputStream) = this.createTableHtml(OutputStreamWriter(outputStream))
+
+    fun createTableHtml(writer: Writer)
+    {
+        this.compileTexts()
+
+        val numberCellWidth = this.elements.maximumValueOf { line -> line.smartFilter { it is CellASCII }.maximumValueOf { (it as CellASCII).xEnd + 1 } }
+        val numberCellHeight = this.elements.size
+        val tableCells = Array<ElementASCII>(numberCellWidth * numberCellHeight) { EmptyElement }
+
+        this.fillWithSeparator(numberCellWidth, tableCells)
+        this.fillWithCells(numberCellWidth, tableCells)
+
+        // Create the final table
+
+        val bufferedWriter = writer as? BufferedWriter ?: BufferedWriter(writer)
+        bufferedWriter.write("<table border=1>")
+
+        var index = 0
+        var element: ElementASCII
+
+        for (row in 0 until numberCellHeight)
+        {
+            bufferedWriter.newLine()
+            bufferedWriter.write("   <tr>")
+
+            for (column in 0 until numberCellWidth)
+            {
+                element = tableCells[index]
+
+                if (element is CellASCII && element.x == column && element.y == row)
+                {
+                    bufferedWriter.write("<td align=\"")
+
+                    when (element.horizontalAlignment)
+                    {
+                        HorizontalAlignment.LEFT   -> bufferedWriter.write("left")
+                        HorizontalAlignment.CENTER -> bufferedWriter.write("center")
+                        HorizontalAlignment.RIGHT  -> bufferedWriter.write("right")
+                    }
+
+                    if (element.width > 1)
+                    {
+                        bufferedWriter.write("\" colSpan=\"")
+                        bufferedWriter.write(element.width.toString())
+                    }
+
+
+                    if (element.height > 1)
+                    {
+                        bufferedWriter.write("\" rowSpan=\"")
+                        bufferedWriter.write(element.height.toString())
+                    }
+
+                    bufferedWriter.write("\">")
+                    element.words.forEach { bufferedWriter.write(it) }
+                    bufferedWriter.write("</td>")
+                }
+
+                index++
+            }
+
+            bufferedWriter.write("</tr>")
+        }
+
+        bufferedWriter.newLine()
+        bufferedWriter.write("</table>")
+        bufferedWriter.flush()
+    }
 }

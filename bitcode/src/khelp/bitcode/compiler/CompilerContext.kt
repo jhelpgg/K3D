@@ -28,7 +28,7 @@ import java.util.regex.Pattern
  *  1. Group 3 : If exists => return type
  *
  */
-private val PATTERN_SIGNATURE_JAVA = Pattern.compile("\\(([a-zA-Z0-9_.,]*)\\)(:([a-zA-Z0-9_.]+))?")
+private val PATTERN_SIGNATURE_JAVA = Pattern.compile("\\(([a-zA-Z0-9_.\\[\\],]*)\\)(:([a-zA-Z0-9_.\\[\\]]+))?")
 private const val GROUP_PARAMETER_LIST = 1
 private const val GROUP_RETURN_TYPE = 3
 
@@ -463,13 +463,15 @@ class CompilerContext
      * Method reference is compose of `<ClassCompleteName>.<methodName><methodSignature>`. Remember
      * that signature is form like : ()V , (I,I)J, (Ljava.lang.String;)V, ...
      *
+     * @param interfaceReference Indicates if call an interface method
      * @param completeMethodReference Method reference
      * @param lineNumber Line number of declaration
      * @return Method reference
      * @throws CompilerException If method reference invalid
      */
     @Throws(CompilerException::class)
-    fun addMethodReference(completeMethodReference: String, lineNumber: Int): Int
+    fun addMethodReference(interfaceReference: Boolean, completeMethodReference: String,
+                           lineNumber: Int): MethodReferenceInfo
     {
         val indexSignature = completeMethodReference.indexOf('(')
 
@@ -490,7 +492,8 @@ class CompilerContext
             throw CompilerException(lineNumber, "No method name !")
         }
 
-        return this.addMethodReference(completeMethodReference.substring(0, indexClassName),
+        return this.addMethodReference(interfaceReference,
+                                       completeMethodReference.substring(0, indexClassName),
                                        completeMethodReference.substring(indexClassName + 1, indexSignature),
                                        completeMethodReference.substring(indexSignature), lineNumber)
     }
@@ -498,6 +501,7 @@ class CompilerContext
     /**
      * Add method reference for invoke it
      *
+     * @param interfaceReference Indicates if call an interface method
      * @param className Class complete name
      * @param method Method name
      * @param signature Signature in form like : ()V , (I,I)J, (Ljava.lang.String;)V, ... OR (int, char, String):List
@@ -506,20 +510,34 @@ class CompilerContext
      * @throws CompilerException If class name not valid or method signature not valid
      */
     @Throws(CompilerException::class)
-    fun addMethodReference(className: String, method: String, signature: String, lineNumber: Int): Int
+    fun addMethodReference(interfaceReference: Boolean, className: String, method: String, signature: String,
+                           lineNumber: Int): MethodReferenceInfo
     {
         val type = this.stringToType(className) as? ObjectType ?: throw CompilerException(lineNumber,
                                                                                           "Not a reference to a class : $className")
 
         var goodSignature = signature.replace('.', '/')
+        var argumentsSize = 0
 
         try
         {
-            Type.getArgumentTypes(goodSignature)
+            for (argumentType in Type.getArgumentTypes(goodSignature))
+            {
+                if (argumentType == Type.DOUBLE || argumentType == Type.LONG)
+                {
+                    argumentsSize += 2
+                }
+                else
+                {
+                    argumentsSize++
+                }
+            }
+
             Type.getReturnType(goodSignature)
         }
         catch (exception: Exception)
         {
+            argumentsSize = 0
             val matcher = PATTERN_SIGNATURE_JAVA.matcher(signature)
 
             if (!matcher.matches())
@@ -560,6 +578,18 @@ class CompilerContext
                 }
             }
 
+            for (argumentType in parameters)
+            {
+                if (argumentType == Type.DOUBLE || argumentType == Type.LONG)
+                {
+                    argumentsSize += 2
+                }
+                else
+                {
+                    argumentsSize++
+                }
+            }
+
             goodSignature = Type.getMethodSignature(returnType, parameters.toTypedArray())
         }
 
@@ -568,7 +598,19 @@ class CompilerContext
             this.needEmptyConstructor = false
         }
 
-        return this.constantPoolGen!!.addMethodref(type.toString(), method, goodSignature)
+        return MethodReferenceInfo(if (interfaceReference)
+                                   {
+                                       this.constantPoolGen!!.addInterfaceMethodref(type.toString(),
+                                                                                    method,
+                                                                                    goodSignature)
+                                   }
+                                   else
+                                   {
+                                       this.constantPoolGen!!.addMethodref(type.toString(),
+                                                                           method,
+                                                                           goodSignature)
+                                   },
+                                   argumentsSize)
     }
 
     /**
@@ -722,7 +764,7 @@ class CompilerContext
                 when
                 {
                     this.classIsAbstract  -> ACCES_FLAGS_CLASS.toInt() or Constants.ACC_ABSTRACT.toInt()
-                    this.classIsInterface -> Constants.ACC_PUBLIC.toInt() or Constants.ACC_INTERFACE.toInt()
+                    this.classIsInterface -> Constants.ACC_PUBLIC.toInt() or Constants.ACC_INTERFACE.toInt() or Constants.ACC_ABSTRACT.toInt() or Constants.ACC_SUPER.toInt()
                     else                  -> ACCES_FLAGS_CLASS.toInt()
                 }
 

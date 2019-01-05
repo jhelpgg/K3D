@@ -1,5 +1,7 @@
 package khelp.util
 
+import khelp.list.EnumerationIterator
+
 fun <R, S, T> composeTransformation(transform1: (R) -> S, transform2: (S) -> T) = { r: R -> transform2(transform1(r)) }
 fun <R> composeFilter(filter1: (R) -> Boolean, filter2: (R) -> Boolean) = { r: R -> filter1(r) && filter2(r) }
 
@@ -68,6 +70,12 @@ class FilteredIterable<T>(private val iterable: Iterable<T>,
     override fun iterator() = this.iterable.iterator().smartFilter(this.filter)
 
     fun filter(filter: (T) -> Boolean) = FilteredIterable<T>(this.iterable, composeFilter<T>(this.filter, filter))
+}
+
+class FilterableArray<T>(private val array: Array<T>,
+                         private val filter: (T) -> Boolean = { true }) : Iterable<T>
+{
+    override fun iterator() = (EnumerationIterator<T>(this.array) as Iterator<T>).smartFilter(this.filter)
 }
 
 class TransformedIterator<R, S>(private val iterator: Iterator<R>, private val transformation: (R) -> S) : Iterator<S>

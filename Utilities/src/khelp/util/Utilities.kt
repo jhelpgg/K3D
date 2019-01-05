@@ -125,6 +125,8 @@ fun <T> Iterator<T>.smartFilter(filter: (T) -> Boolean) =
             FilteredIterator(this, filter)
         }
 
+fun <T> Array<T>.smartFilter(filter: (T) -> Boolean) = FilterableArray(this, filter)
+
 /**
  * Apply a transformation on each element of this [Iterable] without create an intermediate array
  *
@@ -666,6 +668,8 @@ fun <T> Iterable<T>.onFirstIndexed(condition: (T) -> Boolean,
     firstNotFound()
 }
 
+fun <T> Iterable<T>.firstOrDefault(condition: (T) -> Boolean, default: T) = this.firstOrNull(condition) ?: default
+
 fun <E> Collection<E>.notContains(element: E) = !this.contains(element)
 
 fun <E> MutableCollection<E>.addIfNotContains(element: E) = if (this.notContains(element)) this.add(element) else false
@@ -695,3 +699,29 @@ inline fun <T> Array<T>.forEachIndexedReversed(task: (index: Int, T) -> Unit) =
 
 inline fun <T> Array<T>.forEachReversed(task: (T) -> Unit) =
         this.forEachIndexedReversed { _, element -> task(element) }
+
+fun <T> Array<T>.toDescriptiveStringLight(spaceBetweenComma: Boolean = true): String
+{
+    val stringBuilder = StringBuilder()
+
+    if (this.isNotEmpty())
+    {
+        stringBuilder.append(this[0])
+
+        for (index in 1 until this.size)
+        {
+            stringBuilder.append(",")
+
+            if (spaceBetweenComma)
+            {
+                stringBuilder.append(" ")
+            }
+
+            stringBuilder.append(this[index])
+        }
+    }
+
+    return stringBuilder.toString()
+}
+
+fun <T> Array<T>.toDescriptiveString() = "[${this.toDescriptiveStringLight()}]"

@@ -32,13 +32,13 @@ internal class CellASCII(text: String,
         while (matcher.find())
         {
             end = matcher.end()
-            this.words += text.substring(start, end).trim()
+            this.words += text.substring(start, end)
             start = end
         }
 
         if (start < text.length)
         {
-            this.words += text.substring(start).trim()
+            this.words += text.substring(start)
         }
     }
 
@@ -52,7 +52,6 @@ internal class CellASCII(text: String,
         if (this.height == 1 || this.verticalRule == VerticalRule.IN_ONE_LINE)
         {
             val stringBuilder = this.words.fold(StringBuilder()) { stringBuilder, string ->
-                stringBuilder.append(" ")
                 stringBuilder.append(string)
             }
 
@@ -97,7 +96,7 @@ internal class CellASCII(text: String,
 
                 if (sum <= maxWidth)
                 {
-                    this.words[index] += " " + this.words[index + 1]
+                    this.words[index] += this.words[index + 1]
                     this.words.removeAt(index + 1)
                     widths[index] = sum
                     widths.remove(index + 1)
@@ -113,7 +112,7 @@ internal class CellASCII(text: String,
 
             if (!changed)
             {
-                this.words[minimumIndex] += " " + this.words[minimumIndex + 1]
+                this.words[minimumIndex] += this.words[minimumIndex + 1]
                 this.words.removeAt(minimumIndex + 1)
                 widths[minimumIndex] = minimum
                 widths.remove(minimumIndex + 1)

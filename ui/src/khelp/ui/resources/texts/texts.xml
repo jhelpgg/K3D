@@ -1,0 +1,14 @@
+<Texts>
+    <Text key="OK">
+        Ok
+    </Text>
+    <Text key="YES">
+        Yes
+    </Text>
+    <Text key="NO">
+        No
+    </Text>
+    <Text key="CANCEL">
+        Cancel
+    </Text>
+</Texts>

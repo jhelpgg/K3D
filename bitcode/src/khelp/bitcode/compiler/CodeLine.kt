@@ -617,16 +617,17 @@ class CodeLine(val instruction: String, private val parameters: List<String>, va
             }
             INVOKEINTERFACE ->
             {
-                if (parameter1 == null || parameter2 == null)
+                if (parameter1 == null)
                 {
-                    throw CompilerException(this.lineNumber, "Miss parameters !")
+                    throw CompilerException(this.lineNumber, "Miss method description !")
                 }
 
                 try
                 {
+                    val methodReferenceInfo = compilerContext.addMethodReference(true, parameter1, this.lineNumber)
                     com.sun.org.apache.bcel.internal.generic.INVOKEINTERFACE(
-                            compilerContext.addMethodReference(parameter1, this.lineNumber),
-                            Integer.parseInt(parameter2))
+                            methodReferenceInfo.reference,
+                            methodReferenceInfo.argumentsSize + 1)
                 }
                 catch (exception: Exception)
                 {
@@ -641,7 +642,7 @@ class CodeLine(val instruction: String, private val parameters: List<String>, va
                 }
 
                 com.sun.org.apache.bcel.internal.generic.INVOKESPECIAL(
-                        compilerContext.addMethodReference(parameter1, this.lineNumber))
+                        compilerContext.addMethodReference(false, parameter1, this.lineNumber).reference)
             }
             INVOKESTATIC    ->
             {
@@ -651,7 +652,7 @@ class CodeLine(val instruction: String, private val parameters: List<String>, va
                 }
 
                 com.sun.org.apache.bcel.internal.generic.INVOKESTATIC(
-                        compilerContext.addMethodReference(parameter1, this.lineNumber))
+                        compilerContext.addMethodReference(false, parameter1, this.lineNumber).reference)
             }
             INVOKEVIRTUAL   ->
             {
@@ -661,7 +662,7 @@ class CodeLine(val instruction: String, private val parameters: List<String>, va
                 }
 
                 com.sun.org.apache.bcel.internal.generic.INVOKEVIRTUAL(
-                        compilerContext.addMethodReference(parameter1, this.lineNumber))
+                        compilerContext.addMethodReference(false, parameter1, this.lineNumber).reference)
             }
             IOR             -> com.sun.org.apache.bcel.internal.generic.IOR()
             IREM            -> com.sun.org.apache.bcel.internal.generic.IREM()

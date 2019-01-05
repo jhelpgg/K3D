@@ -1,20 +1,18 @@
 package khelp.text
 
+import khelp.io.obtainExternalFile
 import java.nio.charset.Charset
 import java.text.Normalizer
 import java.util.regex.Pattern
-import java.awt.SystemColor.text
-
-
 
 /**
  * Pattern for class reference
  */
-private val IMAGE_TAG_CLASS_REFERENCE = Pattern.compile("(<\\s*img\\s+src=\\\")class:([a-zA-Z0-9.]+)([^\"]*)")
+private val IMAGE_TAG_CLASS_REFERENCE = Pattern.compile("(<\\s*img\\s+src=\")class:([a-zA-Z0-9.]+)([^\"]*)")
 /**
  * Pattern for external reference
  */
-private val IMAGE_TAG_EXTERNAL_REFERENCE = Pattern.compile("(<\\s*img\\s+src=\\\")external:([^\"]*)")
+private val IMAGE_TAG_EXTERNAL_REFERENCE = Pattern.compile("(<\\s*img\\s+src=\")external:([^\"]*)")
 /**
  * Default escape characters : \ (see [StringExtractor])
  */
@@ -586,3 +584,140 @@ fun String.indexOfIgnoreStrings(search: String, startIndex: Int = 0,
 }
 
 fun Char.repeat(time: Int) = String(CharArray(time) { this })
+
+fun String.indexOfFirstCharacter(charArray: CharArray, offset: Int = 0): Int
+{
+    var index = -1
+    var i: Int
+
+    for (character in charArray)
+    {
+        i = this.indexOf(character, offset)
+
+        if (index < 0 || (i >= 0 && i < index))
+        {
+            index = i
+        }
+    }
+
+    return index
+}
+
+fun String.indexOfFirstCharacter(characters: String, offset: Int = 0) =
+        this.indexOfFirstCharacter(characters.toCharArray(), offset)
+
+fun String.indexOfLastCharacter(charArray: CharArray, offset: Int = this.length): Int
+{
+    var index = -1
+    var i: Int
+
+    for (character in charArray)
+    {
+        i = this.lastIndexOf(character, offset)
+
+        if (index < 0 || (i >= 0 && i > index))
+        {
+            index = i
+        }
+    }
+
+    return index
+}
+
+fun String.indexOfLastCharacter(characters: String, offset: Int = this.length) =
+        this.indexOfLastCharacter(characters.toCharArray(), offset)
+
+/**
+ * Resolve image reference for class and external protocols.
+ *
+ * Class protocol aim to get resources embed near a class,
+ * the idea is to give the class and relative path of image from the class.
+ * Syntax :
+ * ````
+ * class:<classCompleteName>/<relativePath>
+ * ````
+ *
+ * External link give possibility to get image relatively of directory where running jar is.
+ * So you can deploy application and resource without care what is the absolute path.
+ * Syntax :
+ * ````
+ * external:<relativePathFormJarDirectory>
+ * ````
+ *
+ * Other protocols withe absolute path `(file: , jar: , ...)` or url (http: , https: , ...) are not modified.
+ *
+ * @param html HTML text to resolve
+ * @return Resolved text
+ */
+fun resolveImagesLinkInHTML(html: String): String
+{
+    var length = html.length
+    val stringBuilder = java.lang.StringBuilder(length + length / 8)
+    var matcher = IMAGE_TAG_CLASS_REFERENCE.matcher(html)
+    var start = 0
+    var end: Int
+    var className: String
+    var path: String
+    var clazz: Class<*>
+
+    while (matcher.find())
+    {
+        end = matcher.start()
+
+        if (start < end)
+        {
+            stringBuilder.append(html.substring(start, end))
+        }
+
+        stringBuilder.append(matcher.group(1))
+        className = matcher.group(2)
+        path = matcher.group(3)
+
+        try
+        {
+            clazz = Class.forName(className)
+            stringBuilder.append(clazz.getResource(path.substring(1)))
+        }
+        catch (exception: Exception)
+        {
+            khelp.debug.exception(exception, "Failed to resolve resource class=", className, " path=", path)
+            stringBuilder.append("file:")
+            stringBuilder.append(path)
+        }
+
+        start = matcher.end()
+    }
+
+    if (start < length)
+    {
+        stringBuilder.append(html.substring(start))
+    }
+
+    val html2 = stringBuilder.toString()
+    stringBuilder.delete(0, stringBuilder.length)
+    length = html2.length
+    start = 0
+    matcher = IMAGE_TAG_EXTERNAL_REFERENCE.matcher(html2)
+
+    while (matcher.find())
+    {
+        end = matcher.start()
+
+        if (start < end)
+        {
+            stringBuilder.append(html2.substring(start, end))
+        }
+
+        stringBuilder.append(matcher.group(1))
+        stringBuilder.append("file:")
+        stringBuilder.append(obtainExternalFile(matcher.group(2)).absolutePath)
+        start = matcher.end()
+    }
+
+    if (start < length)
+    {
+        stringBuilder.append(html2.substring(start))
+    }
+
+    return stringBuilder.toString()
+}

@@ -159,7 +159,7 @@ class MethodDescription(val name: String, var accessFlags: Int = ACCES_FLAGS_MET
                 when (this.name)
                 {
                     "<init>"   -> this.accessFlags and Constants.ACC_FINAL.toInt().inv() and Constants.ACC_STATIC.toInt().inv()
-                    "<clinit>" -> this.accessFlags and ACCES_FLAGS_CONTROL.inv() and Constants.ACC_FINAL.toInt().inv() or Constants.ACC_STATIC.toInt()
+                    "<clinit>" -> Constants.ACC_STATIC.toInt()
                     else       -> this.accessFlags
                 }
 
