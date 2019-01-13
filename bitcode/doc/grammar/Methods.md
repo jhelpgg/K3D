@@ -16,7 +16,7 @@ By default, method is:
 * final (If the method not abstract)
 * not static
 
-
+````
      +-----------+----------------------------------------------------------+
      | Modifier  |                          Effect                          |
      +===========+==========================================================+
@@ -30,7 +30,7 @@ By default, method is:
      +-----------+----------------------------------------------------------+
      |  static   | Static method                                            |
      +-----------+----------------------------------------------------------+
-
+````
 
 Specifies `public` or `final` can be considered useless (since its the default status), 
 but it is not an error, so you can be explicit.
