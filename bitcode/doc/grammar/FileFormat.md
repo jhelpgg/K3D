@@ -87,7 +87,7 @@ As Java or Kotlin can extends only one class
 Grammar :
 ````
 ExtendsDeclarartion := extends <ShortOrCompleteName>
-<ShortOrCompleteName> := <Name> | <ClassCompleteName>
+ShortOrCompleteName := <Name> | <ClassCompleteName>
 ClassCompleteName := <Name>.<Name> | <Name>.<ClassCompleteName>
 Name := [a-zA-Z][a-zA-Z0-9_]*
 ````
@@ -109,7 +109,7 @@ If the class/interface have to fulfill one or more interfaces, use the `implemen
 Grammar
 ````
 ImplementsDeclaration := implements  <ShortOrCompleteName>
-<ShortOrCompleteName> := <Name> | <ClassCompleteName>
+ShortOrCompleteName := <Name> | <ClassCompleteName>
 ClassCompleteName := <Name>.<Name> | <Name>.<ClassCompleteName>
 Name := [a-zA-Z][a-zA-Z0-9_]*
 ````
@@ -134,7 +134,7 @@ FieldAlias := <Name>
 Type := <Primitve> | <Array> | <ShortOrCompleteName>
 Array := <Type>[]
 Primitve := boolean | char | byte | short | int | long | float | double
-<ShortOrCompleteName> := <Name> | <ClassCompleteName>
+ShortOrCompleteName := <Name> | <ClassCompleteName>
 ClassCompleteName := <Name>.<Name> | <Name>.<ClassCompleteName>
 Name := [a-zA-Z][a-zA-Z0-9_]*
 ````
@@ -156,7 +156,7 @@ Modifier := public | package | procted | private | static | final | open
 Type := <Primitve> | <Array> | <ShortOrCompleteName>
 Array := <Type>[]
 Primitve := boolean | char | byte | short | int | long | float | double
-<ShortOrCompleteName> := <Name> | <ClassCompleteName>
+ShortOrCompleteName := <Name> | <ClassCompleteName>
 ClassCompleteName := <Name>.<Name> | <Name>.<ClassCompleteName>
 Name := [a-zA-Z][a-zA-Z0-9_]*
 ````
@@ -188,10 +188,13 @@ Methods:
 To override the default constructor or use one with parameters, use the special name "`<init>`" (< and > are inside the name).
 There some specific rule for the constructors code (No abstract constructor by example), see [Constructors](Constructors.md)
 
+It is possible to define a static initializer (For initialize static fields by example).
+The method is named `<clinit>` and must be public static
+
 Grammar:
 ````
 MethodDescription := method <MethodName> <Modifier>* <Parameter>* <Return>? <Throws>* <AbstractOrCode>
-<MethodName> := `<init>` | <Name>
+<MethodName> := `<init>` | `<clinit>` | <Name>
 Modifier := public | package | procted | private | static | final | open
 Parameter := `\n` parameter <ParameterType> <ParameterName>
 Return := `\n` return <ReturnType>
@@ -273,11 +276,13 @@ FieldReferenceDeclaration := field_reference <ShortOrCompleteName> <Type> <Name>
 
 FieldDeclaration := field <Type> <Name> <Modifier>*
 
-MethodDelcaration := method <Name> <Modifier>*
+MethodDelcaration := method <MethodName> <Modifier>*
                      <Parameter>*
                      <Return>?
                      <Throws>*
                      <AbstractOrCode>
+                     
+MethodName := `<init>` | `<clinit>` | <Name>
                      
 Parameter := parameter <Type> <Name>
 Return := return <Type>

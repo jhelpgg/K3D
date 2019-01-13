@@ -20,25 +20,25 @@ class AddColumnQuery private constructor(val table: String, val column: String, 
             this(table, column, DataType.BOOLEAN, if (defaultValue) "TRUE" else "FALSE")
 
     constructor(table: String, column: String, defaultValue: Int) :
-            this(table, column, DataType.INTEGER, defaultValue.toString(16))
+            this(table, column, DataType.INTEGER, defaultValue.toHexadecimal())
 
     constructor(table: String, column: String, defaultValue: Long) :
-            this(table, column, DataType.LONG, defaultValue.toString(16))
+            this(table, column, DataType.LONG, defaultValue.toHexadecimal())
 
     constructor(table: String, column: String, defaultValue: Float) :
-            this(table, column, DataType.FLOAT, defaultValue.toBits().toString(16))
+            this(table, column, DataType.FLOAT, defaultValue.toBits().toHexadecimal())
 
     constructor(table: String, column: String, defaultValue: Double) :
-            this(table, column, DataType.DOUBLE, defaultValue.toBits().toString(16))
+            this(table, column, DataType.DOUBLE, defaultValue.toBits().toHexadecimal())
 
     constructor(table: String, column: String, defaultValue: String) :
             this(table, column, DataType.TEXT, defaultValue)
 
     constructor(table: String, column: String, defaultValue: ElapsedTime) :
-            this(table, column, DataType.ELAPSED_TIME, defaultValue.timeInMilliseconds.toString(16))
+            this(table, column, DataType.ELAPSED_TIME, defaultValue.timeInMilliseconds.toHexadecimal())
 
     constructor(table: String, column: String, defaultValue: TimeStamp) :
-            this(table, column, DataType.TIMESTAMP, defaultValue.timeInMilliseconds.toString(16))
+            this(table, column, DataType.TIMESTAMP, defaultValue.timeInMilliseconds.toHexadecimal())
 
     constructor(table: String, column: String, defaultValue: ByteArray) :
             this(table, column, DataType.DATA, Base64.getEncoder().encodeToString(defaultValue))

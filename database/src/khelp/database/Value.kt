@@ -3,6 +3,7 @@ package khelp.database
 import khelp.math.isNul
 import khelp.text.utf8
 import khelp.util.toUnsignedInt
+import java.lang.StringBuilder
 import java.util.Base64
 
 class Value private constructor(databaseValue: String, type: DataType)
@@ -14,12 +15,12 @@ class Value private constructor(databaseValue: String, type: DataType)
 
     constructor(value: String) : this(value, DataType.TEXT)
     constructor(value: Boolean) : this(if (value) "TRUE" else "FALSE", DataType.BOOLEAN)
-    constructor(value: Int) : this(value.toString(16), DataType.INTEGER)
-    constructor(value: Long) : this(value.toString(16), DataType.LONG)
-    constructor(value: Float) : this(value.toBits().toString(16), DataType.FLOAT)
-    constructor(value: Double) : this(value.toBits().toString(16), DataType.DOUBLE)
-    constructor(value: TimeStamp) : this(value.timeInMilliseconds.toString(16), DataType.TIMESTAMP)
-    constructor(value: ElapsedTime) : this(value.timeInMilliseconds.toString(16), DataType.ELAPSED_TIME)
+    constructor(value: Int) : this(value.toHexadecimal(), DataType.INTEGER)
+    constructor(value: Long) : this(value.toHexadecimal(), DataType.LONG)
+    constructor(value: Float) : this(value.toBits().toHexadecimal(), DataType.FLOAT)
+    constructor(value: Double) : this(value.toBits().toHexadecimal(), DataType.DOUBLE)
+    constructor(value: TimeStamp) : this(value.timeInMilliseconds.toHexadecimal(), DataType.TIMESTAMP)
+    constructor(value: ElapsedTime) : this(value.timeInMilliseconds.toHexadecimal(), DataType.ELAPSED_TIME)
     constructor(value: ByteArray) : this(Base64.getEncoder().encodeToString(value), DataType.DATA)
     constructor(value: Value) : this(value.databaseValue, value.type)
 
@@ -34,7 +35,7 @@ class Value private constructor(databaseValue: String, type: DataType)
             DataType.INTEGER      ->
                 try
                 {
-                    this.databaseValue = this.databaseValue.toInt().toString(16)
+                    this.databaseValue = this.databaseValue.toInt().toHexadecimal()
                 }
                 catch (ignored: Exception)
                 {
@@ -43,7 +44,7 @@ class Value private constructor(databaseValue: String, type: DataType)
             DataType.LONG         ->
                 try
                 {
-                    this.databaseValue = this.databaseValue.toLong().toString(16)
+                    this.databaseValue = this.databaseValue.toLong().toHexadecimal()
                 }
                 catch (ignored: Exception)
                 {
@@ -52,25 +53,25 @@ class Value private constructor(databaseValue: String, type: DataType)
             DataType.FLOAT        ->
                 try
                 {
-                    this.databaseValue = this.databaseValue.toFloat().toBits().toString(16)
+                    this.databaseValue = this.databaseValue.toFloat().toBits().toHexadecimal()
                 }
                 catch (ignored: Exception)
                 {
-                    this.databaseValue = 0f.toBits().toString(16)
+                    this.databaseValue = 0f.toBits().toHexadecimal()
                 }
             DataType.DOUBLE       ->
                 try
                 {
-                    this.databaseValue = this.databaseValue.toDouble().toBits().toString(16)
+                    this.databaseValue = this.databaseValue.toDouble().toBits().toHexadecimal()
                 }
                 catch (ignored: Exception)
                 {
-                    this.databaseValue = 0.0.toBits().toString(16)
+                    this.databaseValue = 0.0.toBits().toHexadecimal()
                 }
             DataType.TIMESTAMP    ->
-                this.databaseValue = TimeStamp(this.databaseValue).timeInMilliseconds.toString(16)
+                this.databaseValue = TimeStamp(this.databaseValue).timeInMilliseconds.toHexadecimal()
             DataType.ELAPSED_TIME ->
-                this.databaseValue = ElapsedTime(this.databaseValue).timeInMilliseconds.toString(16)
+                this.databaseValue = ElapsedTime(this.databaseValue).timeInMilliseconds.toHexadecimal()
             DataType.DATA         ->
                 this.databaseValue = Base64.getEncoder().encodeToString(this.databaseValue.utf8())
         }
@@ -91,11 +92,11 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (value) this.databaseValue = "1"
                 else this.databaseValue = "0"
             DataType.FLOAT        ->
-                if (value) this.databaseValue = 1f.toBits().toString(16)
-                else this.databaseValue = 0f.toBits().toString(16)
+                if (value) this.databaseValue = 1f.toBits().toHexadecimal()
+                else this.databaseValue = 0f.toBits().toHexadecimal()
             DataType.DOUBLE       ->
-                if (value) this.databaseValue = 1.0.toBits().toString(16)
-                else this.databaseValue = 0.0.toBits().toString(16)
+                if (value) this.databaseValue = 1.0.toBits().toHexadecimal()
+                else this.databaseValue = 0.0.toBits().toHexadecimal()
             DataType.TIMESTAMP    ->
                 this.databaseValue = "0"
             DataType.ELAPSED_TIME ->
@@ -108,7 +109,7 @@ class Value private constructor(databaseValue: String, type: DataType)
 
     private fun intTo(type: DataType)
     {
-        val value = this.databaseValue.toInt(16)
+        val value = this.databaseValue.fromHexadecimalInt()
 
         when (type)
         {
@@ -119,15 +120,15 @@ class Value private constructor(databaseValue: String, type: DataType)
                 else this.databaseValue = "TRUE"
             DataType.INTEGER      -> Unit
             DataType.LONG         ->
-                this.databaseValue = value.toLong().toString(16)
+                this.databaseValue = value.toLong().toHexadecimal()
             DataType.FLOAT        ->
-                this.databaseValue = value.toFloat().toBits().toString(16)
+                this.databaseValue = value.toFloat().toBits().toHexadecimal()
             DataType.DOUBLE       ->
-                this.databaseValue = value.toDouble().toBits().toString(16)
+                this.databaseValue = value.toDouble().toBits().toHexadecimal()
             DataType.TIMESTAMP    ->
-                this.databaseValue = TimeStamp(value.toLong()).timeInMilliseconds.toString(16)
+                this.databaseValue = TimeStamp(value.toLong()).timeInMilliseconds.toHexadecimal()
             DataType.ELAPSED_TIME ->
-                this.databaseValue = ElapsedTime(value.toLong()).timeInMilliseconds.toString(16)
+                this.databaseValue = ElapsedTime(value.toLong()).timeInMilliseconds.toHexadecimal()
             DataType.DATA         ->
             {
                 val array = ByteArray(4)
@@ -142,7 +143,7 @@ class Value private constructor(databaseValue: String, type: DataType)
 
     private fun longTo(type: DataType)
     {
-        val value = this.databaseValue.toLong(16)
+        val value = this.databaseValue.fromHexadecimalLong()
 
         when (type)
         {
@@ -151,16 +152,16 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (value == 0L) this.databaseValue = "FALSE"
                 else this.databaseValue = "TRUE"
             DataType.INTEGER      ->
-                this.databaseValue = value.toInt().toString(16)
+                this.databaseValue = value.toInt().toHexadecimal()
             DataType.LONG         -> Unit
             DataType.FLOAT        ->
-                this.databaseValue = value.toFloat().toBits().toString(16)
+                this.databaseValue = value.toFloat().toBits().toHexadecimal()
             DataType.DOUBLE       ->
-                this.databaseValue = value.toDouble().toBits().toString(16)
+                this.databaseValue = value.toDouble().toBits().toHexadecimal()
             DataType.TIMESTAMP    ->
-                this.databaseValue = TimeStamp(value).timeInMilliseconds.toString(16)
+                this.databaseValue = TimeStamp(value).timeInMilliseconds.toHexadecimal()
             DataType.ELAPSED_TIME ->
-                this.databaseValue = ElapsedTime(value).timeInMilliseconds.toString(16)
+                this.databaseValue = ElapsedTime(value).timeInMilliseconds.toHexadecimal()
             DataType.DATA         ->
             {
                 val array = ByteArray(8)
@@ -179,7 +180,7 @@ class Value private constructor(databaseValue: String, type: DataType)
 
     private fun floatTo(type: DataType)
     {
-        val value = Float.fromBits(this.databaseValue.toInt(16))
+        val value = Float.fromBits(this.databaseValue.fromHexadecimalInt())
 
         when (type)
         {
@@ -189,16 +190,16 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (isNul(value)) this.databaseValue = "FALSE"
                 else this.databaseValue = "TRUE"
             DataType.INTEGER      ->
-                this.databaseValue = value.toInt().toString(16)
+                this.databaseValue = value.toInt().toHexadecimal()
             DataType.LONG         ->
-                this.databaseValue = value.toLong().toString(16)
+                this.databaseValue = value.toLong().toHexadecimal()
             DataType.FLOAT        -> Unit
             DataType.DOUBLE       ->
-                this.databaseValue = value.toDouble().toBits().toString(16)
+                this.databaseValue = value.toDouble().toBits().toHexadecimal()
             DataType.TIMESTAMP    ->
-                this.databaseValue = TimeStamp(value.toLong()).timeInMilliseconds.toString(16)
+                this.databaseValue = TimeStamp(value.toLong()).timeInMilliseconds.toHexadecimal()
             DataType.ELAPSED_TIME ->
-                this.databaseValue = ElapsedTime(value.toLong()).timeInMilliseconds.toString(16)
+                this.databaseValue = ElapsedTime(value.toLong()).timeInMilliseconds.toHexadecimal()
             DataType.DATA         ->
             {
                 val bits = value.toBits()
@@ -214,7 +215,7 @@ class Value private constructor(databaseValue: String, type: DataType)
 
     private fun doubleTo(type: DataType)
     {
-        val value = Double.fromBits(this.databaseValue.toLong(16))
+        val value = Double.fromBits(this.databaseValue.fromHexadecimalLong())
 
         when (type)
         {
@@ -224,16 +225,16 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (isNul(value)) this.databaseValue = "FALSE"
                 else this.databaseValue = "TRUE"
             DataType.INTEGER      ->
-                this.databaseValue = value.toInt().toString(16)
+                this.databaseValue = value.toInt().toHexadecimal()
             DataType.LONG         ->
-                this.databaseValue = value.toLong().toString(16)
+                this.databaseValue = value.toLong().toHexadecimal()
             DataType.FLOAT        ->
-                this.databaseValue = value.toFloat().toBits().toString(16)
+                this.databaseValue = value.toFloat().toBits().toHexadecimal()
             DataType.DOUBLE       -> Unit
             DataType.TIMESTAMP    ->
-                this.databaseValue = TimeStamp(value.toLong()).timeInMilliseconds.toString(16)
+                this.databaseValue = TimeStamp(value.toLong()).timeInMilliseconds.toHexadecimal()
             DataType.ELAPSED_TIME ->
-                this.databaseValue = ElapsedTime(value.toLong()).timeInMilliseconds.toString(16)
+                this.databaseValue = ElapsedTime(value.toLong()).timeInMilliseconds.toHexadecimal()
             DataType.DATA         ->
             {
                 val bits = value.toBits()
@@ -253,7 +254,7 @@ class Value private constructor(databaseValue: String, type: DataType)
 
     private fun timeStampTo(type: DataType)
     {
-        val value = TimeStamp(this.databaseValue.toLong(16))
+        val value = TimeStamp(this.databaseValue.fromHexadecimalLong())
 
         when (type)
         {
@@ -263,13 +264,13 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (value.timeInMilliseconds == 0L) this.databaseValue = "FALSE"
                 else this.databaseValue = "TRUE"
             DataType.INTEGER      ->
-                this.databaseValue = value.timeInMilliseconds.toInt().toString(16)
+                this.databaseValue = value.timeInMilliseconds.toInt().toHexadecimal()
             DataType.LONG         ->
-                this.databaseValue = value.timeInMilliseconds.toString(16)
+                this.databaseValue = value.timeInMilliseconds.toHexadecimal()
             DataType.FLOAT        ->
-                this.databaseValue = value.timeInMilliseconds.toFloat().toBits().toString(16)
+                this.databaseValue = value.timeInMilliseconds.toFloat().toBits().toHexadecimal()
             DataType.DOUBLE       ->
-                this.databaseValue = value.timeInMilliseconds.toDouble().toBits().toString(16)
+                this.databaseValue = value.timeInMilliseconds.toDouble().toBits().toHexadecimal()
             DataType.TIMESTAMP    -> Unit
             DataType.ELAPSED_TIME -> Unit
             DataType.DATA         ->
@@ -291,7 +292,7 @@ class Value private constructor(databaseValue: String, type: DataType)
 
     private fun elapsedTimeTo(type: DataType)
     {
-        val value = ElapsedTime(this.databaseValue.toLong(16))
+        val value = ElapsedTime(this.databaseValue.fromHexadecimalLong())
 
         when (type)
         {
@@ -301,13 +302,13 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (value.timeInMilliseconds == 0L) this.databaseValue = "FALSE"
                 else this.databaseValue = "TRUE"
             DataType.INTEGER      ->
-                this.databaseValue = value.timeInMilliseconds.toInt().toString(16)
+                this.databaseValue = value.timeInMilliseconds.toInt().toHexadecimal()
             DataType.LONG         ->
-                this.databaseValue = value.timeInMilliseconds.toString(16)
+                this.databaseValue = value.timeInMilliseconds.toHexadecimal()
             DataType.FLOAT        ->
-                this.databaseValue = value.timeInMilliseconds.toFloat().toBits().toString(16)
+                this.databaseValue = value.timeInMilliseconds.toFloat().toBits().toHexadecimal()
             DataType.DOUBLE       ->
-                this.databaseValue = value.timeInMilliseconds.toDouble().toBits().toString(16)
+                this.databaseValue = value.timeInMilliseconds.toDouble().toBits().toHexadecimal()
             DataType.TIMESTAMP    -> Unit
             DataType.ELAPSED_TIME -> Unit
             DataType.DATA         ->
@@ -345,7 +346,7 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (value.size > 1) result = result or (value[1].toUnsignedInt() shl 16)
                 if (value.size > 2) result = result or (value[2].toUnsignedInt() shl 8)
                 if (value.size > 3) result = result or value[3].toUnsignedInt()
-                this.databaseValue = result.toString(16)
+                this.databaseValue = result.toHexadecimal()
             }
             DataType.LONG         ->
             {
@@ -358,7 +359,7 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (value.size > 5) result = result or (value[5].toUnsignedInt().toLong() shl 16)
                 if (value.size > 6) result = result or (value[6].toUnsignedInt().toLong() shl 8)
                 if (value.size > 7) result = result or value[7].toUnsignedInt().toLong()
-                this.databaseValue = result.toString(16)
+                this.databaseValue = result.toHexadecimal()
             }
             DataType.FLOAT        ->
             {
@@ -367,7 +368,7 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (value.size > 1) result = result or (value[1].toUnsignedInt() shl 16)
                 if (value.size > 2) result = result or (value[2].toUnsignedInt() shl 8)
                 if (value.size > 3) result = result or value[3].toUnsignedInt()
-                this.databaseValue = Float.fromBits(result).toBits().toString(16)
+                this.databaseValue = Float.fromBits(result).toBits().toHexadecimal()
             }
             DataType.DOUBLE       ->
             {
@@ -380,7 +381,7 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (value.size > 5) result = result or (value[5].toUnsignedInt().toLong() shl 16)
                 if (value.size > 6) result = result or (value[6].toUnsignedInt().toLong() shl 8)
                 if (value.size > 7) result = result or value[7].toUnsignedInt().toLong()
-                this.databaseValue = Double.fromBits(result).toBits().toString(16)
+                this.databaseValue = Double.fromBits(result).toBits().toHexadecimal()
             }
             DataType.TIMESTAMP    ->
             {
@@ -393,7 +394,7 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (value.size > 5) result = result or (value[5].toUnsignedInt().toLong() shl 16)
                 if (value.size > 6) result = result or (value[6].toUnsignedInt().toLong() shl 8)
                 if (value.size > 7) result = result or value[7].toUnsignedInt().toLong()
-                this.databaseValue = TimeStamp(result).timeInMilliseconds.toString(16)
+                this.databaseValue = TimeStamp(result).timeInMilliseconds.toHexadecimal()
             }
             DataType.ELAPSED_TIME ->
             {
@@ -406,7 +407,7 @@ class Value private constructor(databaseValue: String, type: DataType)
                 if (value.size > 5) result = result or (value[5].toUnsignedInt().toLong() shl 16)
                 if (value.size > 6) result = result or (value[6].toUnsignedInt().toLong() shl 8)
                 if (value.size > 7) result = result or value[7].toUnsignedInt().toLong()
-                this.databaseValue = ElapsedTime(result).timeInMilliseconds.toString(16)
+                this.databaseValue = ElapsedTime(result).timeInMilliseconds.toHexadecimal()
             }
             DataType.DATA         -> Unit
         }
@@ -441,29 +442,57 @@ class Value private constructor(databaseValue: String, type: DataType)
 
     fun integer() =
             (if (this.type == DataType.INTEGER) this.databaseValue
-            else Value(this).convertTo(DataType.INTEGER).databaseValue).toInt(16)
+            else Value(this).convertTo(DataType.INTEGER).databaseValue).fromHexadecimalInt()
 
     fun long() =
             (if (this.type == DataType.LONG) this.databaseValue
-            else Value(this).convertTo(DataType.LONG).databaseValue).toLong(16)
+            else Value(this).convertTo(DataType.LONG).databaseValue).fromHexadecimalLong()
 
     fun float() =
             Float.fromBits((if (this.type == DataType.FLOAT) this.databaseValue
-            else Value(this).convertTo(DataType.FLOAT).databaseValue).toInt(16))
+            else Value(this).convertTo(DataType.FLOAT).databaseValue).fromHexadecimalInt())
 
     fun double() =
             Double.fromBits((if (this.type == DataType.DOUBLE) this.databaseValue
-            else Value(this).convertTo(DataType.DOUBLE).databaseValue).toLong(16))
+            else Value(this).convertTo(DataType.DOUBLE).databaseValue).fromHexadecimalLong())
 
     fun timeStamp() =
             TimeStamp((if (this.type == DataType.TIMESTAMP) this.databaseValue
-            else Value(this).convertTo(DataType.TIMESTAMP).databaseValue).toLong(16))
+            else Value(this).convertTo(DataType.TIMESTAMP).databaseValue).fromHexadecimalLong())
 
     fun elapsedTime() =
             ElapsedTime((if (this.type == DataType.ELAPSED_TIME) this.databaseValue
-            else Value(this).convertTo(DataType.ELAPSED_TIME).databaseValue).toLong(16))
+            else Value(this).convertTo(DataType.ELAPSED_TIME).databaseValue).fromHexadecimalLong())
 
     fun data() =
             Base64.getDecoder().decode(if (this.type == DataType.DATA) this.databaseValue
                                        else Value(this).convertTo(DataType.DATA).databaseValue)
 }
+
+private fun minimum16Characters(string: String): String
+{
+    val length = string.length
+
+    if (length >= 16)
+    {
+        return string
+    }
+
+    val stringBuilder = StringBuilder(16)
+
+    for (time in length until 16)
+    {
+        stringBuilder.append('0')
+    }
+
+    stringBuilder.append(string)
+    return stringBuilder.toString()
+}
+
+fun Int.toHexadecimal() = minimum16Characters(java.lang.Integer.toHexString(this))
+
+fun Long.toHexadecimal() = minimum16Characters(java.lang.Long.toHexString(this))
+
+fun String.fromHexadecimalInt() = java.lang.Integer.parseUnsignedInt(this, 16)
+
+fun String.fromHexadecimalLong() = java.lang.Long.parseUnsignedLong(this, 16)

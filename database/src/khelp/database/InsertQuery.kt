@@ -19,15 +19,15 @@ class ColumnValue internal constructor(val columnName: String, internal val valu
     }
 
     constructor(columnName: String, value: String) : this(columnName, value, DataType.TEXT)
-    constructor(columnName: String, value: Int) : this(columnName, value.toString(16), DataType.INTEGER)
-    constructor(columnName: String, value: Long) : this(columnName, value.toString(16), DataType.LONG)
-    constructor(columnName: String, value: Float) : this(columnName, value.toBits().toString(16), DataType.FLOAT)
-    constructor(columnName: String, value: Double) : this(columnName, value.toBits().toString(16), DataType.DOUBLE)
+    constructor(columnName: String, value: Int) : this(columnName, value.toHexadecimal(), DataType.INTEGER)
+    constructor(columnName: String, value: Long) : this(columnName, value.toHexadecimal(), DataType.LONG)
+    constructor(columnName: String, value: Float) : this(columnName, value.toBits().toHexadecimal(), DataType.FLOAT)
+    constructor(columnName: String, value: Double) : this(columnName, value.toBits().toHexadecimal(), DataType.DOUBLE)
     constructor(columnName: String, value: Boolean) : this(columnName, if (value) "TRUE" else "FALSE", DataType.BOOLEAN)
-    constructor(columnName: String, value: TimeStamp) : this(columnName, value.timeInMilliseconds.toString(16),
+    constructor(columnName: String, value: TimeStamp) : this(columnName, value.timeInMilliseconds.toHexadecimal(),
                                                              DataType.TIMESTAMP)
 
-    constructor(columnName: String, value: ElapsedTime) : this(columnName, value.timeInMilliseconds.toString(16),
+    constructor(columnName: String, value: ElapsedTime) : this(columnName, value.timeInMilliseconds.toHexadecimal(),
                                                                DataType.ELAPSED_TIME)
 
     constructor(columnName: String, value: ByteArray) : this(columnName, Base64.getEncoder().encodeToString(value),

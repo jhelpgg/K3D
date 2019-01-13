@@ -1,6 +1,7 @@
 package khelp.bitcode.compiler
 
 import com.sun.org.apache.bcel.internal.Constants
+import com.sun.org.apache.bcel.internal.generic.ACONST_NULL
 import com.sun.org.apache.bcel.internal.generic.ArrayType
 import com.sun.org.apache.bcel.internal.generic.BasicType
 import com.sun.org.apache.bcel.internal.generic.BranchHandle
@@ -1008,6 +1009,11 @@ class CompilerContext
         if ("false" == value)
         {
             return PUSH(this.constantPoolGen, false).instruction
+        }
+
+        if ("null" == value)
+        {
+            return ACONST_NULL()
         }
 
         if (value.endsWith("f") || value.endsWith("F"))

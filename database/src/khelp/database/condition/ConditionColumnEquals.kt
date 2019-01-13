@@ -5,6 +5,7 @@ import khelp.database.ID_COLUMN_NAME
 import khelp.database.Security
 import khelp.database.TimeStamp
 import khelp.database.Value
+import khelp.database.toHexadecimal
 import java.util.Base64
 
 /**
@@ -36,7 +37,7 @@ class ConditionColumnEquals : Condition
     {
         this.columnName = columnName
         this.id = value
-        this.value = value.toString(16)
+        this.value = value.toHexadecimal()
     }
 
     constructor(columnName: String, value: Long)
@@ -44,7 +45,7 @@ class ConditionColumnEquals : Condition
         this.checkColumnName(columnName)
         this.columnName = columnName
         this.id = -1
-        this.value = value.toString(16)
+        this.value = value.toHexadecimal()
     }
 
     constructor(columnName: String, value: Float)
@@ -52,7 +53,7 @@ class ConditionColumnEquals : Condition
         this.checkColumnName(columnName)
         this.columnName = columnName
         this.id = -1
-        this.value = value.toBits().toString(16)
+        this.value = value.toBits().toHexadecimal()
     }
 
     constructor(columnName: String, value: Double)
@@ -60,7 +61,7 @@ class ConditionColumnEquals : Condition
         this.checkColumnName(columnName)
         this.columnName = columnName
         this.id = -1
-        this.value = value.toBits().toString(16)
+        this.value = value.toBits().toHexadecimal()
     }
 
     constructor(columnName: String, value: Boolean)
@@ -76,7 +77,7 @@ class ConditionColumnEquals : Condition
         this.checkColumnName(columnName)
         this.columnName = columnName
         this.id = -1
-        this.value = value.timeInMilliseconds.toString(16)
+        this.value = value.timeInMilliseconds.toHexadecimal()
     }
 
     constructor(columnName: String, value: ElapsedTime)
@@ -84,7 +85,7 @@ class ConditionColumnEquals : Condition
         this.checkColumnName(columnName)
         this.columnName = columnName
         this.id = -1
-        this.value = value.timeInMilliseconds.toString(16)
+        this.value = value.timeInMilliseconds.toHexadecimal()
     }
 
     constructor(columnName: String, value: ByteArray)
@@ -149,6 +150,9 @@ infix fun String.EQUALS(value: Boolean) = ConditionColumnEquals(this, value)
 
 /**Condition satisfied if this column name have the given value*/
 infix fun String.EQUALS(value: TimeStamp) = ConditionColumnEquals(this, value)
+
+/**Condition satisfied if this column name have the given value*/
+infix fun String.EQUALS(value: ElapsedTime) = ConditionColumnEquals(this, value)
 
 /**Condition satisfied if this column name have the given value*/
 infix fun String.EQUALS(value: ByteArray) = ConditionColumnEquals(this, value)

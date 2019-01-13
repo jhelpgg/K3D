@@ -112,7 +112,7 @@ class QueryColumn internal constructor(private val resultSet: ResultSet, val col
     fun integer(column: Int): Int
     {
         val encrypted = this.resultSet.getString(column + 1) ?: return 0
-        return this.security.decrypt(encrypted).toInt(16)
+        return this.security.decrypt(encrypted).fromHexadecimalInt()
     }
 
     /** Obtain value as Int */
@@ -122,7 +122,7 @@ class QueryColumn internal constructor(private val resultSet: ResultSet, val col
     fun long(column: Int): Long
     {
         val encrypted = this.resultSet.getString(column + 1) ?: return 0L
-        return this.security.decrypt(encrypted).toLong(16)
+        return this.security.decrypt(encrypted).fromHexadecimalLong()
     }
 
     /** Obtain value as Long */
@@ -138,7 +138,7 @@ class QueryColumn internal constructor(private val resultSet: ResultSet, val col
             return 0f
         }
 
-        return Float.fromBits(this.security.decrypt(read).toInt(16))
+        return Float.fromBits(this.security.decrypt(read).fromHexadecimalInt())
     }
 
     /** Obtain value as Float */
@@ -154,7 +154,7 @@ class QueryColumn internal constructor(private val resultSet: ResultSet, val col
             return 0.0
         }
 
-        return Double.fromBits(this.security.decrypt(read).toLong(16))
+        return Double.fromBits(this.security.decrypt(read).fromHexadecimalLong())
     }
 
     /** Obtain value as Double */
@@ -180,7 +180,7 @@ class QueryColumn internal constructor(private val resultSet: ResultSet, val col
             return TimeStamp()
         }
 
-        return TimeStamp(this.security.decrypt(read).toLong(16))
+        return TimeStamp(this.security.decrypt(read).fromHexadecimalLong())
     }
 
     /** Obtain value as TimeStamp */
@@ -196,7 +196,7 @@ class QueryColumn internal constructor(private val resultSet: ResultSet, val col
             return ElapsedTime()
         }
 
-        return ElapsedTime(this.security.decrypt(read).toLong(16))
+        return ElapsedTime(this.security.decrypt(read).fromHexadecimalLong())
     }
 
     /** Obtain value as ElapsedTime */

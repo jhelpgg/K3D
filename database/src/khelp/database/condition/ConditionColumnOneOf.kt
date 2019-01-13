@@ -4,6 +4,7 @@ import khelp.database.ElapsedTime
 import khelp.database.ID_COLUMN_NAME
 import khelp.database.Security
 import khelp.database.TimeStamp
+import khelp.database.toHexadecimal
 import java.util.Base64
 
 /**
@@ -35,7 +36,7 @@ class ConditionColumnOneOf : Condition
     {
         this.columnName = columnName
         this.id = value
-        this.value = Array<String>(value.size, { value[it].toString(16) })
+        this.value = Array<String>(value.size, { value[it].toHexadecimal() })
     }
 
     constructor(columnName: String, value: LongArray)
@@ -43,7 +44,7 @@ class ConditionColumnOneOf : Condition
         this.checkColumnName(columnName)
         this.columnName = columnName
         this.id = IntArray(0)
-        this.value = Array<String>(value.size, { value[it].toString(16) })
+        this.value = Array<String>(value.size, { value[it].toHexadecimal() })
     }
 
     constructor(columnName: String, value: FloatArray)
@@ -51,7 +52,7 @@ class ConditionColumnOneOf : Condition
         this.checkColumnName(columnName)
         this.columnName = columnName
         this.id = IntArray(0)
-        this.value = Array<String>(value.size, { value[it].toBits().toString(16) })
+        this.value = Array<String>(value.size, { value[it].toBits().toHexadecimal() })
     }
 
     constructor(columnName: String, value: DoubleArray)
@@ -59,7 +60,7 @@ class ConditionColumnOneOf : Condition
         this.checkColumnName(columnName)
         this.columnName = columnName
         this.id = IntArray(0)
-        this.value = Array<String>(value.size, { value[it].toBits().toString(16) })
+        this.value = Array<String>(value.size, { value[it].toBits().toHexadecimal() })
     }
 
     constructor(columnName: String, value: BooleanArray)
@@ -75,7 +76,7 @@ class ConditionColumnOneOf : Condition
         this.checkColumnName(columnName)
         this.columnName = columnName
         this.id = IntArray(0)
-        this.value = Array<String>(value.size, { value[it].timeInMilliseconds.toString(16) })
+        this.value = Array<String>(value.size, { value[it].timeInMilliseconds.toHexadecimal() })
     }
 
     constructor(columnName: String, value: Array<ElapsedTime>)
@@ -83,7 +84,7 @@ class ConditionColumnOneOf : Condition
         this.checkColumnName(columnName)
         this.columnName = columnName
         this.id = IntArray(0)
-        this.value = Array<String>(value.size, { value[it].timeInMilliseconds.toString(16) })
+        this.value = Array<String>(value.size, { value[it].timeInMilliseconds.toHexadecimal() })
     }
 
     constructor(columnName: String, value: Array<ByteArray>)
