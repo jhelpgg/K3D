@@ -97,7 +97,7 @@ Method and **abstract** body capacity depends if the current file represents:
 * An abstract class, declared with `abstract`
 * An interface, declared with `interface`
 
-
+````
      +-------------+---------------------------------------------+
      | Declaration |            Abstract or concrete             |
      +=============+=============================================+
@@ -107,6 +107,7 @@ Method and **abstract** body capacity depends if the current file represents:
      +-------------+---------------------------------------------+
      |  interface  | All methods are abstract. No body method    |
      +-------------+---------------------------------------------+
+````
 
 ### Body constraint
 
