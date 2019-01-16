@@ -5,6 +5,13 @@ To declare field in class :
 field <Type> <Name> <Modifier>*
 ````
 
+A filed have no values after declaration.
+No value means it can't be read before a method write in it.
+
+For final static fields, they must be initialize inside the [static initializer](StaticInitializer.md)
+
+For final non static fields, they must be initialize in each [constructor](Constructors.md) 
+
 Where:
 * **Type:** The field type.
 * **Name:** The field name.

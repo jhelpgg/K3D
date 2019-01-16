@@ -289,9 +289,9 @@ Return := return <Type>
 Throws := throws <ShortOrCompleteName>
 AbstractOrCode := abstract | <Code>
 
-<Code> := {
+Code := {
           <Opcode>+
-          }
+        }
           
 Opcode := @{see opcodes instructions}
 

@@ -16,6 +16,10 @@ By default, method is:
 * final (If the method not abstract)
 * not static
 
+Their two special method's name :
+* **`<clinit>`** : [The static initializer](StaticInitializer.md)
+* **`<init>`** : [Class constructors](Constructors.md) 
+
 ````
      +-----------+----------------------------------------------------------+
      | Modifier  |                          Effect                          |
