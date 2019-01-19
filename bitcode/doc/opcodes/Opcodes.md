@@ -17,7 +17,7 @@ opcode.
 
 Before start with opcodes, we need to talk about method stack, since opcodes use it.
 
-### Method stack
+## Method stack
 
 When a method is called, a empty stack is created that live during the method playing.
 Type that push/pop from stack are : `int`, `float`, `long`, `double`, `null`, `object reference`.
@@ -52,9 +52,9 @@ To explains stack effect, we adopt the following notation:
 
 We use special notation `[]` in right side to show stack is empty after the opcode.
 
-### Opcodes
+## Opcodes
 
-##### Local variables
+### Local variables
 
 Inside method, it is possible to create local variable.
 
@@ -126,7 +126,7 @@ method test
 
 For fields see : [fields operations](FieldOperations.md)
 
-##### Store value
+### Store value
 
 Those opcodes read value or object reference from stack and write them to variable.
 
@@ -176,7 +176,7 @@ method test
 
 For fields see : [fields operations](FieldOperations.md)
 
-##### Return opcodes
+### Return opcodes
 
 Every method (even `void` ones) must exit with a return instruction.
 
@@ -404,7 +404,7 @@ Example with `-55` and `3`:
      | IXOR       |                                  |           |
      +------------+----------------------------------+-----------+
 
-##### Conversion opcodes
+### Conversion opcodes
 
 Those opcodes are for transform a number type to an other.
 
@@ -434,7 +434,7 @@ Converted type may be truncated, by example when convert **double** to **int** w
      |  D2F   | ..., double -> ..., float | Convert double to float |
      +--------+---------------------------+-------------------------+
 
-##### Push constants
+### Push constants
 
 To push a constant value on stack use `PUSH` opcode.
 
@@ -478,7 +478,433 @@ The pushed value type depends on expression. We choose a Java like notation.
      |                  |                  | Like Java must put between "                  |
      +------------------+------------------+-----------------------------------------------+
 
-##### Increment opcode 
+### Increment opcode 
 
-I.6.h)
+To do something like this :
 
+````Java
+// ...
+int j = 10;
+// ...
+j += 32;
+// ...
+j --;
+// ...
+````
+
+With what we see previously, we will do :
+
+````ASM
+// ...
+VAR int j ; ...           -> ...
+PUSH 10   ; ...           -> ..., int
+ISTORE j  ; ..., int      -> ...
+// ...
+ILOAD j   ; ...           -> ..., int
+PUSH 32   ; ..., int      -> ..., int, int
+IADD      ; ..., int, int -> ..., int
+ISTORE j  ; ..., int      -> ...
+// ...
+ILOAD j   ; ...           -> ..., int
+PUSH 1    ; ..., int      -> ...., int, int
+ISUB      ; ..., int, int -> ..., int
+ISTORE j  ; ..., int      -> ...
+````
+
+But for `int` local variable or parameters to increment or decrement with a constant, 
+the opcode **`IINC`** is more efficient.
+
+````ASM
+IINC <variableName> <incrementOrDecrement>
+```` 
+
+Where :
+* **`variableName`** : Name of local variable of method parameters. 
+  Not work with fields.
+* **`incrementOrDecrement`** : Constant integer between -32768 and 32767
+
+No stack effect.
+
+Our example become :
+
+````ASM
+// ...
+VAR int j ; ...      -> ...
+PUSH 10   ; ...      -> ..., int
+ISTORE j  ; ..., int -> ...
+// ...
+IINC j 32 ; ...      -> ... 
+// ...
+IINC j -1 ; ...      -> ... 
+````
+
+### Jump opcodes
+
+Usually instructions are played from first (top) to last (bottom).
+It is possible to change this order by jumping further or backward inside the method.
+
+Each jump instruction have one or several position to jump. 
+To mark a position to jump, use the **`LABEL`** opcode.
+
+````ASM
+LABEL <labelName>
+````
+
+Where:
+* **`labelName`** : label name (No space in it) to mark the position where jump.
+
+No stack effect.
+
+#### Always jump
+
+The opcode **`GOTO`** will always jump to corresponding label.
+
+````ASM
+GOTO <labelName>
+````
+
+Where:
+* **`labelName`** : label to jump.
+
+No stack effect.
+
+Example :
+
+````ASM
+// ...
+ILOAD j      ; ...      -> ..., int
+GOTO further ; ..., int -> ..., int
+
+ILOAD p      ; Ignored by the jump
+IADD         ; Ignored by the jump
+
+LABEL further 
+ISTORE k     ; ..., int -> ...
+```` 
+
+#### Compare to `null`
+
+Opcode **`IFNONNULL`** jump if object in stack not null.
+
+Opcode **`IFNULL`** jump if object in stack null.
+
+````ASM
+IFNONNULL <labelName>
+IFNULL <labelName>
+````
+Where:
+* **`labelName`** : label to jump.
+
+Stack effect :
+
+````ASM
+..., object -> ...
+````
+
+Where:
+* **`object`** : Object instance to compare to null
+
+#### Compare to `0`
+
+Those opcode:
+1. Read `int` from method stack
+1. Compare this number 
+1. Jump or not depends on comparison result
+
+````
+     +------------------+---------------------------------------------+
+     |      Opcode      |               Jump condition                |
+     +------------------+---------------------------------------------+
+     | IFEQ <labelName> | Jump if read int is equals 0                |
+     | IFNE <labelName> | Jump if read int in not 0                   |
+     | IFGE <labelName> | Jump if read int is greater or equals 0     |
+     | IFGT <labelName> | Jump if read int is strictly greater than 0 |
+     | IFLE <labelName> | Jump if read int is lower o equals 0        |
+     | IFLT <labelName> | Jump if read int is strictly lower than 0   |
+     +------------------+---------------------------------------------+
+````
+
+Where:
+* **`labelName`** : label to jump.
+
+````ASM
+..., object -> ...
+````
+
+Where:
+* **`object`** : Object instance to compare to null
+
+Example :
+
+````ASM
+//Divide two number
+//If second number is 0 then 0 is return, else returns first/second
+method divideNoZero
+   parameter int first
+   parameter int second
+   return int
+{
+   ILOAD second        ; Push second           : [] => [second(int))]
+   IFEQ zeroTreatment  ; Compare stack to 0    : [second(int))] => []
+
+                       ; Reach if second not 0 
+   ILOAD first         ; Load first            : [] => [first(int)]
+   ILOAD second        ; Load second           : [first(int)] => [first(int), second(int)]
+   IDIV                ; Divide                : [first(int), second(int)] => [first/second(int)]
+   IRETURN             ; Return stack element  : [first/second(int)] => []
+   
+   LABEL zeroTreatment ; Reach if second is 0
+   ICONST 0            ; Push 0                : [] => [0(int)]             
+   IRETURN             ; Return stack element  : [0(int)] => []
+}
+````
+
+#### Compare two objects
+
+Those opcodes jump to label if two objects reference the same or not.
+It is reference comparison like `==` in Java or `===` in Kotlin.
+The method `equals` is not called.
+
+Opcode **`IF_ACMPEQ`** jump if objects reference same object
+
+Opcode **`IF_ACMPNE`** jump if objects reference different object.
+
+````ASM
+IF_ACMPEQ <labelName>
+IF_ACMPNE <labelName>
+````
+Where:
+* **`labelName`** : label to jump.
+
+Stack effect :
+
+````ASM
+..., object1, object2 -> ...
+````
+
+Where :
+* **`object1`** and **`object2`** are the reference to compare
+
+#### Compare two `int`
+
+Those opcodes jump to label depends on comparison of two `int` 
+
+Stack effect :
+
+````ASM
+..., int1, int2 -> ...
+````
+
+Where :
+* **`int1`** and **`int2`** are the int to compare
+
+````
+     +-----------------------+----------------------+
+     |        Opcode         |    Jump condition    |
+     +-----------------------+----------------------+
+     | IF_ICMPEQ <labelName> | Jump if int1 == int2 |
+     | IF_ICMPNE <labelName> | Jump if int1 != int2 |
+     | IF_ICMPGE <labelName> | Jump if int1 >= int2 |
+     | IF_ICMPGT <labelName> | Jump if int1 > int2  |
+     | IF_ICMPLE <labelName> | Jump if int1 <= int2 |
+     | IF_ICMPLT <labelName> | Jump if int1 < int2  |
+     +-----------------------+----------------------+
+````
+
+Where:
+* **`labelName`** : label to jump.
+
+Example:
+
+````ASM
+//Minium of two number
+ method min
+  parameter int first
+  parameter int second
+  return int
+{
+   ILOAD fisrt             ; Push first                : [] => [first(int)]
+   ILOAD second            ; Push second               : [first(int)] => [first(int), second(int)]
+   IF_ICMPGT minimumSecond ; Jump if first>second      : [first(int), second(int)] => []
+   
+                           ; Reach if first <= second
+   ILOAD first             ; Push first                : [] => [first(int)]
+   IRETURN                 ; Return first              : [first(int)] => []
+
+   LABEL minimumSecond     ; Reach if first > second
+   ILOAD second            ; Push second               : [] => [second(int)]
+   IRETURN                 ; Return second             : [second(int)] => []
+}
+````
+
+#### Comparison opcodes
+
+Those opcodes don't do any jump. 
+
+They just compare two double, two float or two long.
+And write comparison result as a `int`
+
+Stack effect :
+
+````
+..., first, second -> ..., comparison
+````
+
+````
+     +-----------------+---------------------+
+     |    Condition    | int write in statck |
+     +-----------------+---------------------+
+     | first < second  |         -1          |
+     | first == second |          0          |
+     | first > second  |          1          |
+     +-----------------+---------------------+
+````
+
+Opcodes:
+
+````
+     +--------+---------------------------------+---------------------------------------+
+     | Opcode |          Stack effect           |                Details                |
+     +--------+---------------------------------+---------------------------------------+
+     | DCMPG  | ..., double, double -> ..., int | If one of number is NaN, 1 is pushed  |
+     | DCMPL  | ..., double, double -> ..., int | If one of number is NaN, -1 is pushed |
+     | FCMPG  |  ..., float, float -> ..., int  | If one of number is NaN, 1 is pushed  |
+     | FCMPL  |  ..., float, float -> ..., int  | If one of number is NaN, -1 is pushed |
+     |  LCMP  |   ..., long, long -> ..., int   |                                       |
+     +--------+---------------------------------+---------------------------------------+
+````
+
+Example:
+
+````ASM
+//Minium of two number
+ method min
+  parameter double first
+  parameter double second
+  return double
+{
+   DLOAD fisrt             ; Push first                : [] => [first(double)]
+   DLOAD second            ; Push second               : [first(double)] => [first(double), second(double)]
+   DCMPG                   ; Compare first, second     : [first(double), second(double)] => [int]
+   IFGT minimumSecond      ; Jump if > 0               : [int] => []
+   
+                           ; Reach if first <= second
+   DLOAD first             ; Push first                : [] => [first(double)]
+   DRETURN                 ; Return first              : [first(double)] => []
+
+   LABEL minimumSecond     ; Reach if first > second
+   DLOAD second            ; Push second               : [] => [second(double)]
+   DRETURN                 ; Return second             : [second(double)] => []
+}
+```` 
+
+#### Switch instruction
+
+Opcode **`SWITCH`** choose the label to jump depends a int value.
+
+````ASM
+SWITCH [<key> <label>]* <default>
+````
+
+Where:
+
+* **`key`** : Constant int. If the read int is equals to this constant, jump to following **`label`**
+* **`label`** : Label to jump if read int equals to ahead **`key`**
+* **`default`** : Default label to jump if no **`key`*** match
+
+All keys must have a different value.
+
+**`default`** label is mandatory.
+
+Stack effect:
+
+````
+..., int -> ...
+````
+
+Where :
+
+* **`int`** : The value to compare to keys
+
+Example:
+
+````ASM
+// ......                                   :  [...] => [..., int] 
+SWITCH 0 zero 1 one 5 five default ; Switch : [..., int] => [...]
+//...
+LABEL zero                         ; Reach here if tested int was 0
+//...
+LABEL one                          ; Reach here if tested int was 1
+//...
+LABEL five                         ; Reach here if tested int was 5
+//...
+LABEL default                      ; Reach here if tested int wasn't 0, 1 nor 5
+//...
+````
+
+#### Subroutines
+
+Its a couple of opcodes : **`JSR`** and **`RET`**
+
+**`JSR`** : Write in stack a return address and jump to given label. 
+At this label starts the subroutine
+
+**`RET`** : Exit from subroutine. 
+Read return address from local variable and jump just after the **`JSR`** that enter in subroutine.
+
+The address write by **`JSR`** should be store in an `Object` local variable when  subroutine starts.
+
+The local variable should not changed in subroutine, because have to use it for exit subroutine with **`RET`**
+
+````ASM
+JSR <label>
+// ...
+LABEL <label>
+VAR Object <addressToReturn>
+ASTORE <addressToReturn>
+// ....
+RET <addressToReturn> 
+````
+
+Where :
+
+* **`label`** : Label to jump
+* **`addressToReturn`** : Local variable name where address is stored.
+
+Example:
+
+````ASM
+class jhelp.example.Printer
+
+import java.io.PrintStream
+
+field_reference System PrintStream out systemOut
+ 
+method print
+{
+   PUSH "Test 1"       ; Push "Test 1"                        : [] => ["Test 1"(String)]
+   JSR subroutinePrint ; Execute subroutine 'subroutinePrint' : ["Test 1"(String)] => []
+
+   PUSH "Test 2"       ; Push "Test 2"                        : [] => ["Test 2"(String)]
+   JSR subroutinePrint ; Execute subroutine 'subroutinePrint' : ["Test 2"(String)] => []
+
+   PUSH "Test 3"       ; Push "Test 3"                        : [] => ["Test 3"(String)]
+   JSR subroutinePrint ; Execute subroutine 'subroutinePrint' : ["Test 3"(String)] => []
+   
+   RETURN
+
+   // The subroutine print text on console
+   // Effect on stack : [..., String] => [...]
+   LABEL subroutinePrint
+   VAR Object addressToReturn                
+   ASTORE addressToReturn                     ; Save adress                : [..., String, address] => [..., String] 
+   GETSTATIC systemOut                        ; get System.out             : [..., String] => [..., String, systemOut(PrintStream)]
+   SWAP                                       ; Exchange                   : [..., String, systemOut(PrintStream)] => [..., systemOut(PrintStream), String] 
+   INVOKEVIRTUAL PrintStream.println(String)  ; System.out.println(String) : [..., systemOut(PrintStream), String] => [...]
+   RET addressToReturn                        ; Return to calling address  : [...] => [...]
+}
+````
+
+### Call methods
+
+I.6.j)
