@@ -907,4 +907,603 @@ method print
 
 ### Call methods
 
-I.6.j)
+See [Method declaration](../grammar/Methods.md)
+
+For call a method, depends on method nature, have too choose between opcodes:
+* **`INVOKEINTERFACE <methodDescription>`** : For abstract method.
+* **`INVOKESPECIAL <methodDescription>`** : For private, parent method (**super** in Java or Kotlin) or invoke constructor 
+* **`INVOKESTATIC <methodDescription>`** : For static method
+* **`INVOKEVIRTUAL <methodDescription>`** : For other methods
+
+Where:
+* **`methodDescription`** : Describe the method to call. Format use is : 
+  `<className>.<methodName>(<parameterTypeComaSeparated>*)<returnType>?`
+
+Examples of method description :
+````
+ PrintStream.println(String) 
+ List.add(Object):boolean
+ Math.max(double, double):double
+````
+
+Stack effect:
+````
++-----------------+----------------------------------+------------------------------------------+
+|     Opcode      |           Void methods           |              Other methods               |
++-----------------+----------------------------------+------------------------------------------+
+| INVOKEINTERFACE | ..., object, [parameter]* -> ... | ..., object, [parameter]* -> ..., result |
+|  INVOKESPECIAL  | ..., object, [parameter]* -> ... | ..., object, [parameter]* -> ..., result |
+|  INVOKESTATIC   |     ..., [parameter]* -> ...     |     ..., [parameter]* -> ..., result     |
+|  INVOKEVIRTUAL  | ..., object, [parameter]* -> ... | ..., object, [parameter]* -> ..., result |
++-----------------+----------------------------------+------------------------------------------+
+````
+
+Where:
+* **`object`** : Object instance where call the method
+* **`parameter`** : Parameter give to the method
+* **`result`** : Method result
+
+#### Opcode `INVOKEINTERFACE`
+
+Call an abstract method. By example, if we have the two files:
+
+````ASM
+interface test.Operation
+
+method doOperation
+   parameter int first
+   parameter int second
+   return int
+abstract   
+````
+
+````ASM
+class test.Add
+
+implements Operation
+
+method doOperation
+   parameter int first
+   parameter int second
+   return int
+{
+   ILOAD first  ; []       -> int
+   ILOAD second ; int      -> int, int
+   IADD         ; int, int -> int
+   IRETURN      ; int      -> []
+}
+````
+
+And in a method :
+
+````ASM
+// ...                                              ; ...                -> ..., Add, int, int
+INVOKEINTERFACE Operation.doOperation(int, int):int ; ..., Add, int, int -> ..., int
+```` 
+
+Here we call an abstract method, on instance of `Add`. 
+
+The instance given can be from any class that implements the interface. 
+
+#### Opcode `INVOKESPECIAL`
+
+Call class private method, a parent method (**super**) or invoke constructor
+
+Example :
+
+````ASM
+class test.MyView
+
+import javax.swing.JComponent
+import java.awt.Graphics
+
+method <init>
+{
+   ALOAD this                        ; []   -> this
+   INVOKESPECIAL JComponent.<init>() ; this -> []
+   // ...
+   RETURN
+}
+
+
+method internalComputing private
+{
+   // ....
+   RETURN
+}
+
+method paintComponent
+   parameter Graphics graphics
+{
+   // ...
+   ALOAD this                                        ; ...                 -> ..., this
+   ALOAD graphics                                    ; ..., this           -> ..., this, Graphics
+   INVOKESPECIAL JComponent.paintComponent(Graphics) ; ..., this, Graphics -> ... 
+   // ...
+   ALOAD this                                        ; ...                 -> ..., this
+   INVOKESPECIAL MyView.internalComputing()          ; ..., this           -> ...    
+   // ...
+   RETURN
+}
+````
+
+#### Opcode `INVOKESTATIC` 
+
+For static methods.
+
+````ASM
+class jhelp.example.Maximum
+
+method maximum
+   parameter float first
+   parameter float second
+   return float
+{
+   FLOAD first                               ; Push first      : [] => [first(float)] 
+   FLOAD second                              ; Push second     : [first(float)] => [first(float), second(float)]
+   INVOKESTATIC Math.max(float, float):float ; Invoke Math.max : [first(float), second(float)] => [float] 
+   FRETURN                                   ; Return result   : [float] => []
+}
+````
+
+#### Opcode `INVOKEVIRTUAL` 
+
+For all other calls.
+
+````ASM
+class jhelp.example.HelloWorld
+
+import java.io.PrintStream
+
+field_reference System PrintStream out systemOut ; Reference to System.out
+
+method helloWorld
+{
+   GETSTATIC systemOut                       ; Get System.out   : [] => [out(PrintStream)]
+   PUSH "Hello world !"                       ; Load constant    : [out(PrintStream)] => [out(PrintStream), String]
+   INVOKEVIRTUAL PrintStream.println(String) ; Call out.println : [out(PrintStream), String] => []
+   RETURN                                    ; The end !        : [] => []
+}
+````
+
+### Create object instance
+
+For create a new object instance , two steps are necessary:
+1. Reserve memory for the object instance. 
+   With **`NEW`** opcode.
+   The object have no value, not even `null`
+1. Initialize the object with a constructor and use **`INVOKESPECIAL`** opcode.
+
+See [constructors](../grammar/Constructors.md)
+
+````ASM
+class jhelp.example.CreateObject
+
+import java.util.ArrayList
+
+method collect
+   return ArrayList
+{
+   VAR ArrayList list                          ; list declaration
+   NEW ArrayList                               ; Create reference on Arraylist   : [] => [Arraylist]
+   ASTORE list                                 ; Store reference to list         : [Arraylist] => []
+   ALOAD list                                  ; Get reference from list         : [] => [Arraylist]
+   INVOKESPECIAL ArrayList.<init>()            ; Call the constructor by default : [Arraylist] => []
+   ALOAD list                                  ; Get reference from list         : [] => [Arraylist]
+   PUSH "Test"                                 ; Create constant                 : [Arraylist] => [Arraylist, String]
+   INVOKEVIRTUAL ArrayList.add(Object):boolean ; Call add(Object):boolean        : [Arraylist, String] => [boolean]
+   ALOAD list                                  ; Get reference from list         : [boolean] => [boolean, ArrayList]
+   ARETURN                                     ; Return object                   : [boolean, ArrayList] => []
+}
+````
+
+> Note:
+> 
+> It exists a more optimize way than to use local variable. 
+> We will explain it in opcode the manipulate the stack.
+
+### Array manipulation opcodes 
+
+Array are objects, so opcode that manipulate object can manipulate array also.
+
+#### Create array
+
+Create an array of primitive elements:
+````ASM
+NEWARRAY <primitive>
+````
+Where :
+* **`primitive`** : Primitive type: `boolean`, `char`, `byte`, `short`, `int`, `long`, `float` or `double`
+
+Stack effect:
+````
+..., size -> ..., array
+````
+Where:
+* **`size`** : Array size
+* **`array`** : Created array
+
+Example:
+````ASM
+// ...
+PUSH 42       ; ...      -> ..., int
+NEWARRAY byte ; ..., int -> ..., byte[]
+// ...
+````
+For create a `byte` array with 42 elements.
+
+Create an array of objects:
+````ASM
+ANEWARRAY <type>
+````
+Where:
+* **`type`** : Array elements type.
+
+Stack effect:
+````
+..., size -> ..., array
+````
+Where:
+* **`size`** : Array size
+* **`array`** : Created array
+
+Example:
+````ASM
+//...
+PUSH 73          ; ...      -> ..., int
+ANEWARRAY String ; ..., int -> ..., String[]
+// ...
+````
+Create a String array of 73 elements.
+
+Create a multi-dimension array:
+````ASM
+MULTIANEWARRAY <type> <number>
+````
+Where:
+* **`type`** : Array elements type. Primitive or any class/interface
+* **`number`** : Number of dimension. In 1 to 127
+
+Stack effect:
+````
+..., [size]+ -> ..., array
+````
+Where:
+* **`size`** : Size for corresponding dimension. First size for first dimension, second size for second dimension ...
+  The number of size must be the number of dimension.
+* **`array`** : Created array
+
+Example:
+````ASM
+//...
+PUSH 3                  ; Push 3              : [...] => [..., 3(int)]
+PUSH 2                  ; Push 2              : [..., 3(int)] => [..., 3(int), 2(int)]
+MULTIANEWARRAY String 2 ; Create String[3][2] : [..., 3(int), 2(int)] => [..., String[][]]
+//..
+
+// ...
+PUSH 1               ; Push 1           : [...] => [..., 1(int)]
+PUSH 4               ; Push 4           : [..., 1(int)] => [..., 1(int), 4(int)]
+MULTIANEWARRAY int 2 ; Create int[1][4] : [..., 1(int), 4(int)] => [..., int[][]]
+// ...
+````
+
+#### Read from array
+
+The opcode to use depends of array element type.
+Remember multi-dimension array can be see as array of array.
+
+````
++--------+-----------------+
+| Opcode |  Element type   |
++--------+-----------------+
+| AALOAD | Object or array |
+| BALOAD | boolean or byte |
+| CALOAD | char            |
+| SALOAD | short           |
+| IALOAD | int             |
+| LALOAD | long            |
+| FALOAD | float           |
+| DALOAD | double          |
++--------+-----------------+
+````
+
+Stack effect:
+````
+..., array, index -> ..., element 
+````
+Where:
+* **`array`** : Array where read element
+* **`index`** : Index in array
+* **`element`** : Element read from array at given index
+
+Example:
+````ASM
+// ...                    [...] => [..., array(boolean[])]
+ICONST 2 ; Push 2       : [..., array(boolean[])] => [..., array(boolean[]), 2(int)]
+BALOAD   ; Get array[2] : [..., array(boolean[]), 2(int)] => [..., int]
+// ....
+ 
+// ....                      [...] => [..., texts(String[][])]
+PUSH 1   ; Push 1          : [..., texts(String[][])] => [..., texts(String[][]), 1(int)]
+AALOAD   ; Get texts[1]    : [..., texts(String[][]), 1(int)] => [..., String[]]
+PUSH 3   ; Push 3          : [..., String[]] => [..., String[], 3]
+AALOAD   ; Get texts[1][3] : [..., String[], 3] => [..., String]
+// ...
+````
+
+#### Write to array
+
+The opcode to use depends of array element type.
+
+````
++---------+-----------------+
+| Opcode  |  Element type   |
++---------+-----------------+
+| AASTORE | Object or array |
+| BASTORE | boolean or byte |
+| CASTORE | char            |
+| SASTORE | short           |
+| IASTORE | int             |
+| LASTORE | long            |
+| FASTORE | float           |
+| DASTORE | double          |
++---------+-----------------+
+````
+
+Stack effect:
+````
+..., array, index, element -> ... 
+````
+Where:
+* **`array`** : Array where write element
+* **`index`** : Index in array
+* **`element`** : Element to write to array at given index
+
+Example:
+````ASM
+// ...                 [...] => [..., array(float[])]
+PUSH 2  ; Push 2     : [..., array(float[])] => [..., array(float[]), 2(int)]
+PUSH 1  ; Push 1     : [..., array(float[]), 2(int)] => [..., array(float[]), 2(int), 1(float)]
+FASTORE ; array[2]=1 : [..., array(float[]), 2(int), 1(float)] => [...]
+// ...
+````
+
+#### Array size
+
+```ASM
+ARRAYLENGTH
+```
+
+Stack effect:
+````
+..., array -> ..., size
+````
+Where:
+* **`array`** : Array to get size
+* **`size`** : Array size
+
+````ASM
+// ...                       [...] => [..., array(double[])]
+ARRAYLENGTH ; array.length : [..., array(double[])] => [..., int]
+// ..
+````
+
+### Method stack manipulation opcodes
+
+Those opcodes modify the method stack by remove, add, exchange, duplicates some stack elements.
+
+The method stack can be see as a `int array`. Objects reference are unsigned int, so they take one stack array cell.
+
+The problem with that, is `long` and `double` can't be store in one cell they have to take two cells.
+
+So we will consider two type of elements:
+1. Type 1 : `boolean`, `char`, `byte`, `short`, `int`, `float` or `object reference`
+1. Type 2 : `long` or `double`
+
+**`PUSH`** opcode can be consider manipulate stack, because it add element "from nowhere".
+See [PUSH](#push-constants)
+
+Number after **first**, **second**, **third** or **fourth** indicate the element type.
+By example:
+* **second1** indicates an element of type 1
+* **first2**  indicates an element of type 2
+
+Opcodes may have several stack effect.
+
+````
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+|     Opcode      |                                          Stack effect                                           |     Information      |
++=================+=================================================================================================+======================+
+| PUSH <constant> |                                      ... -> ..., constant                                       | Push a constant      |
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+|      SWAP       |                          ..., first1, second1 -> ..., sceond1, first1                           | Exchange two type 1  |
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+|       POP       |                                       ..., first1 -> ...                                        | Remove one type 1    |
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+|      POP2       |                                   ..., first1, second1 -> ...                                   | Remove two type 1    |
+|                 |                                       ..., first2 -> ...                                        | Remove one type 2    |
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+|       DUP       |                               ..., first1 -> ..., first1, first1                                | Duplicate one type 1 |
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+|     DUP_X1      |                      ..., first1, second1 -> ..., second1, first1, second1                      | Duplicate one type 1 |
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+|     DUP_X2      |              ..., first1, second1, third1 -> ..., third1, first1, second1, third1               | Duplicate one type 1 |
+|                 |                      ..., first2, second1 -> ..., second1, first2, second1                      | Duplicate one type 1 |
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+|      DUP2       |                  ..., first1, second1 -> ..., first1, second1, first1, second1                  | Duplicate two type 1 |
+|                 |                               ..., first2 -> ..., first2, first2                                | Duplicate one type 2 |
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+|     DUP2_X1     |          ..., first1, second1, third1 -> ..., second1, third1, first1, second1, third1          | Duplicate two type 1 |
+|                 |                      ..., first1, second2 -> ..., second2, first1, second2                      | Duplicate one type 2 |
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+|                 | ..., first1, second1, third1, fourth1 -> ..., third1, fourth1, first1, second1, third1, fourth1 | Duplicate two type 1 |
+|     DUP2_X2     |              ..., first1, second1, third2 -> ..., third2, first1, second1, third2               | Duplicate one type 2 |
+|                 |          ..., first2, second1, third1 -> ..., second1, third1, first2, second1, third1          | Duplicate two type 1 |
+|                 |                      ..., first2, second2 -> ..., second2, first2, second2                      | Duplicate one type 2 |
++-----------------+-------------------------------------------------------------------------------------------------+----------------------+
+````
+
+As example, we wil use some of those opcode to optimize:
+
+````ASM
+VAR ArrayList list                          ; list declaration
+NEW ArrayList                               ; Create reference on Arraylist   : [] => [Arraylist]
+ASTORE list                                 ; Store reference to list         : [Arraylist] => []
+ALOAD list                                  ; Get reference from list         : [] => [Arraylist]
+INVOKESPECIAL ArrayList.<init>()            ; Call the constructor by default : [Arraylist] => []
+ALOAD list                                  ; Get reference from list         : [] => [Arraylist]
+PUSH "Test"                                 ; Create constant                 : [Arraylist] => [Arraylist, String]
+INVOKEVIRTUAL ArrayList.add(Object):boolean ; Call add(Object):boolean        : [Arraylist, String] => [boolean]
+ALOAD list                                  ; Get reference from list         : [boolean] => [boolean, ArrayList]
+ARETURN                                     ; Return object                   : [boolean, ArrayList] => []
+````
+
+The code can be cut in 3 step :
+1. Create an ArrayList instance
+1. Add `"Test"` in the created list
+1. Return the list
+
+The aim is to remove the usage of local variable `list`
+
+Step 1 :  Create an ArrayList instance
+````ASM
+NEW ArrayList                    ; ...            -> ..., ArrayList
+INVOKESPECIAL ArrayList.<init>() ; ..., ArrayList -> ...
+````
+In global, no stack effect
+
+Step 2 : Add `"Test"`
+````ASM
+PUSH ""Test"                                ; ..., ArrayList         -> ..., ArrayList, String
+INVOKEVIRTUAL ArrayList.add(Object):boolean ; ..., ArrayList, String -> ..., boolean
+````
+In global, stack effect is :
+````
+..., ArrayList -> ..., boolean
+````
+
+So step 2 need that step 1 let the array list instance in stack.
+
+Actually step 1 let nothing in stack, so we have to add a method stack opcode to have the instance.
+
+We have theoretically 3 place to place the opcode:
+````ASM
+// Place 1
+NEW ArrayList                    ; ...            -> ..., ArrayList
+// Place 2
+INVOKESPECIAL ArrayList.<init>() ; ..., ArrayList -> ...
+// Place 3
+````
+In place 1, the ArrayList reference not exists, so its impossible to do something here
+
+In place 3, it is too late, the instance is consumed by `INVOKEVIRTUAL`.
+
+So let the place 2. At this place we have in stck the ArrayList reference, and we know that following `INVOKEVIRTUAL` will consume one instance.
+
+So if we duplicates the reference, we will have the reference two times, one consume by following instruction. 
+So it will let the instance we need.
+
+Step 1 becomes:
+````ASM
+NEW ArrayList                    ; ...                       -> ..., ArrayList
+DUP                              ; ..., ArrayList            -> ..., ArrayList, ArrayList
+INVOKESPECIAL ArrayList.<init>() ; ..., ArrayList, ArrayList -> ..., ArrayList
+````
+
+Step 1 and 2 together :
+````ASM
+NEW ArrayList                               ; ...                       -> ..., ArrayList
+DUP                                         ; ..., ArrayList            -> ..., ArrayList, ArrayList
+INVOKESPECIAL ArrayList.<init>()            ; ..., ArrayList, ArrayList -> ..., ArrayList
+PUSH ""Test"                                ; ..., ArrayList            -> ..., ArrayList, String
+INVOKEVIRTUAL ArrayList.add(Object):boolean ; ..., ArrayList, String    -> ..., boolean
+````
+
+Step 3 :  Return the list
+````ASM
+ARETURN ; ..., ArrayList -> []
+````
+
+So Step 1,2 have to let ArrayList instance in end of stack.
+So we use **`DUP`** again:
+````ASM
+NEW ArrayList                               ; ...                               -> ..., ArrayList
+DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
+INVOKESPECIAL ArrayList.<init>()            ; ..., ArrayList, ArrayList         -> ..., ArrayList
+DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
+PUSH ""Test"                                ; ..., ArrayList, ArrayList         -> ..., ArrayList, ArrayList, String
+INVOKEVIRTUAL ArrayList.add(Object):boolean ; ..., ArrayList, ArrayList, String -> ..., ArrayList, boolean
+````
+> Exercise, find an other place where put the second `DUP`
+
+We don't care about the last `boolean`, so we remove it:
+````ASM
+NEW ArrayList                               ; ...                               -> ..., ArrayList
+DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
+INVOKESPECIAL ArrayList.<init>()            ; ..., ArrayList, ArrayList         -> ..., ArrayList
+DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
+PUSH ""Test"                                ; ..., ArrayList, ArrayList         -> ..., ArrayList, ArrayList, String
+INVOKEVIRTUAL ArrayList.add(Object):boolean ; ..., ArrayList, ArrayList, String -> ..., ArrayList, boolean
+POP                                         ; ..., ArrayList, boolean           -> ..., ArrayList
+````
+
+Final code :
+````ASM
+NEW ArrayList                               ; ...                               -> ..., ArrayList
+DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
+INVOKESPECIAL ArrayList.<init>()            ; ..., ArrayList, ArrayList         -> ..., ArrayList
+DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
+PUSH ""Test"                                ; ..., ArrayList, ArrayList         -> ..., ArrayList, ArrayList, String
+INVOKEVIRTUAL ArrayList.add(Object):boolean ; ..., ArrayList, ArrayList, String -> ..., ArrayList, boolean
+POP                                         ; ..., ArrayList, boolean           -> ..., ArrayList
+ARETURN                                     ; ..., ArrayList                    -> []
+````
+
+### Object cast/instance of
+
+For test if an object is instance of a class/interface :
+````ASM
+INSTANCEOF <className>
+````
+Where:
+* **`className`** : Class to test
+
+Stack effect:
+````
+..., object -> ..., result
+````
+Where:
+* **`object`** : Object to test
+* **`result`** : Instance of result :
+  * 0 : **`object`** not instance of **`className`**
+  * 1 : **`object`** instance of **`className`**
+
+To cast an object to a class :
+````ASM
+CHECKCAST <className>
+````
+Where:
+* **`className`** : Class to cast in
+
+Stack effect:
+````
+..., object -> ..., casted
+````
+Where:
+* **`object`** : Object to test
+* **`casted`** : Casted object
+
+Example:
+````ASM
+// ...                               [...] => [..., Object]
+DUP               ; duplicate      : [..., Object] => [..., Object, Object]
+INSTANCEOF String ; Is String ?    : [..., Object, Object] => [..., Object, int]
+IFEQ notString    ; IF == 0 jump   : [..., Object, int] => [..., Object]
+CHECKCAST String  ; Cast to String : [..., Object] => [..., String]
+// ...
+````
+
+### Exceptions
+
+throws/ATHROW | TRY/CATCH 

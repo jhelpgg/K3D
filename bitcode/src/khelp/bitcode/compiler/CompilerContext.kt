@@ -159,12 +159,11 @@ class CompilerContext
      *
      * @param typeName Array base element type
      * @param dimensions Number of dimensions
-     * @param lineNumber Line number in code
      * @return Created reference
      * @throws CompilerException On issue while creation
      */
     @Throws(CompilerException::class)
-    fun addArrayReference(typeName: String, dimensions: Int, lineNumber: Int): Int
+    fun addArrayReference(typeName: String, dimensions: Int): Int
     {
         val type = this.stringToType(typeName)
         val arrayType = ArrayType(type, dimensions)
@@ -1251,8 +1250,7 @@ class CompilerContext
             return tryCatchInformation
         }
 
-        if (tryCatchInformation.startLine !== startLineNumber || !tryCatchInformation.exceptionType.equals(
-                        exceptionType))
+        if (tryCatchInformation.startLine != startLineNumber || tryCatchInformation.exceptionType != exceptionType)
         {
             throw CompilerException(startLineNumber,
                                     exceptionName + " already defined for line=" + tryCatchInformation.startLine + " and "

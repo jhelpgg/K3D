@@ -820,7 +820,7 @@ class CodeLine(val instruction: String, private val parameters: List<String>, va
                 {
                     val dimensions = parameter2.toShort()
                     com.sun.org.apache.bcel.internal.generic.MULTIANEWARRAY(
-                            compilerContext.addArrayReference(parameter1, dimensions.toInt(), this.lineNumber),
+                            compilerContext.addArrayReference(parameter1, dimensions.toInt()),
                             dimensions)
                 }
                 catch (exception: Exception)
