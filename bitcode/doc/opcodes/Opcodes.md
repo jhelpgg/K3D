@@ -1375,7 +1375,7 @@ In global, no stack effect
 
 Step 2 : Add `"Test"`
 ````ASM
-PUSH ""Test"                                ; ..., ArrayList         -> ..., ArrayList, String
+PUSH "Test"                                ; ..., ArrayList         -> ..., ArrayList, String
 INVOKEVIRTUAL ArrayList.add(Object):boolean ; ..., ArrayList, String -> ..., boolean
 ````
 In global, stack effect is :
@@ -1416,7 +1416,7 @@ Step 1 and 2 together :
 NEW ArrayList                               ; ...                       -> ..., ArrayList
 DUP                                         ; ..., ArrayList            -> ..., ArrayList, ArrayList
 INVOKESPECIAL ArrayList.<init>()            ; ..., ArrayList, ArrayList -> ..., ArrayList
-PUSH ""Test"                                ; ..., ArrayList            -> ..., ArrayList, String
+PUSH "Test"                                ; ..., ArrayList            -> ..., ArrayList, String
 INVOKEVIRTUAL ArrayList.add(Object):boolean ; ..., ArrayList, String    -> ..., boolean
 ````
 
@@ -1432,7 +1432,7 @@ NEW ArrayList                               ; ...                               
 DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
 INVOKESPECIAL ArrayList.<init>()            ; ..., ArrayList, ArrayList         -> ..., ArrayList
 DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
-PUSH ""Test"                                ; ..., ArrayList, ArrayList         -> ..., ArrayList, ArrayList, String
+PUSH "Test"                                ; ..., ArrayList, ArrayList         -> ..., ArrayList, ArrayList, String
 INVOKEVIRTUAL ArrayList.add(Object):boolean ; ..., ArrayList, ArrayList, String -> ..., ArrayList, boolean
 ````
 > Exercise, find an other place where put the second `DUP`
@@ -1443,7 +1443,7 @@ NEW ArrayList                               ; ...                               
 DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
 INVOKESPECIAL ArrayList.<init>()            ; ..., ArrayList, ArrayList         -> ..., ArrayList
 DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
-PUSH ""Test"                                ; ..., ArrayList, ArrayList         -> ..., ArrayList, ArrayList, String
+PUSH "Test"                                ; ..., ArrayList, ArrayList         -> ..., ArrayList, ArrayList, String
 INVOKEVIRTUAL ArrayList.add(Object):boolean ; ..., ArrayList, ArrayList, String -> ..., ArrayList, boolean
 POP                                         ; ..., ArrayList, boolean           -> ..., ArrayList
 ````
@@ -1454,7 +1454,7 @@ NEW ArrayList                               ; ...                               
 DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
 INVOKESPECIAL ArrayList.<init>()            ; ..., ArrayList, ArrayList         -> ..., ArrayList
 DUP                                         ; ..., ArrayList                    -> ..., ArrayList, ArrayList
-PUSH ""Test"                                ; ..., ArrayList, ArrayList         -> ..., ArrayList, ArrayList, String
+PUSH "Test"                                ; ..., ArrayList, ArrayList         -> ..., ArrayList, ArrayList, String
 INVOKEVIRTUAL ArrayList.add(Object):boolean ; ..., ArrayList, ArrayList, String -> ..., ArrayList, boolean
 POP                                         ; ..., ArrayList, boolean           -> ..., ArrayList
 ARETURN                                     ; ..., ArrayList                    -> []
