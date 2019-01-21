@@ -1,4 +1,38 @@
 # Opcodes
+1. [Method stack](#method-stack)
+1. [Opcodes](#opcodes)
+   1. [Local variables](#local-variables)
+      1. [Load value](#load-value)
+      1. [Store value](#store-value)
+   1. [Return opcodes](#return-opcodes)
+   1. [Computing opcodes](#computing-opcodes)
+   1. [Conversion opcodes](#conversion-opcodes)
+   1. [Push constant](#push-constants)
+   1. [Increment opcode](#increment-opcode)
+   1. [Jump opcodes](#jump-opcodes)
+      1. [Always jump](#always-jump)
+      1. [Compare to 'null'](#compare-to-`null`)
+      1. [Compare to '0'](#compare-to-`0`)
+      1. [Compare two objects](#compare-two-objects)
+      1. [Compare two 'int'](#compare-two-`int`)
+      1. [Comparison opcodes](#comparison-opcodes)
+      1. [Switch instruction](#switch-instruction)
+      1. [Subroutines](#subroutines)
+   1. [Call methods](#call-methods)
+      1. [Opcode 'INVOKEINTERFACE'](#opcode-`invokeinterface`)
+      1. [Opcode 'INVOKESPECIAL'](#opcode-`invokespecial`)
+      1. [Opcode 'INVOKESTATIC'](#opcode-`invokestatic`)
+      1. [Opcode 'INVOKEVIRTUAL'](#opcode-`invokevirtual`)
+   1. [Create object instance](#create-object-instance)
+   1. [Array manipulation opcodes](#array-manipulation-opcodes)
+      1. [Create array](#create-array)
+      1. [Read from array](#read-from-array)
+      1. [Write to array](#write-to-array)
+      1. [Array size](#array-size)
+   1. [Method stack manipulation opcodes](#method-stack-manipulation-opcodes)
+   1. [Objects cast/instance of](#object-cast/instance-of)
+   1. [Exceptions](#exceptions)
+      
 
 Opcodes are instructions in method body.
 They describe to method "job".
@@ -126,7 +160,7 @@ method test
 
 For fields see : [fields operations](FieldOperations.md)
 
-### Store value
+#### Store value
 
 Those opcodes read value or object reference from stack and write them to variable.
 
@@ -204,7 +238,7 @@ Every method (even `void` ones) must exit with a return instruction.
 Import never forget return opcode. 
 If method exit without one of return opcode : crash, generally strange method not found, will happen.
 
-##### Computing opcodes 
+### Computing opcodes 
 
 Here we talk about for operation like addition, subtraction, ...
 
@@ -628,11 +662,11 @@ Where:
 * **`labelName`** : label to jump.
 
 ````ASM
-..., object -> ...
+..., value -> ...
 ````
 
 Where:
-* **`object`** : Object instance to compare to null
+* **`value`** : Value to compare to 0
 
 Example :
 
@@ -1506,4 +1540,106 @@ CHECKCAST String  ; Cast to String : [..., Object] => [..., String]
 
 ### Exceptions
 
-throws/ATHROW | TRY/CATCH 
+When a method may throw one or several exceptions, we use the instruction `throws` in method declaration.
+
+To effectively throw an excecption in method code:
+````ASM
+ATHROW
+````
+
+Stack effect:
+````
+..., exception -> exception [EXIT]
+````
+Where:
+* **`exception`** : Exception instance to throw
+
+Example:
+````ASM
+// If 'text' is 'null', throw NullPointerException
+// If 'text' is empty, throw IllegalArgumentException
+method doSomething
+  parameter String text
+  throws NullPointerException
+  throws IllegalArgumentException
+{
+  ALOAD text                                            ; [] -> String       
+  DUP                                                   ; String -> String, String
+  IFNONNULL notNull                                     ; String, String -> String
+  
+  NEW NullPointerException                              ; String -> String, NullPointerException 
+  DUP                                                   ; String, NullPointerException -> String, NullPointerException, NullPointerException 
+  PUSH "'text' musn't be null !"                        ; String, NullPointerException, NullPointerException -> String, NullPointerException, NullPointerException, String
+  INVOKESPECIAL NullPointerException.<init>(String)     ; String, NullPointerException, NullPointerException, String -> String, NullPointerException
+  ATHROW                                                ; String, NullPointerException -> [NullPointerException]
+  
+LABEL notNull                                           ; String
+  DUP                                                   ; String -> String, String
+  INVOKEVIRTUAL String.length()                         ; String, String -> String, int
+  IFNE notEmpty                                         ; String, int -> String
+  
+  NEW IllegalArgumentException                          ; String -> String, IllegalArgumentException
+  DUP                                                   ; String, IllegalArgumentException -> String, IllegalArgumentException, IllegalArgumentException
+  PUSH "'text' musn't be empty !"                       ; String, IllegalArgumentException, IllegalArgumentException -> String, IllegalArgumentException, IllegalArgumentException, String
+  INVOKESPECIAL IllegalArgumentException.<init>(String) ; String, IllegalArgumentException, IllegalArgumentException, String -> String, IllegalArgumentException 
+  ATHROW                                                ; String, IllegalArgumentException -> [IllegalArgumentException]
+  
+LABEL notEmpty                                          ; String
+
+// .... Do something with the text
+
+  RETURN
+}
+````
+
+To catch exception inside method, use the pair **`TRY`**, **`CATCH`**
+
+Start the block of capture instructions where exception may throw:
+````ASM
+TRY <exceptionClassName> <exceptionName>
+````
+Where :
+* **`exceptionClassName`** : Exception class to capture
+* **`exceptionName`** : Given name to exception (Need for corresponding **`CATCH`**)
+
+No stack effect
+
+To close the block of instructions:
+````ASM
+CATCH <exceptionName> <label>
+````
+Where :
+* **`exceptionName`** : Exception name. Same name given to corresponding **`TRY`**
+* **`label`** : Label to go if exception happen
+
+No direct stack effect. But if exception happen, the exception is put on the stack and do the jump.
+So at `label`, stack will end with exception instance.
+
+It is possible to capture several exception for same block. 
+The most precise should be the first, to to most generic.
+
+Example:
+````ASM
+method calculate open
+	parameter	int	first
+	parameter	int	second
+	return		int
+{												; []
+	ILOAD first									; []						->	[first]
+	ILOAD second								; [first]		    		->	[first, second]
+	TRY ArithmeticException arithmeticException
+		TRY Exception exception
+			IDIV 								; [first, second]			->	[first/second]
+			IRETURN								; [first/second]			->	[] EXIT
+		CATCH exception issue
+	CATCH arithmeticException arithmetic
+
+LABEL issue										; [Exception]
+	PUSH -1										; [Exception]				->	[Exception, -1]
+	IRETURN										; [Exception, -1]			->	[] EXIT
+
+LABEL arithmetic								; [ArithmeticException]
+	PUSH -2										; [ArithmeticException]     ->  [ArithmeticException, -2]
+	IRETURN										; [ArithmeticException, -2] ->  [] EXIT
+}
+````

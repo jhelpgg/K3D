@@ -96,3 +96,5 @@ In terminal got to in the directory where `khelp` lies and type :
 java khelp.asm.HelloWorld
 ````
 Like any classic `class` file
+
+[Menu](Menu.md)
