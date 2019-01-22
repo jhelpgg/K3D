@@ -1,4 +1,8 @@
 # Field operations
+1. [GETFIELD](#getfield)
+1. [GETSTATIC](#getstatic)
+1. [PUTFIELD](#putfield)
+1. [PUTSTATIC](#putstatic)
 
 To manipulate fields, it is necessary they exists.
 
@@ -167,3 +171,5 @@ method test
    RETURN
 }
 ````
+
+[Menu](../Menu.md#menu)

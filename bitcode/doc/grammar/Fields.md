@@ -52,3 +52,5 @@ To get/set a field value, use the opcode (depend if field is static or not):
      +-----+------------+-----------+
 
 See [Fields operations](../opcodes/FieldOperations.md) for more details.
+
+[Menu](../Menu.md#menu)

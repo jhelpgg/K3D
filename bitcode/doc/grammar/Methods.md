@@ -1,4 +1,12 @@
 # Methods
+1. [Method declaration](#method-declaration)
+1. [Method parameters](#method-parameters)
+1. [Method return value](#method-return-value)
+1. [Method throw exception](#method-throw-exception)
+1. [Method body](#method-body)
+1. [Abstract rule](#abstract-rule)
+1. [Body constraint](#body-constraint)
+1. [Declaration examples](#declaration-examples)
 
 ### Method declaration
 
@@ -166,3 +174,5 @@ method internalComputing private
     RETURN
 }
 ````
+
+[Menu](../Menu.md#menu)

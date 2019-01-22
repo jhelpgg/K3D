@@ -35,3 +35,5 @@ To change the value of a field, opcodes instruction : `PUTSTATIC` and `PUTFIELD`
 They are also used for get internal fields. 
 
 See [Fields operations](../opcodes/FieldOperations.md) for more details.
+
+[Menu](../Menu.md#menu)

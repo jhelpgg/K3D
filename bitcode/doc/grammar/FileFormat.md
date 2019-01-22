@@ -1,4 +1,12 @@
 # Bytecode file format
+1. [Class declaration](#class-declaration)
+1. [Imports](#imports)
+1. [Extends an other class](#extends-an-other-class)
+1. [Implements](#implements)
+1. [Fields reference](#fields-reference)
+1. [Filed declaration](#filed-declaration)
+1. [Methods](#methods)
+1. [Complete Grammar](#complete-grammar)
 
 A file represents one and only one class, interface or abstract class.
 
@@ -306,3 +314,5 @@ Name := [a-zA-Z][a-zA-Z0-9_]*
 ````
 
 See [Opcodes instruction](../opcodes/Opcodes.md)
+
+[Menu](../Menu.md#menu)
