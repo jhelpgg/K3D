@@ -194,10 +194,10 @@ Methods:
 * Must be abstract in interface
 
 To override the default constructor or use one with parameters, use the special name "`<init>`" (< and > are inside the name).
-There some specific rule for the constructors code (No abstract constructor by example), see [Constructors](Constructors.md)
+There some specific rule for the constructors code (No abstract constructor by example), see [Constructors](Constructors.md#constructors)
 
 It is possible to define a static initializer (For initialize static fields by example).
-The method is named `<clinit>` and must be public static
+The method is named `<clinit>` and must be public static, see [Static initializer](StaticInitializer.md#static-initializer)
 
 Grammar:
 ````

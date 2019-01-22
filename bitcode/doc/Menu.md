@@ -18,7 +18,7 @@
    1. [Abstract rule](grammar/Methods.md#abstract-rule)
    1. [Body constraint](grammar/Methods.md#body-constraint)
    1. [Declaration examples](grammar/Methods.md#declaration-examples)
-1 .[Static initializer](grammar/StaticInitializer.md#static-initializer)
+1. [Static initializer](grammar/StaticInitializer.md#static-initializer)
 1. [Constructors](grammar/Constructors.md#constructors)
 1. [Field reference](grammar/FieldsReference.md#field-reference)
 1. [Fields](grammar/Fields.md#fields)
