@@ -1064,7 +1064,6 @@ class CompilerContext
             {
                 throw CompilerException(lineNumber, "Invalid double !", exception)
             }
-
         }
 
         try
