@@ -844,7 +844,7 @@ Where:
 
 * **`key`** : Constant int. If the read int is equals to this constant, jump to following **`label`**
 * **`label`** : Label to jump if read int equals to ahead **`key`**
-* **`default`** : Default label to jump if no **`key`*** match
+* **`default`** : Default label to jump if no **`key`** match
 
 All keys must have a different value.
 
