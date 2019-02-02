@@ -1254,7 +1254,7 @@ Where:
 Example:
 ````ASM
 // ...                    [...] => [..., array(boolean[])]
-ICONST 2 ; Push 2       : [..., array(boolean[])] => [..., array(boolean[]), 2(int)]
+PUSH 2   ; Push 2       : [..., array(boolean[])] => [..., array(boolean[]), 2(int)]
 BALOAD   ; Get array[2] : [..., array(boolean[]), 2(int)] => [..., int]
 // ....
  
