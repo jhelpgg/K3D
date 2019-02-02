@@ -5,6 +5,9 @@
     <Text key="Open">
         Open a project
     </Text>
+    <Text key="Import">
+        Import a .class
+    </Text>
     <Text key="Save">
         Save current project
     </Text>

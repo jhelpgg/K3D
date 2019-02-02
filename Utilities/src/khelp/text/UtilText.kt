@@ -721,3 +721,42 @@ fun resolveImagesLinkInHTML(html: String): String
 
     return stringBuilder.toString()
 }
+
+fun putAntiSlash(string: String, vararg additionals: Char): String
+{
+    val stringBuilder = StringBuilder(string.length)
+    val detect = CharArray(additionals.size + 5)
+    detect[0] = '\n'
+    detect[1] = '\t'
+    detect[2] = '\r'
+    detect[3] = '\b'
+    System.arraycopy(additionals, 0, detect, 5, additionals.size)
+    var start = 0
+    var index = string.indexOfFirstCharacter(detect)
+    var char: Char
+
+    while (index >= 0)
+    {
+        stringBuilder.append(string.substring(start, index))
+        char = string[index]
+
+        when (char)
+        {
+            '\n' -> stringBuilder.append("\\n")
+            '\t' -> stringBuilder.append("\\t")
+            '\r' -> stringBuilder.append("\\r")
+            '\b' -> stringBuilder.append("\\b")
+            else ->
+            {
+                stringBuilder.append('\\');
+                stringBuilder.append(char);
+            }
+        }
+
+        start = index + 1
+        index = string.indexOfFirstCharacter(detect, start)
+    }
+
+    stringBuilder.append(string.substring(start))
+    return stringBuilder.toString()
+}

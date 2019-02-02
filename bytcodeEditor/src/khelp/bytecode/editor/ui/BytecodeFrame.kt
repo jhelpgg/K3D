@@ -3,6 +3,7 @@ package khelp.bytecode.editor.ui
 import khelp.bitcode.compiler.Compiler
 import khelp.bitcode.compiler.CompilerException
 import khelp.bitcode.compiler.StackInspectorException
+import khelp.bitcode.decompiler.decompile
 import khelp.bitcode.loader.ClassManager
 import khelp.bytecode.editor.resources.BYTECODE_RESOURCES_TEXTS
 import khelp.bytecode.editor.resources.INVALID_LINE
@@ -11,8 +12,10 @@ import khelp.debug.debug
 import khelp.debug.exception
 import khelp.debug.warning
 import khelp.io.StringInputStream
+import khelp.io.StringOutputStream
 import khelp.io.computeRelativePath
 import khelp.io.createFile
+import khelp.io.homeDirectory
 import khelp.io.obtainExternalFile
 import khelp.io.outsideDirectory
 import khelp.preference.Preferences
@@ -24,6 +27,7 @@ import khelp.ui.tabbedPane.JHelpTabbedPane
 import java.awt.BorderLayout
 import java.awt.FlowLayout
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.Stack
 import javax.swing.JButton
@@ -40,6 +44,7 @@ import javax.swing.JScrollPane
 private const val ACTION_NEW = "New"
 private const val ACTION_OPEN = "Open"
 private const val ACTION_SAVE = "Save"
+private const val ACTION_IMPORT = "Import"
 private const val ACTION_EXIT = "Exit"
 
 private const val ACTION_NEW_CLASS = "NewClass"
@@ -48,6 +53,7 @@ private const val ACTION_COMPILE = "Compile"
 private const val ACTION_LAUNCH = "Launch"
 
 private const val PREFERENCE_CURRENT_DIRECTORY = "CurrentDirectory"
+private const val PREFERENCE_LAST_CLASS_FILE = "LastClassFile"
 
 class BytecodeFrame : JFrame("Bytecode editor")
 {
@@ -59,6 +65,7 @@ class BytecodeFrame : JFrame("Bytecode editor")
     private val preferences = Preferences(obtainExternalFile("BytecodeEditor.pref"))
     private var currentDirectory: File? = null
     private val directoryChooser = JFileChooser(outsideDirectory)
+    private val classChooser = JFileChooser(homeDirectory)
 
     init
     {
@@ -80,6 +87,8 @@ class BytecodeFrame : JFrame("Bytecode editor")
 
         this.directoryChooser.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
         this.directoryChooser.isMultiSelectionEnabled = false
+        this.classChooser.fileFilter = ClassFileFilter
+        this.classChooser.isMultiSelectionEnabled = false
         this::initialize.parallel(1024)
     }
 
@@ -87,6 +96,8 @@ class BytecodeFrame : JFrame("Bytecode editor")
     {
         this.tabbedPane.removeTab(0)
         this.currentDirectory = this.preferences.getFileValue(PREFERENCE_CURRENT_DIRECTORY)
+        this.classChooser.currentDirectory = this.preferences.getFileValue(
+                PREFERENCE_LAST_CLASS_FILE)?.parentFile ?: homeDirectory
         this.loadCurrentProject()
     }
 
@@ -133,6 +144,7 @@ class BytecodeFrame : JFrame("Bytecode editor")
             ACTION_NEW       -> this.newProject()
             ACTION_OPEN      -> this.open()
             ACTION_SAVE      -> this.save()
+            ACTION_IMPORT    -> this.importClass()
             ACTION_EXIT      -> this.exit()
             ACTION_NEW_CLASS -> this.newClass()
             ACTION_COMPILE   -> this.compile()
@@ -158,6 +170,8 @@ class BytecodeFrame : JFrame("Bytecode editor")
         menuFile.add(JHelpSeparator())
         this.addItem(menuFile, ACTION_OPEN)
         this.addItem(menuFile, ACTION_SAVE)
+        menuFile.add(JHelpSeparator())
+        this.addItem(menuFile, ACTION_IMPORT)
         menuFile.add(JHelpSeparator())
         this.addItem(menuFile, ACTION_EXIT)
         return menuFile
@@ -334,6 +348,21 @@ class BytecodeFrame : JFrame("Bytecode editor")
             }
 
             debug("Save done!")
+        }
+    }
+
+    private fun importClass()
+    {
+        if (this.classChooser.showOpenDialog(this.tabbedPane) == JFileChooser.APPROVE_OPTION)
+        {
+            val file = this.classChooser.selectedFile
+            val inputStream = FileInputStream(file)
+            val outputStream = StringOutputStream()
+            val className = decompile(inputStream, outputStream, file.name)
+            val editor = BytecodeEditor()
+            editor.text = outputStream.string
+            this.tabbedPane.addTab(className, JScrollPane(editor))
+            this.preferences[PREFERENCE_LAST_CLASS_FILE] = file
         }
     }
 
