@@ -316,7 +316,7 @@ fun parseCode(className: String, constantPool: ConstantPool, localesVariablesNam
                     "TRY ${computeShortName(
                             obtainExceptionClassName(constantPool, exception.catchType))} exception_$index"))
             codeLines[catchIndex] = "CATCH exception_$index ${labelAtHandle(exception.handlerPC, handles,
-                                                                            labels)}"
+                                                                            labels)} ; ${codeLines[catchIndex]}"
             index++
         }
     }
