@@ -70,7 +70,7 @@ fun inASCII(queryResult: QueryResult): String
         separatorCharacters[index++] = '-'
         separatorCharacters[index++] = '+'
     }
-    val separator = String(separatorCharacters)
+    val separator = String(separatorCharacters, 0, index)
     val table = queryResult.tableDescription.name
     val space = (separator.length - table.length) / 2 - 1
     val left = separator.length - table.length - space - 2

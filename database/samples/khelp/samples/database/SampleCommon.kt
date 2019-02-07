@@ -45,15 +45,7 @@ fun treatDatabase(database: Database)
     val result2 = database.select(
             SelectQuery("Person",
                         arrayOf("name")) WHERE ("age" MATCH SelectQuery("Reduction", arrayOf("age"))))
-    var column = result2.next()
-
-    while (column != null)
-    {
-        debug("Person=", column.string(0))
-        column = result2.next()
-    }
-
-    result2.close()
+    debugInASCII(result2)
 
     mark("REGEX")
 

@@ -39,7 +39,6 @@ class Security(password: String)
 
     init
     {
-        loadSecurity()
         if (password.isEmpty())
         {
             this.key = ByteArray(0)

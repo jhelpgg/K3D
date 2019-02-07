@@ -93,7 +93,6 @@ class Database(private val databaseAccess: DatabaseAccess, path: File, password:
 
     init
     {
-        loadSecurity()
         this.databaseConnection.autoCommit = false
         this.internally = true
         this.createTable(PASSWORD_TABLE, Pair(PASSWORD_COLUMN_PASSWORD, DataType.TEXT))
