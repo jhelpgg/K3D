@@ -1,6 +1,5 @@
 package khelp.samples.database
 
-import khelp.database.DataType
 import khelp.database.Database
 import khelp.database.hslqdb.DatabaseAccessHSQLDB
 import khelp.io.outsideDirectory
