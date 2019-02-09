@@ -17,7 +17,7 @@ private val PATTERN_SIGNATURE = Pattern.compile("L[a-zA-Z][a-zA-Z0-9_/.]*;")
  *Remove white spaces are between parenthesis to easy allow signature type (int, char, ..):boolean with spaces/tabs
  * before/after the comma
  */
-private fun removeWhiteSpaceBetweenParenthesis(string: String): String
+fun removeWhiteSpaceBetweenParenthesis(string: String): String
 {
     val source = string.toCharArray()
     val length = source.size
@@ -131,7 +131,7 @@ private fun removeWhiteSpaceBetweenParenthesis(string: String): String
  * compile
  * several class in parallel, you have to use a different instance of compiler on each thread.
  */
-class Compiler
+class Compiler(val precompiler: Precompiler = DefaultPrecompiler)
 {
     private val compilerContext = CompilerContext()
     private var intervals: Intervals? = null
@@ -511,7 +511,9 @@ class Compiler
 
                 if (line.length > 0 && !line.startsWith("//"))
                 {
-                    this.parseLine(removeWhiteSpaceBetweenParenthesis(line), lineNumber)
+                    this.precompiler
+                            .precompile(line)
+                            .forEach { this.parseLine(removeWhiteSpaceBetweenParenthesis(it), lineNumber) }
                 }
 
                 line = bufferedReader.readLine()
