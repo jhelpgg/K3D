@@ -44,7 +44,7 @@ private const val GROUP_RETURN_TYPE = 3
  * them with at least one real opcode instruction.
  *
  * Branches instruction (GOTO, IF_*, ...) target label that can be resolved when all code is finished, thats why they are stored
- * with null target and then resolve when we know the real position of labels. Same trick is apply for "switch" instructions.
+ * with null target and then resolve when we know the real position of labels. Same trick is apply for "switch" and "try/catch" instructions.
  *
  */
 class CompilerContext

@@ -627,6 +627,30 @@ fun String.indexOfLastCharacter(charArray: CharArray, offset: Int = this.length)
 fun String.indexOfLastCharacter(characters: String, offset: Int = this.length) =
         this.indexOfLastCharacter(characters.toCharArray(), offset)
 
+fun String.indexOfFirstString(strings: Array<String>, offset: Int = 0, ignoreCase: Boolean = false): Pair<Int, String>?
+{
+    var index = -1
+    var string = ""
+
+    for (look in strings)
+    {
+        val ind = this.indexOf(look, offset, ignoreCase)
+
+        if (ind >= 0 && (index < 0 || ind < index))
+        {
+            index = ind
+            string = look
+        }
+    }
+
+    if (index >= 0)
+    {
+        return Pair(index, string)
+    }
+
+    return null
+}
+
 /**
  * Resolve image reference for class and external protocols.
  *

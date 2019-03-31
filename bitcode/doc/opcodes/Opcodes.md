@@ -35,7 +35,7 @@
       
 
 Opcodes are instructions in method body.
-They describe to method "job".
+They describe the method "job".
 
 > **Notes :**
 > 
@@ -84,7 +84,7 @@ To explains stack effect, we adopt the following notation:
 * In brown (`->`) : Separator of before opcode instruction and after it.
 * In green (`double`) : Value write by the opcode.
 
-We use special notation `[]` in right side to show stack is empty after the opcode.
+We use special notation `[]` show stack is empty.
 
 ## Opcodes
 
@@ -235,7 +235,7 @@ Every method (even `void` ones) must exit with a return instruction.
 > * **`F`** for float
 > * **`D`** for double
 
-Import never forget return opcode. 
+Important: **never forget return opcode.** 
 If method exit without one of return opcode : crash, generally strange method not found, will happen.
 
 ### Computing opcodes 
