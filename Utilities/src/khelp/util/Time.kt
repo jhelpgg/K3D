@@ -69,10 +69,7 @@ val Milliseconds.longString: String
                 append(ONE_SECOND, "second")
             }
 
-            if (printed || time >= ONE_MILLISECOND)
-            {
-                append(ONE_MILLISECOND, "millisecond")
-            }
+            append(ONE_MILLISECOND, "millisecond")
 
             stringBuilder.toString()
         }()
@@ -87,7 +84,7 @@ val Milliseconds.shortString: String
                     { reference: Milliseconds, name: String ->
                         val factor = time / reference
 
-                        if (factor > 0)
+                        if (factor > 0 || printed == 0)
                         {
                             if (printed > 0)
                             {
@@ -122,7 +119,7 @@ val Milliseconds.shortString: String
                 append(ONE_SECOND, "second")
             }
 
-            if (printed < 2 && (printed > 0 || time >= ONE_MILLISECOND))
+            if (printed < 2)
             {
                 append(ONE_MILLISECOND, "millisecond")
             }
@@ -170,7 +167,7 @@ val Milliseconds.compactString: String
                 append(ONE_SECOND, "s")
             }
 
-            if (time >= ONE_MILLISECOND)
+            if (!printed || time >= ONE_MILLISECOND)
             {
                 append(ONE_MILLISECOND, "ms")
             }

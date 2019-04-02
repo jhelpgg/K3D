@@ -16,6 +16,7 @@ class TestTime
         Assert.assertEquals("3 days, 1 hour, 42 minutes, 0 second, 0 millisecond", 4422.minutes.longString)
         Assert.assertEquals("3 days, 1 hour, 42 minutes, 0 second, 666 milliseconds",
                             (4422.minutes + 666.milliseconds).longString)
+        Assert.assertEquals("0 millisecond", 0.hours.longString)
     }
 
     @Test
@@ -28,6 +29,7 @@ class TestTime
         Assert.assertEquals("3 days, 1 hour", 73.hours.shortString)
         Assert.assertEquals("3 days, 1 hour", 4422.minutes.shortString)
         Assert.assertEquals("3 days, 1 hour", (4422.minutes + 666.milliseconds).shortString)
+        Assert.assertEquals("0 millisecond", 0.hours.shortString)
     }
 
     @Test
@@ -40,6 +42,7 @@ class TestTime
         Assert.assertEquals("3d 1h", 73.hours.compactString)
         Assert.assertEquals("3d 1h 42m", 4422.minutes.compactString)
         Assert.assertEquals("3d 1h 42m 666ms", (4422.minutes + 666.milliseconds).compactString)
+        Assert.assertEquals("0ms", 0.hours.compactString)
     }
 
     @Test
@@ -49,5 +52,7 @@ class TestTime
         Assert.assertEquals(3.days + 1.hours + 42.minutes + 666.milliseconds, "1h 42m 3d 666ms".time)
         Assert.assertEquals(3.days + 1.hours + 42.minutes + 666.milliseconds, "4422m 666ms".time)
         Assert.assertEquals(3.days + 1.hours + 42.minutes + 666.milliseconds, "42m 3 days, 666ms + 1 Hour".time)
+        Assert.assertEquals(0.milliseconds, "0m".time)
+        Assert.assertEquals(0.milliseconds, "0".time)
     }
 }
